@@ -90,6 +90,27 @@ new class extends Component
 };
 ?>
 
+@placeholder
+    <flux:skeleton.group animate="shimmer" class="flex items-center justify-between gap-4 py-5.5">
+        <div class="flex w-1/2 items-center gap-4">
+            <flux:skeleton.line class="w-22 max-lg:hidden" />
+            <div class="w-full lg:w-1/2">
+                <flux:skeleton.line class="w-4/5" />
+                <flux:skeleton.line class="mt-1 w-1/4 lg:hidden" />
+            </div>
+        </div>
+        <div class="flex w-1/2 items-center justify-between gap-4">
+            <div class="flex w-full max-lg:justify-end lg:w-1/4">
+                <div class="w-4/5">
+                    <flux:skeleton.line />
+                    <flux:skeleton.line class="mt-1 w-1/4 lg:hidden" />
+                </div>
+            </div>
+            <flux:skeleton.line class="w-1/4" />
+        </div>
+    </flux:skeleton.group>
+@endplaceholder
+
 <div {{ $attributes->class('flex items-center justify-between gap-4 py-4') }}>
     <div class="flex w-1/2 items-center gap-4">
         <flux:text class="shrink-0 tabular-nums max-lg:hidden">{{ $transaction->display_date }}</flux:text>
