@@ -14,7 +14,7 @@ class Transaction extends Model
         'team_id',
         'created_by',
         'date',
-        'title',
+        'payee',
         'note',
         'amount',
         'category_id',

@@ -12,7 +12,7 @@ new class extends Component
 
     public string $date = '';
 
-    public string $title = '';
+    public string $payee = '';
 
     public ?string $note = null;
 
@@ -25,7 +25,7 @@ new class extends Component
     public function openEditModal()
     {
         $this->date = $this->transaction->date;
-        $this->title = $this->transaction->title;
+        $this->payee = $this->transaction->payee;
         $this->note = $this->transaction->note;
         $this->amount = $this->transaction->amount / 100;
         $this->category_id = $this->transaction->category_id;
@@ -37,14 +37,14 @@ new class extends Component
 
         $this->validate([
             'date' => ['required', 'date'],
-            'title' => ['required', 'string', 'max:255'],
+            'payee' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric'],
             'category_id' => ['nullable', 'exists:categories,id'],
         ]);
 
         $this->transaction->update([
             'date' => $this->date,
-            'title' => $this->title,
+            'payee' => $this->payee,
             'note' => $this->note,
             'amount' => (int) round($this->amount * 100),
             'category_id' => $this->category_id,
@@ -93,7 +93,7 @@ new class extends Component
 <div {{ $attributes->class('flex items-center justify-between gap-4 py-4') }}>
     <div class="flex min-w-0 flex-1 items-center gap-4">
         <flux:text class="w-24 shrink-0">{{ $transaction->date }}</flux:text>
-        <flux:text class="min-w-0 flex-1 truncate">{{ $transaction->title }}</flux:text>
+        <flux:text class="min-w-0 flex-1 truncate">{{ $transaction->payee }}</flux:text>
         <flux:text class="hidden w-48 shrink-0 truncate text-gray-500 sm:block dark:text-gray-400">
             {{ $transaction->note ?? '-' }}
         </flux:text>
@@ -121,7 +121,7 @@ new class extends Component
                     <div>
                         <flux:heading size="lg">Delete transaction?</flux:heading>
                         <flux:text class="mt-2">
-                            You're about to delete "{{ $transaction->title }}". This action cannot be reversed.
+                            You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
                         </flux:text>
                     </div>
                     <div class="flex gap-2">
@@ -154,7 +154,7 @@ new class extends Component
 
                     <flux:input wire:model="date" label="Date" type="date" required />
 
-                    <flux:input wire:model="title" label="Title" type="text" required />
+                    <flux:input wire:model="payee" label="Payee" type="text" required />
 
                     <flux:select
                         wire:model="category_id"

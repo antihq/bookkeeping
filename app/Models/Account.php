@@ -64,11 +64,11 @@ class Account extends Model
         $this->attributes['start_balance'] = (int) round($value * 100);
     }
 
-    public function addTransaction(string $date, string $title, int $amount, ?string $note = null, ?int $createdBy = null, ?int $categoryId = null): Transaction
+    public function addTransaction(string $date, string $payee, int $amount, ?string $note = null, ?int $createdBy = null, ?int $categoryId = null): Transaction
     {
         return $this->transactions()->create([
             'date' => $date,
-            'title' => $title,
+            'payee' => $payee,
             'amount' => $amount,
             'note' => $note,
             'team_id' => $this->team_id,

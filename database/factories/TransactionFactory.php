@@ -14,7 +14,7 @@ class TransactionFactory extends Factory
 
         return [
             'date' => $date->format('Y-m-d'),
-            'title' => fake()->words(3, true),
+            'payee' => fake()->words(3, true),
             'note' => fake()->boolean(70) ? fake()->sentence() : null,
             'amount' => $amount,
             'created_by' => User::factory(),

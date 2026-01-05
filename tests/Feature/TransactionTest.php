@@ -17,7 +17,7 @@ it('creates a transaction and updates account balance', function () {
 
     $account->refresh();
 
-    expect($transaction->title)->toBe('Deposit');
+    expect($transaction->payee)->toBe('Deposit');
     expect($transaction->amount)->toBe(5000);
     expect($account->balanceInDollars)->toBe(150.00);
 });

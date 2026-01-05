@@ -15,7 +15,7 @@ new class extends Component
 
     public string $transaction_date = '';
 
-    public string $transaction_title = '';
+    public string $transaction_payee = '';
 
     public ?string $transaction_note = null;
 
@@ -60,7 +60,7 @@ new class extends Component
 
         $this->validate([
             'transaction_date' => ['required', 'date'],
-            'transaction_title' => ['required', 'string', 'max:255'],
+            'transaction_payee' => ['required', 'string', 'max:255'],
             'transaction_amount' => ['required', 'numeric'],
             'transaction_category_id' => ['nullable', 'exists:categories,id'],
         ]);
@@ -69,7 +69,7 @@ new class extends Component
 
         $this->account->addTransaction(
             date: $this->transaction_date,
-            title: $this->transaction_title,
+            payee: $this->transaction_payee,
             amount: $amount,
             note: $this->transaction_note,
             createdBy: $this->user->id,
@@ -80,7 +80,7 @@ new class extends Component
 
         Flux::modals()->close();
 
-        $this->reset(['transaction_title', 'transaction_note', 'transaction_amount', 'transaction_category_id']);
+        $this->reset(['transaction_payee', 'transaction_note', 'transaction_amount', 'transaction_category_id']);
     }
 
     #[Computed]
@@ -199,7 +199,7 @@ new class extends Component
 
                         <flux:input wire:model="transaction_date" label="Date" type="date" required />
 
-                        <flux:input wire:model="transaction_title" label="Title" type="text" required />
+                        <flux:input wire:model="transaction_payee" label="Payee" type="text" required />
 
                         <flux:select
                             wire:model="transaction_category_id"

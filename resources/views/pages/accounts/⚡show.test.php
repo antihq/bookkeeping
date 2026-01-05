@@ -172,7 +172,7 @@ test('transaction can be added through livewire component', function () {
 
     Livewire::test('pages::accounts.show', ['account' => $account])
         ->set('transaction_date', now()->toDateString())
-        ->set('transaction_title', 'New Deposit')
+        ->set('transaction_payee', 'New Deposit')
         ->set('transaction_amount', 100.50)
         ->set('transaction_note', null)
         ->call('addTransaction')
@@ -181,7 +181,7 @@ test('transaction can be added through livewire component', function () {
     $account->refresh();
 
     expect($account->transactions)->toHaveCount(1);
-    expect($account->transactions->first()->title)->toBe('New Deposit');
+    expect($account->transactions->first()->payee)->toBe('New Deposit');
     expect($account->transactions->first()->amount)->toBe(10050);
     expect($account->balanceInDollars)->toBe(1100.50);
 });
@@ -200,7 +200,7 @@ test('transaction validation errors are shown', function () {
 
     Livewire::test('pages::accounts.show', ['account' => $account])
         ->set('transaction_date', 'invalid-date')
-        ->set('transaction_title', '')
+        ->set('transaction_payee', '')
         ->call('addTransaction')
-        ->assertHasErrors(['transaction_date', 'transaction_title']);
+        ->assertHasErrors(['transaction_date', 'transaction_payee']);
 });

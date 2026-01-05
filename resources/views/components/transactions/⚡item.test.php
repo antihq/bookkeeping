@@ -18,14 +18,14 @@ test('transaction can be edited with category', function () {
     Livewire::test('transactions.item', ['transaction' => $transaction])
         ->call('openEditModal')
         ->set('category_id', $category->id)
-        ->set('title', 'Updated Grocery')
+        ->set('payee', 'Updated Grocery')
         ->call('editTransaction')
         ->assertHasNoErrors();
 
     $transaction->refresh();
 
     expect($transaction->category_id)->toBe($category->id);
-    expect($transaction->title)->toBe('Updated Grocery');
+    expect($transaction->payee)->toBe('Updated Grocery');
 });
 
 test('transaction category can be changed', function () {
