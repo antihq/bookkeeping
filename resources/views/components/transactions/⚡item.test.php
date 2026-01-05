@@ -16,7 +16,6 @@ test('transaction can be edited with category', function () {
     actingAs($user);
 
     Livewire::test('transactions.item', ['transaction' => $transaction])
-        ->call('openEditModal')
         ->set('category_id', $category->id)
         ->set('payee', 'Updated Grocery')
         ->call('editTransaction')
@@ -45,7 +44,6 @@ test('transaction category can be changed', function () {
     actingAs($user);
 
     Livewire::test('transactions.item', ['transaction' => $transaction])
-        ->call('openEditModal')
         ->assertSet('category_id', $category1->id)
         ->set('category_id', $category2->id)
         ->call('editTransaction')
@@ -64,7 +62,6 @@ test('category can be created when editing transaction', function () {
     actingAs($user);
 
     Livewire::test('transactions.item', ['transaction' => $transaction])
-        ->call('openEditModal')
         ->set('category_search', 'Entertainment')
         ->call('createCategory')
         ->assertSet('category_id', Category::where('name', 'Entertainment')->first()->id)
