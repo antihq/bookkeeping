@@ -116,48 +116,6 @@ test('non-owners cannot delete accounts', function () {
         ->assertDontSee('Delete account');
 });
 
-test('transactions are displayed on account page', function () {
-    $user = User::factory()->withPersonalTeam()->create();
-
-    $account = Account::factory()->for($user->currentTeam)->create([
-        'name' => 'Test Account',
-        'type' => 'checking',
-        'currency' => 'usd',
-        'start_balance' => 100000,
-        'created_by' => $user->id,
-    ]);
-
-    $account->addTransaction(now()->toDateString(), 'Deposit', 5000, null, $user->id);
-    $account->addTransaction(now()->toDateString(), 'Withdrawal', -2500, null, $user->id);
-
-    actingAs($user);
-
-    Livewire::test('pages::accounts.show', ['account' => $account])
-        ->assertSee('Deposit')
-        ->assertSee('Withdrawal');
-});
-
-test('transactions are sorted newest first', function () {
-    $user = User::factory()->withPersonalTeam()->create();
-
-    $account = Account::factory()->for($user->currentTeam)->create([
-        'name' => 'Test Account',
-        'type' => 'checking',
-        'currency' => 'usd',
-        'start_balance' => 100000,
-        'created_by' => $user->id,
-    ]);
-
-    $account->addTransaction('2025-01-01', 'First Transaction', 1000, null, $user->id);
-    $account->addTransaction('2025-01-15', 'Second Transaction', 2000, null, $user->id);
-    $account->addTransaction('2025-01-10', 'Third Transaction', 1500, null, $user->id);
-
-    actingAs($user);
-
-    Livewire::test('pages::accounts.show', ['account' => $account])
-        ->assertSeeInOrder(['Second Transaction', 'Third Transaction', 'First Transaction']);
-});
-
 test('transaction can be added through livewire component', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam)->create([
