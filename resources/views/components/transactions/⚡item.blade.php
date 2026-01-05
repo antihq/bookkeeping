@@ -91,7 +91,7 @@ new class extends Component
 ?>
 
 @placeholder
-    <flux:skeleton.group animate="shimmer" class="flex items-center justify-between gap-4 py-5.5">
+    <flux:skeleton.group animate="shimmer" class="flex items-center justify-between gap-4 py-5.5 lg:py-6.5">
         <div class="flex w-1/2 items-center gap-4">
             <flux:skeleton.line class="w-22 max-lg:hidden" />
             <div class="w-full lg:w-1/2">
@@ -124,9 +124,16 @@ new class extends Component
 
     <div class="flex w-1/2 items-center justify-between gap-4">
         <div class="flex min-w-fit justify-end max-lg:hidden">
-            <flux:text :variant="$transaction->category ? 'strong' : null" class="text-[13px]">
-                {{ $transaction->category?->name ?? 'Uncategorized' }}
-            </flux:text>
+            <div>
+                <flux:text :variant="$transaction->category ? 'strong' : null" class="text-[13px]">
+                    {{ $transaction->category?->name ?? 'Uncategorized' }}
+                </flux:text>
+                @if ($transaction->note)
+                    <flux:text class="mt-1 text-[13px] max-lg:hidden">
+                        {{ $transaction->note }}
+                    </flux:text>
+                @endif
+            </div>
         </div>
 
         <div class="flex min-w-fit flex-1 items-center justify-end gap-4">
