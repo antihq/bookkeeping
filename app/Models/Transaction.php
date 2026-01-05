@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -54,5 +55,20 @@ class Transaction extends Model
         $prefix = $this->amount >= 0 ? '+' : '-';
 
         return "{$prefix}{$this->formatted_amount}";
+    }
+
+    public function getDisplayDateAttribute(): string
+    {
+        $date = Carbon::parse($this->date);
+
+        if ($date->isToday()) {
+            return 'Today';
+        }
+
+        if ($date->isYesterday()) {
+            return 'Yesterday';
+        }
+
+        return $date->format('d M Y');
     }
 }

@@ -91,114 +91,133 @@ new class extends Component
 ?>
 
 <div {{ $attributes->class('flex items-center justify-between gap-4 py-4') }}>
-    <div class="flex min-w-0 flex-1 items-center gap-4">
-        <flux:text class="w-24 shrink-0">{{ $transaction->date }}</flux:text>
-        <flux:text class="min-w-0 flex-1 truncate">{{ $transaction->payee }}</flux:text>
-        <flux:text class="hidden w-48 shrink-0 truncate text-gray-500 sm:block dark:text-gray-400">
-            {{ $transaction->note ?? '-' }}
-        </flux:text>
+    <div class="flex w-1/2 items-center gap-4">
+        <flux:text class="shrink-0 tabular-nums max-lg:hidden">{{ $transaction->display_date }}</flux:text>
+        <div>
+            <flux:text class="truncate" variant="strong">{{ $transaction->payee }}</flux:text>
+            <flux:text :variant="$transaction->category ? 'strong' : null" class="mt-1 text-[13px] lg:hidden">
+                {{ $transaction->category?->name ?? 'Uncategorized' }}
+            </flux:text>
+        </div>
     </div>
 
-    <div class="flex gap-4">
-        <flux:text class="{{ $transaction->amount >= 0 ? 'text-green-600' : 'text-red-600' }}">
-            {{ $transaction->display_amount }}
-        </flux:text>
+    <div class="flex w-1/2 items-center justify-between gap-4">
+        <div class="flex min-w-fit justify-end max-lg:hidden">
+            <flux:text :variant="$transaction->category ? 'strong' : null">
+                {{ $transaction->category?->name ?? 'Uncategorized' }}
+            </flux:text>
+        </div>
 
-        <div>
-            <flux:dropdown align="end">
-                <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" inset="top bottom" />
-                <flux:menu>
-                    <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}" wire:click="openEditModal">
-                        <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
-                    </flux:modal.trigger>
-                    <flux:modal.trigger name="delete-transaction-{{ $transaction->id }}">
-                        <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
-                    </flux:modal.trigger>
-                </flux:menu>
-            </flux:dropdown>
-            <flux:modal name="delete-transaction-{{ $transaction->id }}" class="min-w-[22rem]">
-                <div class="space-y-6">
-                    <div>
-                        <flux:heading size="lg">Delete transaction?</flux:heading>
-                        <flux:text class="mt-2">
-                            You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
-                        </flux:text>
+        <div class="flex min-w-fit flex-1 items-center justify-end gap-4">
+            <div class="text-right">
+                @if ($transaction->amount === 0)
+                    <flux:badge color="zinc" size="sm">{{ $transaction->display_amount }}</flux:badge>
+                @elseif ($transaction->amount > 0)
+                    <flux:badge color="green" size="sm">{{ $transaction->display_amount }}</flux:badge>
+                @else
+                    <flux:badge color="red" size="sm">{{ $transaction->display_amount }}</flux:badge>
+                @endif
+                <flux:text class="mt-1 shrink-0 text-[13px] tabular-nums lg:hidden">
+                    {{ $transaction->display_date }}
+                </flux:text>
+            </div>
+
+            <div>
+                <flux:dropdown align="end">
+                    <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" />
+                    <flux:menu>
+                        <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}" wire:click="openEditModal">
+                            <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
+                        </flux:modal.trigger>
+                        <flux:modal.trigger name="delete-transaction-{{ $transaction->id }}">
+                            <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
+                        </flux:modal.trigger>
+                    </flux:menu>
+                </flux:dropdown>
+                <flux:modal name="delete-transaction-{{ $transaction->id }}" class="min-w-[22rem]">
+                    <div class="space-y-6">
+                        <div>
+                            <flux:heading size="lg">Delete transaction?</flux:heading>
+                            <flux:text class="mt-2">
+                                You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
+                            </flux:text>
+                        </div>
+                        <div class="flex gap-2">
+                            <flux:spacer />
+                            <flux:modal.close>
+                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                            </flux:modal.close>
+                            <flux:button
+                                wire:click="$parent.deleteTransaction({{ $transaction->id }})"
+                                variant="danger"
+                                size="sm"
+                            >
+                                Delete transaction
+                            </flux:button>
+                        </div>
                     </div>
-                    <div class="flex gap-2">
-                        <flux:spacer />
-                        <flux:modal.close>
-                            <flux:button variant="ghost" size="sm">Cancel</flux:button>
-                        </flux:modal.close>
-                        <flux:button
-                            wire:click="$parent.deleteTransaction({{ $transaction->id }})"
-                            variant="danger"
-                            size="sm"
+                </flux:modal>
+
+                <flux:modal
+                    name="edit-transaction-{{ $transaction->id }}"
+                    :show="$errors->isNotEmpty()"
+                    focusable
+                    class="max-w-lg"
+                >
+                    <form wire:submit="editTransaction" class="space-y-6">
+                        <div>
+                            <flux:heading size="lg">Edit transaction</flux:heading>
+                            <flux:text class="mt-2">Make changes to this transaction.</flux:text>
+                        </div>
+
+                        <flux:input wire:model="date" label="Date" type="date" required />
+
+                        <flux:input wire:model="payee" label="Payee" type="text" required />
+
+                        <flux:select
+                            wire:model="category_id"
+                            variant="combobox"
+                            label="Category"
+                            placeholder="Optional"
+                            :filter="false"
                         >
-                            Delete transaction
-                        </flux:button>
-                    </div>
-                </div>
-            </flux:modal>
+                            <x-slot name="input">
+                                <flux:select.input wire:model.live="category_search" />
+                            </x-slot>
+                            @foreach ($this->categories as $category)
+                                <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
+                                    {{ $category->name }}
+                                </flux:select.option>
+                            @endforeach
 
-            <flux:modal
-                name="edit-transaction-{{ $transaction->id }}"
-                :show="$errors->isNotEmpty()"
-                focusable
-                class="max-w-lg"
-            >
-                <form wire:submit="editTransaction" class="space-y-6">
-                    <div>
-                        <flux:heading size="lg">Edit transaction</flux:heading>
-                        <flux:text class="mt-2">Make changes to this transaction.</flux:text>
-                    </div>
+                            <flux:select.option.create wire:click="createCategory" min-length="1">
+                                Create "
+                                <span wire:text="category_search"></span>
+                                "
+                            </flux:select.option.create>
+                        </flux:select>
 
-                    <flux:input wire:model="date" label="Date" type="date" required />
+                        <flux:input wire:model="note" label="Note" type="text" placeholder="Optional" />
 
-                    <flux:input wire:model="payee" label="Payee" type="text" required />
+                        <flux:input
+                            wire:model="amount"
+                            label="Amount"
+                            type="number"
+                            step="0.01"
+                            placeholder="Use negative values for expenses"
+                            required
+                        />
 
-                    <flux:select
-                        wire:model="category_id"
-                        variant="combobox"
-                        label="Category"
-                        placeholder="Optional"
-                        :filter="false"
-                    >
-                        <x-slot name="input">
-                            <flux:select.input wire:model.live="category_search" />
-                        </x-slot>
-                        @foreach ($this->categories as $category)
-                            <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
-                                {{ $category->name }}
-                            </flux:select.option>
-                        @endforeach
-
-                        <flux:select.option.create wire:click="createCategory" min-length="1">
-                            Create "
-                            <span wire:text="category_search"></span>
-                            "
-                        </flux:select.option.create>
-                    </flux:select>
-
-                    <flux:input wire:model="note" label="Note" type="text" placeholder="Optional" />
-
-                    <flux:input
-                        wire:model="amount"
-                        label="Amount"
-                        type="number"
-                        step="0.01"
-                        placeholder="Use negative values for expenses"
-                        required
-                    />
-
-                    <div class="flex gap-2">
-                        <flux:spacer />
-                        <flux:modal.close>
-                            <flux:button variant="ghost" size="sm">Cancel</flux:button>
-                        </flux:modal.close>
-                        <flux:button variant="primary" size="sm" type="submit">Save changes</flux:button>
-                    </div>
-                </form>
-            </flux:modal>
+                        <div class="flex gap-2">
+                            <flux:spacer />
+                            <flux:modal.close>
+                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                            </flux:modal.close>
+                            <flux:button variant="primary" size="sm" type="submit">Save changes</flux:button>
+                        </div>
+                    </form>
+                </flux:modal>
+            </div>
         </div>
     </div>
 </div>

@@ -131,16 +131,16 @@ new class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-8">
             <flux:heading size="lg">{{ $account->name }}</flux:heading>
         </div>
 
         <div class="flex items-center gap-6">
-            <flux:text>
-                Overall balance:
-                <flux:text variant="strong" inline>{{ $account->formatted_balance }}</flux:text>
-            </flux:text>
+            <div class="inline-flex flex-wrap gap-1">
+                <flux:text>Overall balance:</flux:text>
+                <flux:heading>{{ $account->formatted_balance }}</flux:heading>
+            </div>
             @can('create', Transaction::class)
                 <flux:modal.trigger name="add-transaction">
                     <flux:button variant="primary" size="sm">Add transaction</flux:button>
