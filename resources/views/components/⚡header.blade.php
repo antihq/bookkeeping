@@ -42,9 +42,11 @@ new class extends Component
                         :icon="request()->account?->is($account) ? 'check' : null"
                         wire:navigate
                     >
-                        <span class="inline-flex w-full justify-between gap-2">
+                        <span class="inline-flex w-full items-center justify-between gap-4">
                             {{ $account->name }}
-                            <flux:text class="font-normal" inline>{{ $account->formatted_balance }}</flux:text>
+                            <flux:text class="text-[13px] font-normal tabular-nums" inline>
+                                {{ $account->formatted_balance }}
+                            </flux:text>
                         </span>
                     </flux:menu.item>
                 @endforeach
