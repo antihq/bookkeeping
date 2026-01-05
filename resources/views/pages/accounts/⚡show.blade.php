@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-new class extends Component {
+new class extends Component
+{
     public Account $account;
 
     public string $transaction_date = '';
@@ -78,8 +79,15 @@ new class extends Component {
 
 <section class="mx-auto max-w-6xl space-y-8">
     <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-            <flux:heading size="lg">{{ $account->name }}</flux:heading>
+        <div class="flex items-center gap-8">
+            <div>
+                <flux:heading size="lg">{{ $account->name }}</flux:heading>
+            </div>
+            <div>
+                <flux:text class="text-2xl font-semibold">
+                    {{ $account->formatted_balance }}
+                </flux:text>
+            </div>
         </div>
 
         <flux:dropdown align="end">
@@ -106,36 +114,6 @@ new class extends Component {
     </div>
 
     <div class="space-y-14">
-        <div class="space-y-8">
-            <header>
-                <flux:heading>Account details</flux:heading>
-            </header>
-
-            <div class="grid gap-8 lg:grid-cols-2">
-                <div>
-                    <flux:text class="text-gray-500 dark:text-gray-400">Type</flux:text>
-                    <flux:text class="mt-1">{{ $account->display_type }}</flux:text>
-                </div>
-
-                <div>
-                    <flux:text class="text-gray-500 dark:text-gray-400">Currency</flux:text>
-                    <flux:text class="mt-1">{{ $account->currency }}</flux:text>
-                </div>
-
-                <div>
-                    <flux:text class="text-gray-500 dark:text-gray-400">Account balance</flux:text>
-                    <flux:text class="mt-1 text-2xl font-semibold">
-                        {{ $account->formatted_balance }}
-                    </flux:text>
-                </div>
-
-                <div>
-                    <flux:text class="text-gray-500 dark:text-gray-400">Created by</flux:text>
-                    <flux:text class="mt-1">{{ $account->creator->name }}</flux:text>
-                </div>
-            </div>
-        </div>
-
         <div class="space-y-6">
             <header class="flex items-center justify-between gap-4">
                 <div class="space-y-1">
