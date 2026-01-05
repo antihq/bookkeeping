@@ -156,27 +156,29 @@ new class extends Component
                     </flux:menu>
                 </flux:dropdown>
                 <flux:modal name="delete-transaction-{{ $transaction->id }}" class="min-w-[22rem]">
-                    <div class="space-y-6">
-                        <div>
-                            <flux:heading size="lg">Delete transaction?</flux:heading>
-                            <flux:text class="mt-2">
-                                You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
-                            </flux:text>
+                    @island(lazy: true)
+                        <div class="space-y-6">
+                            <div>
+                                <flux:heading size="lg">Delete transaction?</flux:heading>
+                                <flux:text class="mt-2">
+                                    You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
+                                </flux:text>
+                            </div>
+                            <div class="flex gap-2">
+                                <flux:spacer />
+                                <flux:modal.close>
+                                    <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                                </flux:modal.close>
+                                <flux:button
+                                    wire:click="$parent.deleteTransaction({{ $transaction->id }})"
+                                    variant="danger"
+                                    size="sm"
+                                >
+                                    Delete transaction
+                                </flux:button>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <flux:spacer />
-                            <flux:modal.close>
-                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
-                            </flux:modal.close>
-                            <flux:button
-                                wire:click="$parent.deleteTransaction({{ $transaction->id }})"
-                                variant="danger"
-                                size="sm"
-                            >
-                                Delete transaction
-                            </flux:button>
-                        </div>
-                    </div>
+                    @endisland
                 </flux:modal>
 
                 <flux:modal
