@@ -30,6 +30,15 @@ new class extends Component
     <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" size="sm" />
 
     <flux:navbar class="-mb-px max-lg:hidden">
+        <flux:navbar.item
+            :href="route('dashboard')"
+            :current="request()->routeIs('accounts.index')"
+            :accent="false"
+            wire:navigate
+        >
+            Dashboard
+        </flux:navbar.item>
+
         <flux:dropdown position="bottom">
             <flux:navbar.item :accent="false" icon:trailing="chevron-down" icon:variant="micro">
                 Accounts
