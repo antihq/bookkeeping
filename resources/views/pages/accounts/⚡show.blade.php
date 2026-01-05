@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Account;
+use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\User;
 use Flux\Flux;
@@ -20,6 +21,10 @@ new class extends Component
 
     public float $transaction_amount = 0.0;
 
+    public ?int $transaction_category_id = null;
+
+    public string $category_search = '';
+
     public function mount(Account $account)
     {
         $this->authorize('view', $account);
@@ -38,6 +43,17 @@ new class extends Component
         return $this->redirectRoute('accounts.index');
     }
 
+    public function deleteTransaction(int $transactionId)
+    {
+        $transaction = Transaction::findOrFail($transactionId);
+
+        $this->authorize('delete', $transaction);
+
+        $transaction->delete();
+
+        Flux::toast('Transaction deleted successfully.', variant: 'success');
+    }
+
     public function addTransaction()
     {
         $this->authorize('create', Transaction::class);
@@ -46,6 +62,7 @@ new class extends Component
             'transaction_date' => ['required', 'date'],
             'transaction_title' => ['required', 'string', 'max:255'],
             'transaction_amount' => ['required', 'numeric'],
+            'transaction_category_id' => ['nullable', 'exists:categories,id'],
         ]);
 
         $amount = (int) round($this->transaction_amount * 100);
@@ -56,13 +73,14 @@ new class extends Component
             amount: $amount,
             note: $this->transaction_note,
             createdBy: $this->user->id,
+            categoryId: $this->transaction_category_id,
         );
 
         Flux::toast('Transaction added successfully.', variant: 'success');
 
         Flux::modals()->close();
 
-        $this->reset(['transaction_title', 'transaction_note', 'transaction_amount']);
+        $this->reset(['transaction_title', 'transaction_note', 'transaction_amount', 'transaction_category_id']);
     }
 
     #[Computed]
@@ -75,6 +93,39 @@ new class extends Component
     public function transactions()
     {
         return $this->account->transactions()->paginate(10);
+    }
+
+    #[Computed]
+    public function categories()
+    {
+        return Category::query()
+            ->where('team_id', $this->account->team_id)
+            ->when(
+                $this->category_search,
+                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+            )
+            ->limit(20)
+            ->get();
+    }
+
+    public function createCategory()
+    {
+        $this->validate([
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->account->team_id],
+        ]);
+
+        $category = Category::create([
+            'name' => $this->category_search,
+            'team_id' => $this->account->team_id,
+        ]);
+
+        $this->transaction_category_id = $category->id;
+        $this->category_search = '';
+    }
+
+    public function updatedCategorySearch()
+    {
+        $this->resetErrorBag('category_search');
     }
 };
 ?>
@@ -149,6 +200,29 @@ new class extends Component
                         <flux:input wire:model="transaction_date" label="Date" type="date" required />
 
                         <flux:input wire:model="transaction_title" label="Title" type="text" required />
+
+                        <flux:select
+                            wire:model="transaction_category_id"
+                            variant="combobox"
+                            label="Category"
+                            placeholder="Optional"
+                            :filter="false"
+                        >
+                            <x-slot name="input">
+                                <flux:select.input wire:model.live="category_search" />
+                            </x-slot>
+                            @foreach ($this->categories as $category)
+                                <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
+                                    {{ $category->name }}
+                                </flux:select.option>
+                            @endforeach
+
+                            <flux:select.option.create wire:click="createCategory" min-length="1">
+                                Create "
+                                <span wire:text="category_search"></span>
+                                "
+                            </flux:select.option.create>
+                        </flux:select>
 
                         <flux:input wire:model="transaction_note" label="Note" type="text" placeholder="Optional" />
 

@@ -1,22 +1,91 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Transaction;
 use Flux\Flux;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 new class extends Component
 {
     public Transaction $transaction;
 
-    public function delete()
+    public string $date = '';
+
+    public string $title = '';
+
+    public ?string $note = null;
+
+    public float $amount = 0.0;
+
+    public ?int $category_id = null;
+
+    public string $category_search = '';
+
+    public function openEditModal()
     {
-        $this->authorize('delete', $this->transaction);
+        $this->date = $this->transaction->date;
+        $this->title = $this->transaction->title;
+        $this->note = $this->transaction->note;
+        $this->amount = $this->transaction->amount / 100;
+        $this->category_id = $this->transaction->category_id;
+    }
 
-        $this->transaction->delete();
+    public function editTransaction()
+    {
+        $this->authorize('update', $this->transaction);
 
-        Flux::toast('Transaction deleted successfully.', variant: 'success');
+        $this->validate([
+            'date' => ['required', 'date'],
+            'title' => ['required', 'string', 'max:255'],
+            'amount' => ['required', 'numeric'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+        ]);
 
-        $this->dispatch('transaction-deleted');
+        $this->transaction->update([
+            'date' => $this->date,
+            'title' => $this->title,
+            'note' => $this->note,
+            'amount' => (int) round($this->amount * 100),
+            'category_id' => $this->category_id,
+        ]);
+
+        Flux::toast('Transaction updated successfully.', variant: 'success');
+
+        Flux::modals()->close();
+    }
+
+    #[Computed]
+    public function categories()
+    {
+        return Category::query()
+            ->where('team_id', $this->transaction->team_id)
+            ->when(
+                $this->category_search,
+                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+            )
+            ->limit(20)
+            ->get();
+    }
+
+    public function createCategory()
+    {
+        $this->validate([
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->transaction->team_id],
+        ]);
+
+        $category = Category::create([
+            'name' => $this->category_search,
+            'team_id' => $this->transaction->team_id,
+        ]);
+
+        $this->category_id = $category->id;
+        $this->category_search = '';
+    }
+
+    public function updatedCategorySearch()
+    {
+        $this->resetErrorBag('category_search');
     }
 };
 ?>
@@ -39,7 +108,9 @@ new class extends Component
             <flux:dropdown align="end">
                 <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" inset="top bottom" />
                 <flux:menu>
-                    <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
+                    <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}" wire:click="openEditModal">
+                        <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
+                    </flux:modal.trigger>
                     <flux:modal.trigger name="delete-transaction-{{ $transaction->id }}">
                         <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
                     </flux:modal.trigger>
@@ -58,9 +129,75 @@ new class extends Component
                         <flux:modal.close>
                             <flux:button variant="ghost" size="sm">Cancel</flux:button>
                         </flux:modal.close>
-                        <flux:button wire:click="delete" variant="danger" size="sm">Delete transaction</flux:button>
+                        <flux:button
+                            wire:click="$parent.deleteTransaction({{ $transaction->id }})"
+                            variant="danger"
+                            size="sm"
+                        >
+                            Delete transaction
+                        </flux:button>
                     </div>
                 </div>
+            </flux:modal>
+
+            <flux:modal
+                name="edit-transaction-{{ $transaction->id }}"
+                :show="$errors->isNotEmpty()"
+                focusable
+                class="max-w-lg"
+            >
+                <form wire:submit="editTransaction" class="space-y-6">
+                    <div>
+                        <flux:heading size="lg">Edit transaction</flux:heading>
+                        <flux:text class="mt-2">Make changes to this transaction.</flux:text>
+                    </div>
+
+                    <flux:input wire:model="date" label="Date" type="date" required />
+
+                    <flux:input wire:model="title" label="Title" type="text" required />
+
+                    <flux:select
+                        wire:model="category_id"
+                        variant="combobox"
+                        label="Category"
+                        placeholder="Optional"
+                        :filter="false"
+                    >
+                        <x-slot name="input">
+                            <flux:select.input wire:model.live="category_search" />
+                        </x-slot>
+                        @foreach ($this->categories as $category)
+                            <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
+                                {{ $category->name }}
+                            </flux:select.option>
+                        @endforeach
+
+                        <flux:select.option.create wire:click="createCategory" min-length="1">
+                            Create "
+                            <span wire:text="category_search"></span>
+                            "
+                        </flux:select.option.create>
+                    </flux:select>
+
+                    <flux:input wire:model="note" label="Note" type="text" placeholder="Optional" />
+
+                    <flux:input
+                        wire:model="amount"
+                        label="Amount"
+                        type="number"
+                        step="0.01"
+                        placeholder="Use negative values for expenses"
+                        required
+                    />
+
+                    <div class="flex gap-2">
+                        <flux:spacer />
+                        <flux:modal.close>
+                            <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                        </flux:modal.close>
+                        <flux:button variant="primary" size="sm" type="submit">Save changes</flux:button>
+                    </div>
+                </form>
             </flux:modal>
         </div>
     </div>
