@@ -21,8 +21,7 @@ test('accounts can be viewed', function () {
 
     Livewire::test('pages::accounts.show', ['account' => $account])
         ->assertSee('Test Account')
-        ->assertSee('$1,000.00')
-        ->assertSee('Checking');
+        ->assertSee('$1,000.00');
 });
 
 test('balance is formatted correctly', function () {

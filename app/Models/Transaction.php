@@ -17,6 +17,7 @@ class Transaction extends Model
         'title',
         'note',
         'amount',
+        'category_id',
     ];
 
     public function account()
@@ -32,6 +33,11 @@ class Transaction extends Model
     public function team()
     {
         return $this->belongsTo(Team::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function getFormattedAmountAttribute(): string

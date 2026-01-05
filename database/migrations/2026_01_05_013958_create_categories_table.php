@@ -8,20 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('accounts', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('team_id')->index();
-            $table->foreignId('created_by')->constrained('users');
-            $table->string('type');
             $table->string('name');
-            $table->string('currency', 3);
-            $table->integer('start_balance');
             $table->timestamps();
+
+            $table->unique(['team_id', 'name']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('accounts');
+        Schema::dropIfExists('categories');
     }
 };

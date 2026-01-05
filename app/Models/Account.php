@@ -64,7 +64,7 @@ class Account extends Model
         $this->attributes['start_balance'] = (int) round($value * 100);
     }
 
-    public function addTransaction(string $date, string $title, int $amount, ?string $note = null, ?int $createdBy = null): Transaction
+    public function addTransaction(string $date, string $title, int $amount, ?string $note = null, ?int $createdBy = null, ?int $categoryId = null): Transaction
     {
         return $this->transactions()->create([
             'date' => $date,
@@ -73,6 +73,7 @@ class Account extends Model
             'note' => $note,
             'team_id' => $this->team_id,
             'created_by' => $createdBy ?? Auth::id(),
+            'category_id' => $categoryId,
         ]);
     }
 

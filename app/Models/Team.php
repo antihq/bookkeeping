@@ -39,6 +39,11 @@ class Team extends JetstreamTeam
         return $this->hasMany(Account::class);
     }
 
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *
