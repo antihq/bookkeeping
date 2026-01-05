@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-new class extends Component
-{
+new class extends Component {
     public Account $account;
 
     public string $transaction_date = '';
@@ -83,9 +82,27 @@ new class extends Component
             <flux:heading size="lg">{{ $account->name }}</flux:heading>
         </div>
 
-        @can('update', $account)
-            <flux:button href="{{ route('accounts.edit', $account) }}" variant="subtle" size="sm">Edit</flux:button>
-        @endcan
+        <flux:dropdown align="end">
+            <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" />
+            <flux:menu>
+                @can('update', $account)
+                    <flux:menu.item
+                        href="{{ route('accounts.edit', $account) }}"
+                        icon="pencil-square"
+                        icon:variant="micro"
+                        wire:navigate
+                    >
+                        Edit
+                    </flux:menu.item>
+                @endcan
+
+                @can('delete', $account)
+                    <flux:modal.trigger name="delete">
+                        <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
+                    </flux:modal.trigger>
+                @endcan
+            </flux:menu>
+        </flux:dropdown>
     </div>
 
     <div class="space-y-14">
@@ -200,33 +217,23 @@ new class extends Component
         </div>
 
         @can('delete', $account)
-            <div class="space-y-6">
-                <header class="space-y-1">
-                    <flux:heading>Delete account</flux:heading>
-                </header>
-
-                <flux:modal.trigger name="delete">
-                    <flux:button variant="danger" size="sm">Delete account</flux:button>
-                </flux:modal.trigger>
-
-                <flux:modal name="delete" class="min-w-[22rem]">
-                    <div class="space-y-6">
-                        <div>
-                            <flux:heading size="lg">Delete account?</flux:heading>
-                            <flux:text class="mt-2">
-                                You're about to delete "{{ $account->name }}". This action cannot be reversed.
-                            </flux:text>
-                        </div>
-                        <div class="flex gap-2">
-                            <flux:spacer />
-                            <flux:modal.close>
-                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
-                            </flux:modal.close>
-                            <flux:button wire:click="delete" variant="danger" size="sm">Delete account</flux:button>
-                        </div>
+            <flux:modal name="delete" class="min-w-[22rem]">
+                <div class="space-y-6">
+                    <div>
+                        <flux:heading size="lg">Delete account?</flux:heading>
+                        <flux:text class="mt-2">
+                            You're about to delete "{{ $account->name }}". This action cannot be reversed.
+                        </flux:text>
                     </div>
-                </flux:modal>
-            </div>
+                    <div class="flex gap-2">
+                        <flux:spacer />
+                        <flux:modal.close>
+                            <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                        </flux:modal.close>
+                        <flux:button wire:click="delete" variant="danger" size="sm">Delete account</flux:button>
+                    </div>
+                </div>
+            </flux:modal>
         @endcan
     </div>
 </section>
