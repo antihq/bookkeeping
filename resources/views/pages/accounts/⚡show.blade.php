@@ -25,6 +25,8 @@ new class extends Component
 
     public string $category_search = '';
 
+    public $page = 1;
+
     public function mount(Account $account)
     {
         $this->authorize('view', $account);
@@ -83,6 +85,11 @@ new class extends Component
         $this->reset(['transaction_payee', 'transaction_note', 'transaction_amount', 'transaction_category_id']);
     }
 
+    public function loadMore()
+    {
+        $this->page++;
+    }
+
     #[Computed]
     public function user(): User
     {
@@ -92,7 +99,10 @@ new class extends Component
     #[Computed]
     public function transactions()
     {
-        return $this->account->transactions()->paginate(10);
+        return $this->account
+            ->transactions()
+            ->forPage($this->page, 10)
+            ->get();
     }
 
     #[Computed]
@@ -174,13 +184,20 @@ new class extends Component
     <div class="space-y-14">
         <div class="space-y-6">
             @if ($this->transactions->count() > 0)
-                <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
-                    @foreach ($this->transactions as $transaction)
-                        <livewire:transactions.item :$transaction wire:key="transaction-{{ $transaction->id }}" />
-                    @endforeach
-                </div>
-                <div class="flex justify-center">
-                    {{ $this->transactions->links() }}
+                <div>
+                    <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
+                        @island(name: 'transactions')
+                            @foreach ($this->transactions as $transaction)
+                                <livewire:transactions.item
+                                    :$transaction
+                                    wire:key="transaction-{{ $transaction->id }}"
+                                    lazy
+                                />
+                            @endforeach
+                        @endisland
+                    </div>
+
+                    <div wire:intersect.append="loadMore" wire:island="transactions"></div>
                 </div>
             @else
                 <div class="flex flex-col items-center justify-center py-12">
@@ -246,25 +263,5 @@ new class extends Component
                 </flux:modal>
             @endcan
         </div>
-
-        @can('delete', $account)
-            <flux:modal name="delete" class="min-w-[22rem]">
-                <div class="space-y-6">
-                    <div>
-                        <flux:heading size="lg">Delete account?</flux:heading>
-                        <flux:text class="mt-2">
-                            You're about to delete "{{ $account->name }}". This action cannot be reversed.
-                        </flux:text>
-                    </div>
-                    <div class="flex gap-2">
-                        <flux:spacer />
-                        <flux:modal.close>
-                            <flux:button variant="ghost" size="sm">Cancel</flux:button>
-                        </flux:modal.close>
-                        <flux:button wire:click="delete" variant="danger" size="sm">Delete account</flux:button>
-                    </div>
-                </div>
-            </flux:modal>
-        @endcan
     </div>
 </section>
