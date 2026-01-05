@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('account_id')->index();
             $table->foreignId('team_id')->index();
             $table->foreignId('created_by');
-            $table->foreignId('category_id')->index();
+            $table->foreignId('category_id')->nullable()->index();
             $table->date('date');
             $table->string('title');
             $table->string('note')->nullable();
