@@ -212,7 +212,7 @@ new class extends Component
             @endif
 
             @can('create', Transaction::class)
-                <flux:modal name="add-transaction" :show="$errors->isNotEmpty()" focusable class="w-full sm:max-w-lg">
+                <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
                     <form wire:submit="addTransaction" class="space-y-6">
                         <div>
                             <flux:heading size="lg">Add transaction</flux:heading>

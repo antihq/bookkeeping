@@ -22,7 +22,7 @@ new class extends Component
 
     public string $category_search = '';
 
-    public function openEditModal()
+    public function mount()
     {
         $this->date = $this->transaction->date;
         $this->payee = $this->transaction->payee;
@@ -159,7 +159,7 @@ new class extends Component
                 <flux:dropdown align="end">
                     <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" />
                     <flux:menu>
-                        <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}" wire:click="openEditModal">
+                        <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}">
                             <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
                         </flux:modal.trigger>
                         <flux:modal.trigger name="delete-transaction-{{ $transaction->id }}">
@@ -194,7 +194,6 @@ new class extends Component
                 <flux:modal
                     name="edit-transaction-{{ $transaction->id }}"
                     :show="$errors->isNotEmpty()"
-                    focusable
                     class="w-full sm:max-w-lg"
                 >
                     <form wire:submit="editTransaction" class="space-y-6">
