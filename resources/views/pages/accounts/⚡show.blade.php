@@ -123,34 +123,34 @@ new class extends Component
     <div class="space-y-14">
         <div class="space-y-6">
             @if ($this->transactions->count() > 0)
-                <flux:table>
-                    <flux:table.columns>
-                        <flux:table.column>Date</flux:table.column>
-                        <flux:table.column>Title</flux:table.column>
-                        <flux:table.column>Note</flux:table.column>
-                        <flux:table.column>Amount</flux:table.column>
-                    </flux:table.columns>
-                    <flux:table.rows>
-                        @foreach ($this->transactions as $transaction)
-                            <flux:table.row>
-                                <flux:table.cell>{{ $transaction->date }}</flux:table.cell>
-                                <flux:table.cell>{{ $transaction->title }}</flux:table.cell>
-                                <flux:table.cell>{{ $transaction->note ?? '-' }}</flux:table.cell>
-                                <flux:table.cell
-                                    class="{{ $transaction->amount >= 0 ? 'text-green-600' : 'text-red-600' }}"
+                <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
+                    @foreach ($this->transactions as $transaction)
+                        <div
+                            wire:key="transaction-{{ $transaction->id }}"
+                            class="flex items-center justify-between gap-4 py-4"
+                        >
+                            <div class="flex min-w-0 flex-1 items-center gap-4">
+                                <flux:text class="w-24 shrink-0">{{ $transaction->date }}</flux:text>
+                                <flux:text class="min-w-0 flex-1 truncate">{{ $transaction->title }}</flux:text>
+                                <flux:text
+                                    class="hidden w-48 shrink-0 truncate text-gray-500 sm:block dark:text-gray-400"
                                 >
-                                    {{ $transaction->display_amount }}
-                                </flux:table.cell>
-                            </flux:table.row>
-                        @endforeach
-                    </flux:table.rows>
-                </flux:table>
+                                    {{ $transaction->note ?? '-' }}
+                                </flux:text>
+                            </div>
+
+                            <flux:text class="{{ $transaction->amount >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $transaction->display_amount }}
+                            </flux:text>
+                        </div>
+                    @endforeach
+                </div>
                 <div class="flex justify-center">
                     {{ $this->transactions->links() }}
                 </div>
             @else
                 <div class="flex flex-col items-center justify-center py-12">
-                    <flux:icon icon="arrow-path" size="lg" class="text-gray-400 dark:text-gray-600" />
+                    <flux:icon icon="credit-card" size="lg" class="text-gray-400 dark:text-gray-600" />
                     <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No transactions yet</flux:text>
                 </div>
             @endif
