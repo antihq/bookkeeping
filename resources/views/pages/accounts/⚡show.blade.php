@@ -60,6 +60,8 @@ new class extends Component
 
         Flux::toast('Transaction added successfully.', variant: 'success');
 
+        Flux::modals()->close();
+
         $this->reset(['transaction_title', 'transaction_note', 'transaction_amount']);
     }
 
