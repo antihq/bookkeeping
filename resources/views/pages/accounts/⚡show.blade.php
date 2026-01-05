@@ -19,7 +19,7 @@ new class extends Component
 
     public ?string $transaction_note = null;
 
-    public float $transaction_amount = 0.0;
+    public string $transaction_amount = '';
 
     public ?int $transaction_category_id = null;
 
@@ -63,11 +63,11 @@ new class extends Component
         $this->validate([
             'transaction_date' => ['required', 'date'],
             'transaction_payee' => ['required', 'string', 'max:255'],
-            'transaction_amount' => ['required', 'numeric'],
+            'transaction_amount' => ['required'],
             'transaction_category_id' => ['nullable', 'exists:categories,id'],
         ]);
 
-        $amount = (int) round($this->transaction_amount * 100);
+        $amount = (int) round((float) $this->transaction_amount * 100);
 
         $this->account->addTransaction(
             date: $this->transaction_date,
@@ -83,6 +83,11 @@ new class extends Component
         Flux::modals()->close();
 
         $this->reset(['transaction_payee', 'transaction_note', 'transaction_amount', 'transaction_category_id']);
+    }
+
+    public function updatedTransactionAmount($value)
+    {
+        $this->transaction_amount = str_replace(['$', ','], '', $value);
     }
 
     public function loadMore()
@@ -207,14 +212,14 @@ new class extends Component
             @endif
 
             @can('create', Transaction::class)
-                <flux:modal name="add-transaction" :show="$errors->isNotEmpty()" focusable class="max-w-lg">
+                <flux:modal name="add-transaction" :show="$errors->isNotEmpty()" focusable class="w-full sm:max-w-lg">
                     <form wire:submit="addTransaction" class="space-y-6">
                         <div>
                             <flux:heading size="lg">Add transaction</flux:heading>
                             <flux:text class="mt-2">Add a new transaction to this account.</flux:text>
                         </div>
 
-                        <flux:input wire:model="transaction_date" label="Date" type="date" required />
+                        <flux:date-picker wire:model="transaction_date" label="Date" required />
 
                         <flux:input wire:model="transaction_payee" label="Payee" type="text" required />
 
@@ -223,11 +228,11 @@ new class extends Component
                             variant="combobox"
                             label="Category"
                             placeholder="Optional"
-                            :filter="false"
                         >
                             <x-slot name="input">
-                                <flux:select.input wire:model.live="category_search" />
+                                <flux:select.input wire:model="category_search" />
                             </x-slot>
+
                             @foreach ($this->categories as $category)
                                 <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
                                     {{ $category->name }}
@@ -246,8 +251,8 @@ new class extends Component
                         <flux:input
                             wire:model="transaction_amount"
                             label="Amount"
-                            type="number"
-                            step="0.01"
+                            type="text"
+                            mask:dynamic="$money($input)"
                             placeholder="Use negative values for expenses"
                             required
                         />

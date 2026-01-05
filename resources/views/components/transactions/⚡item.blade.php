@@ -16,7 +16,7 @@ new class extends Component
 
     public ?string $note = null;
 
-    public float $amount = 0.0;
+    public string $amount = '';
 
     public ?int $category_id = null;
 
@@ -27,7 +27,7 @@ new class extends Component
         $this->date = $this->transaction->date;
         $this->payee = $this->transaction->payee;
         $this->note = $this->transaction->note;
-        $this->amount = $this->transaction->amount / 100;
+        $this->amount = (string) ($this->transaction->amount / 100);
         $this->category_id = $this->transaction->category_id;
     }
 
@@ -38,7 +38,7 @@ new class extends Component
         $this->validate([
             'date' => ['required', 'date'],
             'payee' => ['required', 'string', 'max:255'],
-            'amount' => ['required', 'numeric'],
+            'amount' => ['required'],
             'category_id' => ['nullable', 'exists:categories,id'],
         ]);
 
@@ -46,13 +46,18 @@ new class extends Component
             'date' => $this->date,
             'payee' => $this->payee,
             'note' => $this->note,
-            'amount' => (int) round($this->amount * 100),
+            'amount' => (int) round((float) $this->amount * 100),
             'category_id' => $this->category_id,
         ]);
 
         Flux::toast('Transaction updated successfully.', variant: 'success');
 
         Flux::modals()->close();
+    }
+
+    public function updatedAmount($value)
+    {
+        $this->amount = str_replace(['$', ','], '', $value);
     }
 
     #[Computed]
@@ -163,36 +168,34 @@ new class extends Component
                     </flux:menu>
                 </flux:dropdown>
                 <flux:modal name="delete-transaction-{{ $transaction->id }}" class="min-w-[22rem]">
-                    @island(lazy: true)
-                        <div class="space-y-6">
-                            <div>
-                                <flux:heading size="lg">Delete transaction?</flux:heading>
-                                <flux:text class="mt-2">
-                                    You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
-                                </flux:text>
-                            </div>
-                            <div class="flex gap-2">
-                                <flux:spacer />
-                                <flux:modal.close>
-                                    <flux:button variant="ghost" size="sm">Cancel</flux:button>
-                                </flux:modal.close>
-                                <flux:button
-                                    wire:click="$parent.deleteTransaction({{ $transaction->id }})"
-                                    variant="danger"
-                                    size="sm"
-                                >
-                                    Delete transaction
-                                </flux:button>
-                            </div>
+                    <div class="space-y-6">
+                        <div>
+                            <flux:heading size="lg">Delete transaction?</flux:heading>
+                            <flux:text class="mt-2">
+                                You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
+                            </flux:text>
                         </div>
-                    @endisland
+                        <div class="flex gap-2">
+                            <flux:spacer />
+                            <flux:modal.close>
+                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                            </flux:modal.close>
+                            <flux:button
+                                wire:click="$parent.deleteTransaction({{ $transaction->id }})"
+                                variant="danger"
+                                size="sm"
+                            >
+                                Delete transaction
+                            </flux:button>
+                        </div>
+                    </div>
                 </flux:modal>
 
                 <flux:modal
                     name="edit-transaction-{{ $transaction->id }}"
                     :show="$errors->isNotEmpty()"
                     focusable
-                    class="max-w-lg"
+                    class="w-full sm:max-w-lg"
                 >
                     <form wire:submit="editTransaction" class="space-y-6">
                         <div>
@@ -200,7 +203,7 @@ new class extends Component
                             <flux:text class="mt-2">Make changes to this transaction.</flux:text>
                         </div>
 
-                        <flux:input wire:model="date" label="Date" type="date" required />
+                        <flux:date-picker wire:model="date" label="Date" required />
 
                         <flux:input wire:model="payee" label="Payee" type="text" required />
 
@@ -209,10 +212,9 @@ new class extends Component
                             variant="combobox"
                             label="Category"
                             placeholder="Optional"
-                            :filter="false"
                         >
                             <x-slot name="input">
-                                <flux:select.input wire:model.live="category_search" />
+                                <flux:select.input wire:model="category_search" />
                             </x-slot>
                             @foreach ($this->categories as $category)
                                 <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
@@ -232,8 +234,8 @@ new class extends Component
                         <flux:input
                             wire:model="amount"
                             label="Amount"
-                            type="number"
-                            step="0.01"
+                            type="text"
+                            mask:dynamic="$money($input)"
                             placeholder="Use negative values for expenses"
                             required
                         />
