@@ -139,9 +139,57 @@ new class extends Component
                                 </flux:text>
                             </div>
 
-                            <flux:text class="{{ $transaction->amount >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $transaction->display_amount }}
-                            </flux:text>
+                            <div class="flex gap-4">
+                                <flux:text class="{{ $transaction->amount >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $transaction->display_amount }}
+                                </flux:text>
+
+                                <div>
+                                    <flux:dropdown align="end">
+                                        <flux:button
+                                            variant="subtle"
+                                            size="sm"
+                                            square
+                                            icon="ellipsis-horizontal"
+                                            inset="top bottom"
+                                        />
+                                        <flux:menu>
+                                            <flux:menu.item icon="pencil-square" icon:variant="micro">
+                                                Edit
+                                            </flux:menu.item>
+                                            <flux:modal.trigger name="delete-transaction-{{ $transaction->id }}">
+                                                <flux:menu.item variant="danger" icon="trash" icon:variant="micro">
+                                                    Delete
+                                                </flux:menu.item>
+                                            </flux:modal.trigger>
+                                        </flux:menu>
+                                    </flux:dropdown>
+                                    <flux:modal name="delete-transaction-{{ $transaction->id }}" class="min-w-[22rem]">
+                                        <div class="space-y-6">
+                                            <div>
+                                                <flux:heading size="lg">Delete transaction?</flux:heading>
+                                                <flux:text class="mt-2">
+                                                    You're about to delete "{{ $transaction->title }}". This action
+                                                    cannot be reversed.
+                                                </flux:text>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <flux:spacer />
+                                                <flux:modal.close>
+                                                    <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                                                </flux:modal.close>
+                                                <flux:button
+                                                    wire:click="deleteTransaction({{ $transaction->id }})"
+                                                    variant="danger"
+                                                    size="sm"
+                                                >
+                                                    Delete transaction
+                                                </flux:button>
+                                            </div>
+                                        </div>
+                                    </flux:modal>
+                                </div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
