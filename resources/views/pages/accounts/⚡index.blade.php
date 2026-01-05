@@ -30,18 +30,49 @@ new class extends Component
     {
         return $this->team->accounts()->get();
     }
+
+    #[Computed]
+    public function teamBalances(): array
+    {
+        return $this->team
+            ->accounts()
+            ->with('transactions')
+            ->get()
+            ->groupBy('currency')
+            ->map(function ($accounts, $currency) {
+                $total = $accounts->sum('balance_in_dollars');
+
+                $currencyModel = App\Models\Currency::all()->firstWhere('iso', $currency);
+                $symbol = $currencyModel ? $currencyModel->symbol : '$';
+                $value = number_format($total, 2);
+
+                return "{$symbol}{$value}";
+            })
+            ->toArray();
+    }
 };
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-2">
         <flux:heading size="lg">Accounts</flux:heading>
 
-        @can('create', App\Models\Account::class)
-            <flux:button href="{{ route('accounts.create') }}" variant="primary" size="sm" wire:navigate>
-                Create account
-            </flux:button>
-        @endcan
+        <div class="flex items-center gap-6">
+            <div class="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+                <flux:text>Overall balance</flux:text>
+                <div class="inline-flex flex-wrap items-center gap-x-1 gap-y-2">
+                    @foreach ($this->teamBalances as $currency => $balance)
+                        <flux:badge>{{ strtoupper($currency) }}: {{ $balance }}</flux:badge>
+                    @endforeach
+                </div>
+            </div>
+
+            @can('create', App\Models\Account::class)
+                <flux:button href="{{ route('accounts.create') }}" variant="primary" size="sm" wire:navigate>
+                    Create account
+                </flux:button>
+            @endcan
+        </div>
     </div>
 
     @if ($this->accounts->count() === 0)
