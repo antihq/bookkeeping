@@ -1,4 +1,72 @@
 <laravel-boost-guidelines>
+=== .ai/core rules ===
+
+## Livewire v4
+
+### Component Creation
+
+- Prefer single-file components (`.blade.php` with embedded PHP) or multi-file components over class-based components.
+- Use `php artisan make:livewire post.create` for single-file (default) or `php artisan make:livewire post.create --mfc` for multi-file.
+- Convert between formats with `php artisan livewire:convert post.create`.
+
+### Routing
+
+- Use `Route::livewire()` with component names for single-file and multi-file components:
+
+<code-snippet name="Routing to component example" lang="php">
+    Route::livewire('/dashboard', 'pages::dashboard');
+</code-snippet>
+
+### Directives and Modifiers
+
+- Use to `wire:navigate:scroll` for scroll preservation with `@persist`:
+
+    ```blade
+    @persist('sidebar')
+        <div class="overflow-y-scroll" wire:navigate:scroll>
+            <!-- ... -->
+        </div>
+    @endpersist
+    ```
+
+- New v4 directives: `wire:sort`, `wire:intersect`, `wire:ref`, `wire:show`, `wire:text`
+- New v4 modifiers: `.renderless`, `.preserve-scroll`
+
+### Streaming
+
+- Use to v4 streaming method signature:
+
+    ```php
+    $this->stream(content: 'Hello', replace: true, el: '#container');
+    ```
+
+### JavaScript Hooks
+
+- Use to new `$wire.$js` syntax:
+
+<code-snippet name="livewire:load example" lang="js">
+    $wire.$js.bookmark = () => {
+        // Toggle bookmark...
+    }
+</code-snippet>
+
+### New Features in v4
+
+- Islands architecture (`@island` directive)
+- Single-file components (`.blade.php` with embedded PHP)
+- Multi-file components
+- Viewport intersection with `wire:intersect`
+- Drag-and-drop sorting with `wire:sort`
+- Async actions with `.async` modifier or `#[Async]` attribute
+- Defer loading with `#[Defer]` attribute
+- Renderless actions with `#[Renderless]` attribute or `.renderless` modifier
+- Automatic scroll preservation with `.preserve-scroll` modifier
+- `data-loading` attribute for styling loading states
+- JavaScript access to `$errors` magic property
+
+- Slots and attribute forwarding with `{{ $attributes }}`
+- JavaScript in view-based components without `@script` wrapper
+
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -240,121 +308,12 @@ This is correct as of Boost installation, but there may be additional components
 accordion, autocomplete, avatar, badge, brand, breadcrumbs, button, calendar, callout, card, chart, checkbox, command, composer, context, date-picker, dropdown, editor, field, file-upload, heading, icon, input, kanban, modal, navbar, otp-input, pagination, pillbox, popover, profile, radio, select, separator, skeleton, slider, switch, table, tabs, text, textarea, time-picker, toast, tooltip
 </available-flux-components>
 
-=== livewire/v4 rules ===
-
-## Livewire v4
-
-### Component Creation
-
-- Prefer single-file components (`.blade.php` with embedded PHP) or multi-file components over class-based components.
-- Use `php artisan make:livewire create-post` for single-file (default) or `php artisan make:livewire create-post --mfc` for multi-file.
-- Convert between formats with `php artisan livewire:convert create-post`.
-
-### Routing
-
-- Use `Route::livewire()` with component names for single-file and multi-file components:
-    ```php
-    Route::livewire('/dashboard', 'pages::dashboard');
-    ```
-
-### Configuration
-
-- Use the `component_layout` config key for layout configuration:
-    ```php
-    'component_layout' => 'layouts::app',
-    ```
-- Use the `component_placeholder` config key for placeholder configuration:
-    ```php
-    'component_placeholder' => 'livewire.placeholder',
-    ```
-
-### Directives and Modifiers
-
-- Use `wire:navigate:scroll` for scroll preservation with `@persist`:
-    ```blade
-    @persist('sidebar')
-        <div class="overflow-y-scroll" wire:navigate:scroll>
-            <!-- ... -->
-        </div>
-    @endpersist
-    ```
-- New v4 directives: `wire:sort`, `wire:intersect`, `wire:ref`, `wire:show`, `wire:text`
-- New v4 modifiers: `.renderless`, `.preserve-scroll`
-
-### Streaming
-
-- Use the v4 streaming method signature:
-    ```php
-    $this->stream(content: 'Hello', replace: true, el: '#container');
-    ```
-
-### JavaScript Hooks
-
-- Use the new interceptor system instead of `commit` and `request` hooks:
-
-    ```javascript
-    Livewire.interceptMessage(({ component, message, onFinish, onSuccess, onError, onFailure }) => {
-        onFinish(() => {
-            // Runs after response received but before processing
-        });
-        onSuccess(({ payload }) => {
-            // Runs after successful response
-        });
-        onError(() => {
-            // Runs if request failed (server errors)
-        });
-        onFailure(() => {
-            // Runs if request failed (network errors)
-        });
-    });
-    ```
-
-    ```javascript
-    Livewire.interceptRequest(({ request, onResponse, onSuccess, onError, onFailure }) => {
-        onResponse(({ response }) => {
-            // Runs when response received
-        });
-        onSuccess(({ response, responseJson }) => {
-            // Runs on successful response
-        });
-        onError(({ response, responseBody, preventDefault }) => {
-            // Runs on failed response
-        });
-        onFailure(({ error }) => {
-            // Runs on network errors
-        });
-    });
-    ```
-
-- Use the new `$wire.$js` syntax:
-    ```javascript
-    $wire.$js.bookmark = () => {
-        // Toggle bookmark...
-    };
-    ```
-
-### New Features in v4
-
-- Islands architecture (`@island` directive)
-- Single-file components (`.blade.php` with embedded PHP)
-- Multi-file components
-- Viewport intersection with `wire:intersect`
-- Drag-and-drop sorting with `wire:sort`
-- Async actions with `.async` modifier or `#[Async]` attribute
-- Defer loading with `#[Defer]` attribute
-- Renderless actions with `#[Renderless]` attribute or `.renderless` modifier
-- Automatic scroll preservation with `.preserve-scroll` modifier
-- `data-loading` attribute for styling loading states
-- JavaScript access to `$errors` magic property
-- Slots and attribute forwarding with `{{ $attributes }}`
-- JavaScript in view-based components without `@script` wrapper
-
 === livewire/core rules ===
 
 ## Livewire Core
 
 - Use the `search-docs` tool to find exact version specific documentation for how to write Livewire & Livewire tests.
-- Use the `php artisan make:livewire [Posts\CreatePost]` artisan command to create new components
+- Use the `php artisan make:livewire post.create` artisan command to create new components
 - State should live on the server, with the UI reflecting it.
 - All Livewire requests hit the Laravel backend, they're like regular HTTP requests. Always validate form data, and run authorization checks in Livewire actions.
 
@@ -391,8 +350,8 @@ accordion, autocomplete, avatar, badge, brand, breadcrumbs, button, calendar, ca
 </code-snippet>
 
 <code-snippet name="Testing a Livewire component exists within a page" lang="php">
-    $this->get('/posts/create')
-    ->assertSeeLivewire('create-post');
+    get('/posts/create')
+    ->assertSeeLivewire('post.create');
 </code-snippet>
 
 === pint/core rules ===

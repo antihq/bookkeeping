@@ -1,7 +1,9 @@
 <?php
 
-test('returns a successful response', function () {
-    $response = $this->get('/');
+use function Pest\Laravel\get;
 
-    $response->assertStatus(200);
+it('redirects to dashboard', function () {
+    $response = get('/');
+
+    $response->assertRedirect('/dashboard');
 });

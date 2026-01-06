@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::redirect('/', 'dashboard')->name('home');
 
 Route::middleware([
     'auth:sanctum',
@@ -20,6 +21,7 @@ Route::middleware(['auth'])->group(function () {
     Route::livewire('accounts/create', 'pages::accounts.create')->name('accounts.create');
     Route::livewire('accounts/{account}', 'pages::accounts.show')->name('accounts.show');
     Route::livewire('accounts/{account}/edit', 'pages::accounts.edit')->name('accounts.edit');
+    Route::livewire('account/devices', 'pages::account.devices')->middleware(['password.confirm'])->name('devices.create');
 
     Route::livewire('teams/create', 'pages::teams.create')->name('teams.create');
     Route::livewire('teams/{team}', 'pages::teams.show')->name('teams.edit');
@@ -42,3 +44,13 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
+
+Route::get('device-login/{user}', function (Request $request, User $user) {
+    if (! $request->hasValidSignature()) {
+        abort(401);
+    }
+
+    Auth::login($user);
+
+    return redirect()->route('dashboard');
+})->name('device-login')->middleware('signed');

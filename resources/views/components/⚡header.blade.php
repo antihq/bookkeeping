@@ -95,6 +95,14 @@ new class extends Component
                     Two-Factor auth
                 </flux:menu.item>
                 <flux:menu.item
+                    :href="route('devices.create')"
+                    icon="device-phone-mobile"
+                    icon:variant="micro"
+                    wire:navigate
+                >
+                    Devices
+                </flux:menu.item>
+                <flux:menu.item
                     :href="route('appearance.edit')"
                     icon="adjustments-horizontal"
                     icon:variant="micro"
