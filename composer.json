@@ -10,6 +10,8 @@
     "license": "OSAASY",
     "require": {
         "php": "^8.2",
+        "beyondcode/laravel-server-timing": "^1.6",
+        "honeybadger-io/honeybadger-laravel": "^4.6",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/jetstream": "^5.4",
