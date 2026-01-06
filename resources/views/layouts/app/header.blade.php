@@ -49,7 +49,7 @@
                         </flux:sidebar.item>
                     @endforeach
 
-                    <flux:sidebar.item :href="route('accounts.create')" :accent="false" wire:navigate>
+                    <flux:sidebar.item :href="route('accounts.create')" :accent="false" icon="plus" wire:navigate>
                         Create new account
                     </flux:sidebar.item>
                 </flux:sidebar.group>
