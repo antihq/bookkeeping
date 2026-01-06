@@ -1,13 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/livewire-starter-kit",
+    "name": "antihq/antihq-bookkeeping",
     "type": "project",
-    "description": "The official Laravel starter kit for Livewire.",
+    "description": "A modern Laravel-based personal finance and bookkeeping application built with Livewire and Flux UI.",
     "keywords": [
         "laravel",
         "framework"
     ],
-    "license": "MIT",
+    "license": "OSAASY",
     "require": {
         "php": "^8.2",
         "laravel/fortify": "^1.30",
