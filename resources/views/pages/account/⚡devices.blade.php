@@ -117,10 +117,10 @@ new #[Title('Devices')] class extends Component
                 <div
                     class="relative aspect-square w-64 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700"
                 >
-                    <div class="flex h-full items-center justify-center bg-white p-4">
-                        <div class="rounded bg-white p-3">
-                            {!! $qrCodeSvg !!}
-                        </div>
+                    <div
+                        class="flex h-full items-center justify-center bg-white [&_svg]:h-auto [&_svg]:w-full [&_svg]:max-w-full"
+                    >
+                        {!! $qrCodeSvg !!}
                     </div>
                 </div>
             </div>
