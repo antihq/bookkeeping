@@ -96,3 +96,21 @@ test('non-owners cannot create accounts', function () {
     Livewire::test('pages::accounts.create')
         ->assertForbidden();
 });
+
+test('negative starting balances are allowed', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+
+    actingAs($user);
+
+    Livewire::test('pages::accounts.create')
+        ->set('type', 'credit card')
+        ->set('name', 'Credit Card')
+        ->set('currency', 'usd')
+        ->set('start_balance', -500.00)
+        ->call('create')
+        ->assertHasNoErrors();
+
+    $account = $user->currentTeam->accounts()->latest()->first();
+
+    expect($account->start_balance)->toBe(-50000);
+});

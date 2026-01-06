@@ -40,7 +40,7 @@ new #[Title('Edit Account')] class extends Component
             'type' => ['required', 'in:checking,savings,credit card,cash,other'],
             'name' => ['required', 'string', 'max:255'],
             'currency' => ['required', 'string', 'size:3'],
-            'start_balance' => ['required', 'numeric', 'min:0'],
+            'start_balance' => ['required', 'numeric'],
         ]);
 
         $this->account->update([
@@ -108,7 +108,6 @@ new #[Title('Edit Account')] class extends Component
                     label="Start balance"
                     type="number"
                     step="0.01"
-                    min="0"
                     size="sm"
                     required
                 />

@@ -102,3 +102,26 @@ test('non-owners cannot edit accounts', function () {
     Livewire::test('pages::accounts.edit', ['account' => $account])
         ->assertForbidden();
 });
+
+test('negative starting balances are allowed', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+
+    $account = Account::factory()->for($user->currentTeam)->create([
+        'name' => 'Credit Card',
+        'type' => 'credit card',
+        'currency' => 'usd',
+        'start_balance' => 100000,
+        'created_by' => $user->id,
+    ]);
+
+    actingAs($user);
+
+    Livewire::test('pages::accounts.edit', ['account' => $account])
+        ->set('start_balance', -1000.50)
+        ->call('update')
+        ->assertHasNoErrors();
+
+    $account->refresh();
+
+    expect($account->start_balance)->toBe(-100050);
+});
