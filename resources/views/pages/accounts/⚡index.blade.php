@@ -4,9 +4,10 @@ use App\Models\Account;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new class extends Component
+new #[Title('Accounts')] class extends Component
 {
     public function mount()
     {
