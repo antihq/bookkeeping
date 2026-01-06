@@ -1,12 +1,12 @@
 <?php
 
-it('registration screen can be rendered', function () {
+it('can render registration screen', function () {
     $response = $this->get(route('register'));
 
     $response->assertStatus(200);
 });
 
-it('new users can register', function () {
+it('can register new users', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'John Doe',
         'email' => 'test@example.com',

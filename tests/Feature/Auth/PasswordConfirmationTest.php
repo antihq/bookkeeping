@@ -2,7 +2,7 @@
 
 use App\Models\User;
 
-it('confirm password screen can be rendered', function () {
+it('can render confirm password screen', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get(route('password.confirm'));
