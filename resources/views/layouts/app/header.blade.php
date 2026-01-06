@@ -31,6 +31,28 @@
                 >
                     Dashboard
                 </flux:sidebar.item>
+
+                <flux:sidebar.group heading="Accounts">
+                    @foreach (auth()->user()->currentTeam->accounts as $account)
+                        <flux:sidebar.item
+                            :href="route('accounts.show', $account)"
+                            :current="request()->account?->is($account)"
+                            :accent="false"
+                            wire:navigate
+                        >
+                            <span class="inline-flex w-full items-center justify-between gap-4">
+                                {{ $account->name }}
+                                <flux:text class="text-[13px] font-normal tabular-nums" inline>
+                                    {{ $account->formatted_balance }}
+                                </flux:text>
+                            </span>
+                        </flux:sidebar.item>
+                    @endforeach
+
+                    <flux:sidebar.item :href="route('accounts.create')" :accent="false" wire:navigate>
+                        Create new account
+                    </flux:sidebar.item>
+                </flux:sidebar.group>
             </flux:sidebar.nav>
         </flux:sidebar>
 
