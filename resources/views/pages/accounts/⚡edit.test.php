@@ -65,9 +65,9 @@ it('converts balance from dollars to cents', function () {
 
     $component = Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account]);
 
-    expect($component->get('start_balance'))->toBe(99.99);
+    expect($component->get('start_balance'))->toBe('99.99');
 
-    $component->set('start_balance', 100.50)
+    $component->set('start_balance', '100.50')
         ->call('update');
 
     $account->refresh();

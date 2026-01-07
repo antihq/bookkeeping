@@ -17,11 +17,16 @@ new #[Title('Add Account')] class extends Component
 
     public string $currency = 'usd';
 
-    public float $start_balance = 0.0;
+    public string $start_balance = '';
 
     public function mount()
     {
         $this->authorize('create', Account::class);
+    }
+
+    public function updatedStartBalance($value)
+    {
+        $this->start_balance = str_replace(['$', ','], '', $value);
     }
 
     public function create()
@@ -106,8 +111,9 @@ new #[Title('Add Account')] class extends Component
                 <flux:input
                     wire:model="start_balance"
                     label="Start balance"
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    mask:dynamic="$money($input)"
+                    placeholder="0.00"
                     size="sm"
                     required
                 />

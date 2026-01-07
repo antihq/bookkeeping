@@ -17,7 +17,7 @@ new #[Title('Edit Account')] class extends Component
 
     public string $currency = 'usd';
 
-    public float $start_balance = 0.0;
+    public string $start_balance = '';
 
     public function mount()
     {
@@ -27,7 +27,12 @@ new #[Title('Edit Account')] class extends Component
         $this->type = $this->account->type;
         $this->name = $this->account->name;
         $this->currency = $this->account->currency;
-        $this->start_balance = $this->account->start_balance / 100;
+        $this->start_balance = (string) ($this->account->start_balance / 100);
+    }
+
+    public function updatedStartBalance($value)
+    {
+        $this->start_balance = str_replace(['$', ','], '', $value);
     }
 
     public function update()
@@ -98,8 +103,9 @@ new #[Title('Edit Account')] class extends Component
                 <flux:input
                     wire:model="start_balance"
                     label="Start balance"
-                    type="number"
-                    step="0.01"
+                    type="text"
+                    mask:dynamic="$money($input)"
+                    placeholder="0.00"
                     size="sm"
                     required
                 />
