@@ -8,7 +8,7 @@ use Livewire\Livewire;
 it('allows deleting accounts', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    $account = Account::factory()->for($user->currentTeam)->create([
+    $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
         'currency' => 'usd',
@@ -29,7 +29,7 @@ it('prevents non-owners from deleting accounts', function () {
 
     $owner->currentTeam->users()->attach($member, ['role' => 'editor']);
 
-    $account = Account::factory()->for($owner->currentTeam)->create([
+    $account = Account::factory()->for($owner->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
         'currency' => 'usd',
@@ -41,9 +41,9 @@ it('prevents non-owners from deleting accounts', function () {
         ->assertDontSee('Delete account');
 });
 
-test('transaction can be added through livewire component', function () {
+it('can add transactions', function () {
     $user = User::factory()->withPersonalTeam()->create();
-    $account = Account::factory()->for($user->currentTeam)->create([
+    $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
         'currency' => 'usd',
@@ -67,7 +67,7 @@ test('transaction can be added through livewire component', function () {
     expect($account->balanceInDollars)->toBe(1100.50);
 });
 
-it('can create a new category via livewire component', function () {
+it('can create new categories', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->forTeam($user->currentTeam)->create();
 
@@ -80,10 +80,10 @@ it('can create a new category via livewire component', function () {
     expect($category->name)->toBe('Entertainment');
 });
 
-it('cannot create duplicate categories in same team', function () {
+it('prevents creating duplicate categories in the same team', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->forTeam($user->currentTeam)->create();
-    Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Food']);
+    Category::factory()->for($user->currentTeam, 'team')->create(['name' => 'Food']);
 
     Livewire::actingAs($user)->test('pages::accounts.show', ['account' => $account])
         ->set('category_search', 'Food')

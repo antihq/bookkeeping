@@ -28,9 +28,9 @@ new #[Title('Account')] class extends Component
 
     public $page = 1;
 
-    public function mount(Account $account)
+    public function mount()
     {
-        $this->authorize('view', $account);
+        $this->authorize('view', $this->account);
 
         $this->date = now()->format('Y-m-d');
     }

@@ -4,12 +4,10 @@ use App\Models\Account;
 use App\Models\User;
 use Livewire\Livewire;
 
-use function Pest\Laravel\actingAs;
-
-test('accounts can be edited', function () {
+it('can edit accounts', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    $account = Account::factory()->for($user->currentTeam)->create([
+    $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Old Name',
         'type' => 'checking',
         'currency' => 'usd',
@@ -17,9 +15,7 @@ test('accounts can be edited', function () {
         'created_by' => $user->id,
     ]);
 
-    actingAs($user);
-
-    Livewire::test('pages::accounts.edit', ['account' => $account])
+    Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account])
         ->set('type', 'savings')
         ->set('name', 'New Name')
         ->set('currency', 'eur')
@@ -36,10 +32,10 @@ test('accounts can be edited', function () {
     expect($account->start_balance)->toBe(200050);
 });
 
-test('account type must be valid', function () {
+it('prevents invalid account types', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    $account = Account::factory()->for($user->currentTeam)->create([
+    $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
         'currency' => 'usd',
@@ -47,9 +43,7 @@ test('account type must be valid', function () {
         'created_by' => $user->id,
     ]);
 
-    actingAs($user);
-
-    Livewire::test('pages::accounts.edit', ['account' => $account])
+    Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account])
         ->set('type', 'invalid')
         ->set('name', 'Test Account')
         ->set('currency', 'usd')
@@ -58,10 +52,10 @@ test('account type must be valid', function () {
         ->assertHasErrors(['type']);
 });
 
-test('balance is converted from dollars to cents', function () {
+it('converts balance from dollars to cents', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    $account = Account::factory()->for($user->currentTeam)->create([
+    $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
         'currency' => 'usd',
@@ -69,9 +63,7 @@ test('balance is converted from dollars to cents', function () {
         'created_by' => $user->id,
     ]);
 
-    actingAs($user);
-
-    $component = Livewire::test('pages::accounts.edit', ['account' => $account]);
+    $component = Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account]);
 
     expect($component->get('start_balance'))->toBe(99.99);
 
@@ -83,13 +75,13 @@ test('balance is converted from dollars to cents', function () {
     expect($account->start_balance)->toBe(10050);
 });
 
-test('non-owners cannot edit accounts', function () {
+it('prevents non-owners from editing accounts', function () {
     $owner = User::factory()->withPersonalTeam()->create();
     $member = User::factory()->withPersonalTeam()->create();
 
     $owner->currentTeam->users()->attach($member, ['role' => 'editor']);
 
-    $account = Account::factory()->for($owner->currentTeam)->create([
+    $account = Account::factory()->for($owner->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
         'currency' => 'usd',
@@ -97,16 +89,14 @@ test('non-owners cannot edit accounts', function () {
         'created_by' => $owner->id,
     ]);
 
-    actingAs($member);
-
-    Livewire::test('pages::accounts.edit', ['account' => $account])
+    Livewire::actingAs($member)->test('pages::accounts.edit', ['account' => $account])
         ->assertForbidden();
 });
 
-test('negative starting balances are allowed', function () {
+it('allows negative starting balances', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    $account = Account::factory()->for($user->currentTeam)->create([
+    $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Credit Card',
         'type' => 'credit card',
         'currency' => 'usd',
@@ -114,9 +104,7 @@ test('negative starting balances are allowed', function () {
         'created_by' => $user->id,
     ]);
 
-    actingAs($user);
-
-    Livewire::test('pages::accounts.edit', ['account' => $account])
+    Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account])
         ->set('start_balance', -1000.50)
         ->call('update')
         ->assertHasNoErrors();

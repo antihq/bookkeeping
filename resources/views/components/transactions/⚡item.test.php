@@ -9,8 +9,8 @@ use function Pest\Laravel\actingAs;
 
 test('transaction can be edited with category', function () {
     $user = User::factory()->withPersonalTeam()->create();
-    $account = Account::factory()->forTeam($user->currentTeam)->create();
-    $category = Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Food']);
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
+    $category = Category::factory()->for($user->currentTeam, 'team')->create(['name' => 'Food']);
     $transaction = $account->addTransaction(
         input: [
             'date' => now()->toDateString(),
@@ -37,9 +37,9 @@ test('transaction can be edited with category', function () {
 
 test('transaction category can be changed', function () {
     $user = User::factory()->withPersonalTeam()->create();
-    $account = Account::factory()->forTeam($user->currentTeam)->create();
-    $category1 = Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Food']);
-    $category2 = Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Transport']);
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
+    $category1 = Category::factory()->for($user->currentTeam, 'team')->create(['name' => 'Food']);
+    $category2 = Category::factory()->for($user->currentTeam, 'team')->create(['name' => 'Transport']);
     $transaction = $account->addTransaction(
         input: [
             'date' => now()->toDateString(),
@@ -66,7 +66,7 @@ test('transaction category can be changed', function () {
 
 test('category can be created when editing transaction', function () {
     $user = User::factory()->withPersonalTeam()->create();
-    $account = Account::factory()->forTeam($user->currentTeam)->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $transaction = $account->addTransaction(
         input: [
             'date' => now()->toDateString(),

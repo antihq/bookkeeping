@@ -2,9 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Currency;
-use App\Models\User;
 use Flux\Flux;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -21,15 +19,15 @@ new #[Title('Edit Account')] class extends Component
 
     public float $start_balance = 0.0;
 
-    public function mount(Account $account)
+    public function mount()
     {
-        $this->authorize('update', $account);
+        $this->authorize('update', $this->account);
 
-        $this->account = $account;
-        $this->type = $account->type;
-        $this->name = $account->name;
-        $this->currency = $account->currency;
-        $this->start_balance = $account->start_balance / 100;
+        $this->account = $this->account;
+        $this->type = $this->account->type;
+        $this->name = $this->account->name;
+        $this->currency = $this->account->currency;
+        $this->start_balance = $this->account->start_balance / 100;
     }
 
     public function update()
@@ -53,12 +51,6 @@ new #[Title('Edit Account')] class extends Component
         Flux::toast('Account updated successfully.', variant: 'success');
 
         return $this->redirectRoute('accounts.show', $this->account);
-    }
-
-    #[Computed]
-    public function user(): User
-    {
-        return Auth::user();
     }
 
     #[Computed]

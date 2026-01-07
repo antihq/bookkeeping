@@ -12,11 +12,4 @@ class CategoryFactory extends Factory
             'name' => fake()->word(),
         ];
     }
-
-    public function forTeam(mixed $team): self
-    {
-        return $this->state(fn (array $attributes) => [
-            'team_id' => $team,
-        ]);
-    }
 }
