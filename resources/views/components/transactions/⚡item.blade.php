@@ -230,6 +230,7 @@ new class extends Component
                                     inputmode="decimal"
                                     placeholder="0.00"
                                     required
+                                    autofocus
                                 />
                             </flux:input.group>
                             <flux:error name="amount" />
