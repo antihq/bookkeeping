@@ -69,7 +69,7 @@ it('can add transactions', function () {
 
 it('can create new categories', function () {
     $user = User::factory()->withPersonalTeam()->create();
-    $account = Account::factory()->forTeam($user->currentTeam)->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
 
     Livewire::actingAs($user)->test('pages::accounts.show', ['account' => $account])
         ->set('category_search', 'Entertainment')
@@ -82,7 +82,7 @@ it('can create new categories', function () {
 
 it('prevents creating duplicate categories in the same team', function () {
     $user = User::factory()->withPersonalTeam()->create();
-    $account = Account::factory()->forTeam($user->currentTeam)->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
     Category::factory()->for($user->currentTeam, 'team')->create(['name' => 'Food']);
 
     Livewire::actingAs($user)->test('pages::accounts.show', ['account' => $account])
