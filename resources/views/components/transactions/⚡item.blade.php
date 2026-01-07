@@ -126,7 +126,7 @@ new class extends Component
     <div class="flex w-1/2 items-center gap-4">
         <flux:text class="shrink-0 text-[13px] tabular-nums max-lg:hidden">{{ $transaction->display_date }}</flux:text>
         <div>
-            <flux:text class="truncate" variant="strong">{{ $transaction->payee }}</flux:text>
+            <flux:text class="truncate font-medium" variant="strong">{{ $transaction->payee }}</flux:text>
             <flux:text :variant="$transaction->category ? 'strong' : null" class="mt-1 text-[13px] lg:hidden">
                 {{ $transaction->category?->name ?? 'Uncategorized' }}
             </flux:text>
@@ -150,11 +150,15 @@ new class extends Component
         <div class="flex min-w-fit flex-1 items-center justify-end gap-4">
             <div class="text-right tabular-nums">
                 @if ($transaction->amount === 0)
-                    <flux:badge color="zinc" size="sm">{{ $transaction->display_amount }}</flux:badge>
+                    <flux:text variant="strong" class="font-medium">{{ $transaction->display_amount }}</flux:text>
                 @elseif ($transaction->amount > 0)
-                    <flux:badge color="green" size="sm">{{ $transaction->display_amount }}</flux:badge>
+                    <flux:text variant="strong" color="green" class="font-medium">
+                        {{ $transaction->display_amount }}
+                    </flux:text>
                 @else
-                    <flux:badge color="red" size="sm">{{ $transaction->display_amount }}</flux:badge>
+                    <flux:text variant="strong" color="red" class="font-medium">
+                        {{ $transaction->display_amount }}
+                    </flux:text>
                 @endif
                 <flux:text class="mt-1 shrink-0 text-[13px] tabular-nums lg:hidden">
                     {{ $transaction->display_date }}

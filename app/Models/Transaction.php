@@ -61,7 +61,7 @@ class Transaction extends Model
     protected function displayAmount(): Attribute
     {
         return Attribute::make(
-            get: fn () => ($this->amount >= 0 ? '+' : '-') . $this->formatted_amount,
+            get: fn () => ($this->amount < 0 ? '-' : '') . $this->formatted_amount,
         );
     }
 
