@@ -10,7 +10,8 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Account')] class extends Component {
+new #[Title('Account')] class extends Component
+{
     public Account $account;
 
     public string $date = '';
@@ -70,12 +71,12 @@ new #[Title('Account')] class extends Component {
         $category = $this->category_id ? $this->account->team->categories()->findOrFail($this->category_id) : null;
 
         $this->account->addTransaction(
-            input: ($input = [
+            input: [
                 'date' => $this->date,
                 'payee' => $this->payee,
                 'amount' => (int) round((float) $this->amount * 100),
                 'note' => $this->note,
-            ]),
+            ],
             createdBy: $this->user,
             category: $category,
         );
