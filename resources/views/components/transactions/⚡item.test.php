@@ -87,3 +87,115 @@ test('category can be created when editing transaction', function () {
 
     expect(Category::where('name', 'Entertainment')->exists())->toBeTrue();
 });
+
+test('expense transaction can be edited', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Coffee',
+            'amount' => -550,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
+
+    actingAs($user);
+
+    Livewire::test('transactions.item', ['transaction' => $transaction])
+        ->assertSet('type', 'expense')
+        ->set('payee', 'Updated Coffee')
+        ->set('amount', 7.50)
+        ->set('type', 'expense')
+        ->call('edit')
+        ->assertHasNoErrors();
+
+    $transaction->refresh();
+
+    expect($transaction->payee)->toBe('Updated Coffee');
+    expect($transaction->amount)->toBe(-750);
+});
+
+test('income transaction can be edited', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Salary',
+            'amount' => 500000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
+
+    actingAs($user);
+
+    Livewire::test('transactions.item', ['transaction' => $transaction])
+        ->assertSet('type', 'income')
+        ->set('payee', 'Updated Salary')
+        ->set('amount', 5200)
+        ->set('type', 'income')
+        ->call('edit')
+        ->assertHasNoErrors();
+
+    $transaction->refresh();
+
+    expect($transaction->payee)->toBe('Updated Salary');
+    expect($transaction->amount)->toBe(520000);
+});
+
+test('transaction type can be changed from expense to income', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Refund',
+            'amount' => -2000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
+
+    actingAs($user);
+
+    Livewire::test('transactions.item', ['transaction' => $transaction])
+        ->assertSet('type', 'expense')
+        ->set('amount', 20)
+        ->set('type', 'income')
+        ->call('edit')
+        ->assertHasNoErrors();
+
+    $transaction->refresh();
+
+    expect($transaction->amount)->toBe(2000);
+});
+
+test('transaction type can be changed from income to expense', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Sale',
+            'amount' => 10000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
+
+    actingAs($user);
+
+    Livewire::test('transactions.item', ['transaction' => $transaction])
+        ->assertSet('type', 'income')
+        ->set('amount', 100)
+        ->set('type', 'expense')
+        ->call('edit')
+        ->assertHasNoErrors();
+
+    $transaction->refresh();
+
+    expect($transaction->amount)->toBe(-10000);
+});
