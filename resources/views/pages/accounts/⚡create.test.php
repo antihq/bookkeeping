@@ -1,17 +1,12 @@
 <?php
 
-use App\Models\Account;
 use App\Models\User;
 use Livewire\Livewire;
 
-use function Pest\Laravel\actingAs;
-
-test('accounts can be created', function () {
+it('can create accounts', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    actingAs($user);
-
-    Livewire::test('pages::accounts.create')
+    Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'savings')
         ->set('name', 'Test Savings Account')
         ->set('currency', 'usd')
@@ -28,26 +23,10 @@ test('accounts can be created', function () {
     expect($account->start_balance)->toBe(123456);
 });
 
-// test('account creation validates required fields', function () {
-//     $user = User::factory()->withPersonalTeam()->create();
-//
-//     actingAs($user);
-//
-//     Livewire::test('pages::accounts.create')
-//         ->set('type', 'invalid')
-//         ->set('name', '')
-//         ->set('currency', '')
-//         ->set('start_balance', '')
-//         ->call('create')
-//         ->assertHasErrors(['type', 'name', 'currency', 'start_balance']);
-// });
-
-test('account type must be valid', function () {
+it('prevents invalid account types', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    actingAs($user);
-
-    Livewire::test('pages::accounts.create')
+    Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'invalid')
         ->set('name', 'Test Account')
         ->set('currency', 'usd')
@@ -56,12 +35,10 @@ test('account type must be valid', function () {
         ->assertHasErrors(['type']);
 });
 
-test('balance is stored in cents', function () {
+it('stores balance in cents', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    actingAs($user);
-
-    Livewire::test('pages::accounts.create')
+    Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'checking')
         ->set('name', 'Test Account')
         ->set('currency', 'usd')
@@ -73,36 +50,30 @@ test('balance is stored in cents', function () {
     expect($account->start_balance)->toBe(9999);
 });
 
-test('currency defaults to usd', function () {
+it('defaults currency to usd', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    actingAs($user);
-
-    $component = Livewire::test('pages::accounts.create');
+    $component = Livewire::actingAs($user)->test('pages::accounts.create');
 
     expect($component->get('currency'))->toBe('usd');
 });
 
-test('non-owners cannot create accounts', function () {
+it('prevents non-owners from creating accounts', function () {
     $owner = User::factory()->withPersonalTeam()->create();
     $member = User::factory()->withPersonalTeam()->create();
 
     $owner->currentTeam->users()->attach($member, ['role' => 'editor']);
 
-    actingAs($member);
-
     $member->currentTeam = $owner->currentTeam;
 
-    Livewire::test('pages::accounts.create')
+    Livewire::actingAs($member)->test('pages::accounts.create')
         ->assertForbidden();
 });
 
-test('negative starting balances are allowed', function () {
+it('allows negative starting balances', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
-    actingAs($user);
-
-    Livewire::test('pages::accounts.create')
+    Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'credit card')
         ->set('name', 'Credit Card')
         ->set('currency', 'usd')
