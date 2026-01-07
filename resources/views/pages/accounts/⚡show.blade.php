@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Account;
-use App\Models\Category;
+use App\Models\Team;
 use App\Models\Transaction;
 use App\Models\User;
 use Flux\Flux;
@@ -22,7 +22,7 @@ new #[Title('Account')] class extends Component
 
     public string $amount = '';
 
-    public ?int $category_id = null;
+    public ?int $category = null;
 
     public string $category_search = '';
 
@@ -65,10 +65,10 @@ new #[Title('Account')] class extends Component
             'date' => ['required', 'date'],
             'payee' => ['required', 'string', 'max:255'],
             'amount' => ['required'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'category' => ['nullable', 'exists:categories,id'],
         ]);
 
-        $category = $this->category_id ? $this->account->team->categories()->findOrFail($this->category_id) : null;
+        $category = $this->category ? $this->team->categories()->findOrFail($this->category) : null;
 
         $this->account->addTransaction(
             input: [
@@ -85,7 +85,7 @@ new #[Title('Account')] class extends Component
 
         Flux::modals()->close();
 
-        $this->reset(['payee', 'note', 'amount', 'category_id']);
+        $this->reset(['payee', 'note', 'amount', 'category']);
     }
 
     public function updatedAmount($value)
@@ -105,6 +105,12 @@ new #[Title('Account')] class extends Component
     }
 
     #[Computed]
+    public function team(): Team
+    {
+        return $this->account->team;
+    }
+
+    #[Computed]
     public function transactions()
     {
         return $this->account
@@ -116,8 +122,8 @@ new #[Title('Account')] class extends Component
     #[Computed]
     public function categories()
     {
-        return Category::query()
-            ->where('team_id', $this->account->team_id)
+        return $this->team
+            ->categories()
             ->when(
                 $this->category_search,
                 fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
@@ -129,21 +135,14 @@ new #[Title('Account')] class extends Component
     public function createCategory()
     {
         $this->validate([
-            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->account->team_id],
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->team->id],
         ]);
 
-        $category = Category::create([
-            'name' => $this->category_search,
-            'team_id' => $this->account->team_id,
+        $category = $this->team->categories()->create([
+            'name' => $this->pull('category_search'),
         ]);
 
-        $this->category_id = $category->id;
-        $this->category_search = '';
-    }
-
-    public function updatedCategorySearch()
-    {
-        $this->resetErrorBag('category_search');
+        $this->category = $category->id;
     }
 };
 ?>
@@ -226,12 +225,7 @@ new #[Title('Account')] class extends Component
 
                         <flux:input wire:model="payee" label="Payee" type="text" required />
 
-                        <flux:select
-                            wire:model="category_id"
-                            variant="combobox"
-                            label="Category"
-                            placeholder="Optional"
-                        >
+                        <flux:select wire:model="category" variant="combobox" label="Category" placeholder="Optional">
                             <x-slot name="input">
                                 <flux:select.input wire:model="category_search" />
                             </x-slot>
