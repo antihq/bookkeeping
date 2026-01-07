@@ -13,7 +13,15 @@ it('creates a transaction and updates account balance', function () {
         'start_balance' => 10000,
     ]);
 
-    $transaction = $account->addTransaction(now()->toDateString(), 'Deposit', 5000, null, $user->id);
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Deposit',
+            'amount' => 5000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
 
     $account->refresh();
 
@@ -28,8 +36,24 @@ it('correctly calculates balance with positive and negative transactions', funct
         'start_balance' => 10000,
     ]);
 
-    $account->addTransaction(now()->toDateString(), 'Deposit', 5000, null, $user->id);
-    $account->addTransaction(now()->toDateString(), 'Withdrawal', -2500, null, $user->id);
+    $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Deposit',
+            'amount' => 5000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
+    $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Withdrawal',
+            'amount' => -2500,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
 
     expect($account->balanceInDollars)->toBe(125.00);
 });
@@ -40,7 +64,15 @@ it('formats transaction amounts correctly with currency symbol', function () {
         'currency' => 'usd',
     ]);
 
-    $transaction = $account->addTransaction(now()->toDateString(), 'Test', 1500, null, $user->id);
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Test',
+            'amount' => 1500,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
 
     expect($transaction->formatted_amount)->toBe('$15.00');
     expect($transaction->display_amount)->toBe('+$15.00');
@@ -52,7 +84,15 @@ it('formats negative transaction amounts correctly', function () {
         'currency' => 'usd',
     ]);
 
-    $transaction = $account->addTransaction(now()->toDateString(), 'Expense', -2500, null, $user->id);
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Expense',
+            'amount' => -2500,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
 
     expect($transaction->formatted_amount)->toBe('$25.00');
     expect($transaction->display_amount)->toBe('-$25.00');
@@ -64,12 +104,14 @@ it('creates a transaction with a category', function () {
     $category = Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Food']);
 
     $transaction = $account->addTransaction(
-        now()->toDateString(),
-        'Grocery shopping',
-        1500,
-        null,
-        $user->id,
-        $category->id
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Grocery shopping',
+            'amount' => 1500,
+            'note' => null,
+        ],
+        createdBy: $user,
+        category: $category,
     );
 
     expect($transaction->category_id)->toBe($category->id);
@@ -85,7 +127,7 @@ it('can create a new category via livewire component', function () {
     Livewire::test('pages::accounts.show', ['account' => $account])
         ->set('category_search', 'Entertainment')
         ->call('createCategory')
-        ->assertSet('transaction_category_id', Category::where('name', 'Entertainment')->first()->id)
+        ->assertSet('category_id', Category::where('name', 'Entertainment')->first()->id)
         ->assertSet('category_search', '');
 
     expect(Category::where('name', 'Entertainment')->exists())->toBeTrue();

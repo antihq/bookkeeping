@@ -11,7 +11,15 @@ test('transaction can be edited with category', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->forTeam($user->currentTeam)->create();
     $category = Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Food']);
-    $transaction = $account->addTransaction(now()->toDateString(), 'Grocery', 1000, null, $user->id);
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Grocery',
+            'amount' => 1000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
 
     actingAs($user);
 
@@ -33,12 +41,14 @@ test('transaction category can be changed', function () {
     $category1 = Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Food']);
     $category2 = Category::factory()->forTeam($user->currentTeam)->create(['name' => 'Transport']);
     $transaction = $account->addTransaction(
-        now()->toDateString(),
-        'Grocery',
-        1000,
-        null,
-        $user->id,
-        $category1->id
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Grocery',
+            'amount' => 1000,
+            'note' => null,
+        ],
+        createdBy: $user,
+        category: $category1,
     );
 
     actingAs($user);
@@ -57,7 +67,15 @@ test('transaction category can be changed', function () {
 test('category can be created when editing transaction', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->forTeam($user->currentTeam)->create();
-    $transaction = $account->addTransaction(now()->toDateString(), 'Grocery', 1000, null, $user->id);
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Grocery',
+            'amount' => 1000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
 
     actingAs($user);
 

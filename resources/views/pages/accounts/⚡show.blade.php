@@ -10,19 +10,18 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Account')] class extends Component
-{
+new #[Title('Account')] class extends Component {
     public Account $account;
 
-    public string $transaction_date = '';
+    public string $date = '';
 
-    public string $transaction_payee = '';
+    public string $payee = '';
 
-    public ?string $transaction_note = null;
+    public ?string $note = null;
 
-    public string $transaction_amount = '';
+    public string $amount = '';
 
-    public ?int $transaction_category_id = null;
+    public ?int $category_id = null;
 
     public string $category_search = '';
 
@@ -32,7 +31,7 @@ new #[Title('Account')] class extends Component
     {
         $this->authorize('view', $account);
 
-        $this->transaction_date = now()->format('Y-m-d');
+        $this->date = now()->format('Y-m-d');
     }
 
     public function delete()
@@ -46,9 +45,9 @@ new #[Title('Account')] class extends Component
         return $this->redirectRoute('accounts.index');
     }
 
-    public function deleteTransaction(int $transactionId)
+    public function deleteTransaction(int $id)
     {
-        $transaction = Transaction::findOrFail($transactionId);
+        $transaction = $this->account->transactions()->findOrFail($id);
 
         $this->authorize('delete', $transaction);
 
@@ -62,33 +61,35 @@ new #[Title('Account')] class extends Component
         $this->authorize('create', Transaction::class);
 
         $this->validate([
-            'transaction_date' => ['required', 'date'],
-            'transaction_payee' => ['required', 'string', 'max:255'],
-            'transaction_amount' => ['required'],
-            'transaction_category_id' => ['nullable', 'exists:categories,id'],
+            'date' => ['required', 'date'],
+            'payee' => ['required', 'string', 'max:255'],
+            'amount' => ['required'],
+            'category_id' => ['nullable', 'exists:categories,id'],
         ]);
 
-        $amount = (int) round((float) $this->transaction_amount * 100);
+        $category = $this->category_id ? $this->account->team->categories()->findOrFail($this->category_id) : null;
 
         $this->account->addTransaction(
-            date: $this->transaction_date,
-            payee: $this->transaction_payee,
-            amount: $amount,
-            note: $this->transaction_note,
-            createdBy: $this->user->id,
-            categoryId: $this->transaction_category_id,
+            input: ($input = [
+                'date' => $this->date,
+                'payee' => $this->payee,
+                'amount' => (int) round((float) $this->amount * 100),
+                'note' => $this->note,
+            ]),
+            createdBy: $this->user,
+            category: $category,
         );
 
         Flux::toast('Transaction added successfully.', variant: 'success');
 
         Flux::modals()->close();
 
-        $this->reset(['transaction_payee', 'transaction_note', 'transaction_amount', 'transaction_category_id']);
+        $this->reset(['payee', 'note', 'amount', 'category_id']);
     }
 
-    public function updatedTransactionAmount($value)
+    public function updatedAmount($value)
     {
-        $this->transaction_amount = str_replace(['$', ','], '', $value);
+        $this->amount = str_replace(['$', ','], '', $value);
     }
 
     public function loadMore()
@@ -135,7 +136,7 @@ new #[Title('Account')] class extends Component
             'team_id' => $this->account->team_id,
         ]);
 
-        $this->transaction_category_id = $category->id;
+        $this->category_id = $category->id;
         $this->category_search = '';
     }
 
@@ -220,12 +221,12 @@ new #[Title('Account')] class extends Component
                             <flux:text class="mt-2">Add a new transaction to this account.</flux:text>
                         </div>
 
-                        <flux:date-picker wire:model="transaction_date" label="Date" required />
+                        <flux:date-picker wire:model="date" label="Date" required />
 
-                        <flux:input wire:model="transaction_payee" label="Payee" type="text" required />
+                        <flux:input wire:model="payee" label="Payee" type="text" required />
 
                         <flux:select
-                            wire:model="transaction_category_id"
+                            wire:model="category_id"
                             variant="combobox"
                             label="Category"
                             placeholder="Optional"
@@ -247,10 +248,10 @@ new #[Title('Account')] class extends Component
                             </flux:select.option.create>
                         </flux:select>
 
-                        <flux:input wire:model="transaction_note" label="Note" type="text" placeholder="Optional" />
+                        <flux:input wire:model="note" label="Note" type="text" placeholder="Optional" />
 
                         <flux:input
-                            wire:model="transaction_amount"
+                            wire:model="amount"
                             label="Amount"
                             type="text"
                             mask:dynamic="$money($input)"

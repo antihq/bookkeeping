@@ -129,10 +129,10 @@ test('transaction can be added through livewire component', function () {
     actingAs($user);
 
     Livewire::test('pages::accounts.show', ['account' => $account])
-        ->set('transaction_date', now()->toDateString())
-        ->set('transaction_payee', 'New Deposit')
-        ->set('transaction_amount', 100.50)
-        ->set('transaction_note', null)
+        ->set('date', now()->toDateString())
+        ->set('payee', 'New Deposit')
+        ->set('amount', 100.50)
+        ->set('note', null)
         ->call('addTransaction')
         ->assertHasNoErrors();
 
@@ -157,8 +157,8 @@ test('transaction validation errors are shown', function () {
     actingAs($user);
 
     Livewire::test('pages::accounts.show', ['account' => $account])
-        ->set('transaction_date', 'invalid-date')
-        ->set('transaction_payee', '')
+        ->set('date', 'invalid-date')
+        ->set('payee', '')
         ->call('addTransaction')
-        ->assertHasErrors(['transaction_date', 'transaction_payee']);
+        ->assertHasErrors(['date', 'payee']);
 });

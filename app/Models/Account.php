@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class Account extends Model
 {
@@ -64,16 +63,16 @@ class Account extends Model
         $this->attributes['start_balance'] = (int) round($value * 100);
     }
 
-    public function addTransaction(string $date, string $payee, int $amount, ?string $note = null, ?int $createdBy = null, ?int $categoryId = null): Transaction
+    public function addTransaction(array $input, User $createdBy, ?Category $category = null): Transaction
     {
         return $this->transactions()->create([
-            'date' => $date,
-            'payee' => $payee,
-            'amount' => $amount,
-            'note' => $note,
+            'date' => $input['date'],
+            'payee' => $input['payee'],
+            'amount' => $input['amount'],
+            'note' => $input['note'],
             'team_id' => $this->team_id,
-            'created_by' => $createdBy ?? Auth::id(),
-            'category_id' => $categoryId,
+            'created_by' => $createdBy->id,
+            'category_id' => $category?->id,
         ]);
     }
 
