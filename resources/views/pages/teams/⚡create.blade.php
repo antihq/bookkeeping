@@ -20,10 +20,12 @@ new class extends Component
 
         AddingTeam::dispatch($this->user);
 
-        $this->user->switchTeam($this->user->ownedTeams()->create([
-            'name' => $this->name,
-            'personal_team' => false,
-        ]));
+        $this->user->switchTeam(
+            $this->user->ownedTeams()->create([
+                'name' => $this->name,
+                'personal_team' => false,
+            ]),
+        );
 
         return $this->redirectRoute('dashboard');
     }
@@ -37,21 +39,21 @@ new class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <flux:heading size="lg">Create team</flux:heading>
+    <flux:heading size="xl">Create team</flux:heading>
 
     <div class="space-y-14">
-        <div class="space-y-8">
-            <header>
+        <div class="space-y-6">
+            <header class="space-y-1">
                 <flux:heading>Team details</flux:heading>
-                <flux:text class="mt-1">Create a new team to collaborate with others on projects.</flux:text>
+                <flux:text>Create a new team to collaborate with others on projects.</flux:text>
             </header>
 
             <form wire:submit="create" class="w-full max-w-lg space-y-8">
-                <flux:input wire:model="name" label="Team name" type="text" size="sm" required autofocus />
+                <flux:input wire:model="name" label="Team name" type="text" required autofocus />
 
                 <div class="flex items-center gap-4">
                     <div class="flex items-center justify-end">
-                        <flux:button variant="primary" type="submit" class="w-full" size="sm">Create</flux:button>
+                        <flux:button variant="primary" type="submit" class="w-full">Create team</flux:button>
                     </div>
                 </div>
             </form>

@@ -11,7 +11,7 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\Response;
 
-new #[Title('Two Factor authentication')] class extends Component
+new #[Title('Two Factor Authentication')] class extends Component
 {
     #[Locked]
     public bool $twoFactorEnabled;
@@ -154,15 +154,13 @@ new #[Title('Two Factor authentication')] class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <flux:heading size="lg">Two Factor Authentication</flux:heading>
+    <flux:heading size="xl">Two Factor Authentication</flux:heading>
 
     <div class="space-y-14">
-        <div class="space-y-8">
-            <header>
+        <div class="space-y-6">
+            <header class="space-y-1">
                 <flux:heading>Authentication status</flux:heading>
-                <flux:text class="mt-1">
-                    Add an extra layer of security to your account using two-factor authentication.
-                </flux:text>
+                <flux:text>Add an extra layer of security to your account using two-factor authentication.</flux:text>
             </header>
 
             <div class="flex w-full max-w-lg flex-col space-y-6 text-sm" wire:cloak>
@@ -181,7 +179,6 @@ new #[Title('Two Factor authentication')] class extends Component
                                 variant="danger"
                                 icon="shield-exclamation"
                                 icon:variant="outline"
-                                size="sm"
                                 wire:click="disable"
                             >
                                 Disable 2FA
@@ -193,17 +190,11 @@ new #[Title('Two Factor authentication')] class extends Component
                         <div class="flex items-center gap-3">
                             <flux:badge color="red">Disabled</flux:badge>
                         </div>
-                        <flux:text variant="subtle">
+                        <flux:text>
                             When you enable two-factor authentication, you will be prompted for a secure pin during
                             login. This pin can be retrieved from a TOTP-supported application on your phone.
                         </flux:text>
-                        <flux:button
-                            variant="primary"
-                            icon="shield-check"
-                            icon:variant="outline"
-                            size="sm"
-                            wire:click="enable"
-                        >
+                        <flux:button variant="primary" icon="shield-check" icon:variant="outline" wire:click="enable">
                             Enable 2FA
                         </flux:button>
                     </div>

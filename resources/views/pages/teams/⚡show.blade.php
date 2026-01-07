@@ -60,13 +60,13 @@ new class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <flux:heading size="lg">Team settings</flux:heading>
+    <flux:heading size="xl">Team settings</flux:heading>
 
     <div class="space-y-14">
-        <div class="space-y-8">
-            <header>
+        <div class="space-y-6">
+            <header class="space-y-1">
                 <flux:heading>Team name</flux:heading>
-                <flux:text class="mt-1">The name of your team appears on your profile.</flux:text>
+                <flux:text>The name of your team appears on your profile.</flux:text>
             </header>
 
             <form wire:submit="update" class="w-full max-w-lg space-y-8">
@@ -74,7 +74,6 @@ new class extends Component
                     wire:model="name"
                     label="Team name"
                     type="text"
-                    size="sm"
                     :readonly="! Gate::check('update', $team)"
                     :variant="! Gate::check('update', $team) ? 'filled' : null"
                     required
@@ -84,7 +83,7 @@ new class extends Component
                 @if (Gate::check('update', $team))
                     <div class="flex items-center gap-4">
                         <div class="flex items-center justify-end">
-                            <flux:button variant="primary" type="submit" class="w-full" size="sm">Save</flux:button>
+                            <flux:button variant="primary" type="submit" class="w-full">Save changes</flux:button>
                         </div>
                     </div>
                 @endif
@@ -98,7 +97,7 @@ new class extends Component
                 </header>
 
                 <flux:modal.trigger name="delete">
-                    <flux:button variant="danger" size="sm">Delete team</flux:button>
+                    <flux:button variant="danger">Delete team</flux:button>
                 </flux:modal.trigger>
 
                 <flux:modal name="delete" class="min-w-[22rem]">
@@ -112,9 +111,9 @@ new class extends Component
                         <div class="flex gap-2">
                             <flux:spacer />
                             <flux:modal.close>
-                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                                <flux:button variant="ghost">Cancel</flux:button>
                             </flux:modal.close>
-                            <flux:button wire:click="delete" variant="danger" size="sm">Delete team</flux:button>
+                            <flux:button wire:click="delete" variant="danger">Delete team</flux:button>
                         </div>
                     </div>
                 </flux:modal>

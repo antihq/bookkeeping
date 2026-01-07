@@ -40,13 +40,13 @@ new #[Title('Password')] class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <flux:heading size="lg">Password</flux:heading>
+    <flux:heading size="xl">Password</flux:heading>
 
     <div class="space-y-14">
-        <div class="space-y-8">
-            <header>
+        <div class="space-y-6">
+            <header class="space-y-1">
                 <flux:heading>Update password</flux:heading>
-                <flux:text class="mt-1">Ensure your account is using a long, random password to stay secure.</flux:text>
+                <flux:text>Ensure your account is using a long, random password to stay secure.</flux:text>
             </header>
 
             <form wire:submit="updatePassword" class="w-full max-w-lg space-y-8">
@@ -54,7 +54,6 @@ new #[Title('Password')] class extends Component
                     wire:model="current_password"
                     :label="'Current password'"
                     type="password"
-                    size="sm"
                     required
                     autocomplete="current-password"
                 />
@@ -62,7 +61,6 @@ new #[Title('Password')] class extends Component
                     wire:model="password"
                     :label="'New password'"
                     type="password"
-                    size="sm"
                     required
                     autocomplete="new-password"
                 />
@@ -70,13 +68,12 @@ new #[Title('Password')] class extends Component
                     wire:model="password_confirmation"
                     :label="'Confirm Password'"
                     type="password"
-                    size="sm"
                     required
                     autocomplete="new-password"
                 />
                 <div class="flex items-center gap-4">
                     <div class="flex items-center justify-end">
-                        <flux:button variant="primary" type="submit" class="w-full" size="sm">Save</flux:button>
+                        <flux:button variant="primary" type="submit" class="w-full">Save changes</flux:button>
                     </div>
                 </div>
             </form>

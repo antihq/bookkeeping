@@ -7,13 +7,13 @@ new #[Title('Appearance')] class extends Component {};
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <flux:heading size="lg">Appearance</flux:heading>
+    <flux:heading size="xl">Appearance</flux:heading>
 
     <div class="space-y-14">
-        <div class="space-y-8">
-            <header>
+        <div class="space-y-6">
+            <header class="space-y-1">
                 <flux:heading>Theme preference</flux:heading>
-                <flux:text class="mt-1">Select your preferred color scheme.</flux:text>
+                <flux:text>Select your preferred color scheme.</flux:text>
             </header>
 
             <div class="max-w-lg">

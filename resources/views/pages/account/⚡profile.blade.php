@@ -91,12 +91,12 @@ new #[Title('Profile')] class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <flux:heading size="lg">Profile</flux:heading>
+    <flux:heading size="xl">Profile</flux:heading>
 
     <div class="space-y-14">
         <div class="space-y-6">
             <header>
-                <flux:heading>Profile information</flux:heading>
+                <flux:heading size="lg">Profile information</flux:heading>
                 <flux:text class="mt-1">Update your account's profile information and email address.</flux:text>
             </header>
 
@@ -132,9 +132,9 @@ new #[Title('Profile')] class extends Component
                 </flux:file-upload>
 
                 <div class="flex-1 space-y-3">
-                    <div>
-                        <flux:heading size="sm">Profile photo</flux:heading>
-                        <flux:text class="text-sm">JPG, PNG, or GIF up to 10MB</flux:text>
+                    <div class="space-y-2">
+                        <flux:label>Profile photo</flux:label>
+                        <flux:text>JPG, PNG, or GIF up to 10MB</flux:text>
                     </div>
 
                     @if ($photo && ! $errors->has('photo'))
@@ -151,25 +151,10 @@ new #[Title('Profile')] class extends Component
             </div>
 
             <form wire:submit="updateProfileInformation" class="w-full max-w-lg space-y-8">
-                <flux:input
-                    wire:model="name"
-                    :label="'Name'"
-                    type="text"
-                    size="sm"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
+                <flux:input wire:model="name" :label="'Name'" type="text" required autofocus autocomplete="name" />
 
                 <div>
-                    <flux:input
-                        wire:model="email"
-                        :label="'Email'"
-                        type="email"
-                        size="sm"
-                        required
-                        autocomplete="email"
-                    />
+                    <flux:input wire:model="email" :label="'Email'" type="email" required autocomplete="email" />
 
                     @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
                         <div>
@@ -195,7 +180,7 @@ new #[Title('Profile')] class extends Component
 
                 <div class="flex items-center gap-4">
                     <div class="flex items-center justify-end">
-                        <flux:button variant="primary" type="submit" class="w-full" size="sm">Save</flux:button>
+                        <flux:button variant="primary" type="submit" class="w-full">Save changes</flux:button>
                     </div>
                 </div>
             </form>
