@@ -63,7 +63,7 @@ new #[Title('Account')] class extends Component
 
         Flux::modals()->close();
 
-        $this->reset(['payee', 'note', 'amount', 'category']);
+        $this->reset(['payee', 'note', 'amount', 'category', 'page']);
     }
 
     public function createCategory()
@@ -193,7 +193,7 @@ new #[Title('Account')] class extends Component
             @if ($this->transactions->count() > 0)
                 <div>
                     <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
-                        @island(name: 'transactions')
+                        @island(name: 'transactions', always: true)
                             @foreach ($this->transactions as $transaction)
                                 <livewire:transactions.item
                                     :$transaction
