@@ -204,7 +204,7 @@ new class extends Component
                 <flux:modal
                     name="edit-transaction-{{ $transaction->id }}"
                     :show="$errors->isNotEmpty()"
-                    class="w-full sm:max-w-lg"
+                    class="w-full pb-0 sm:max-w-lg"
                 >
                     <form wire:submit="edit" class="space-y-6">
                         <div>
@@ -271,7 +271,9 @@ new class extends Component
 
                         <flux:date-picker wire:model="date" label="Date" required />
 
-                        <div class="flex gap-2">
+                        <div
+                            class="sticky bottom-0 flex gap-2 border-t border-zinc-100 bg-white py-6 dark:border-white/5 dark:bg-zinc-900"
+                        >
                             <flux:spacer />
                             <flux:modal.close>
                                 <flux:button variant="ghost" size="sm">Cancel</flux:button>

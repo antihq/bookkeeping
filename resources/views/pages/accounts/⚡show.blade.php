@@ -218,7 +218,7 @@ new #[Title('Account')] class extends Component
             @endif
 
             @can('create', Transaction::class)
-                <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
+                <flux:modal name="add-transaction" class="w-full pb-0 sm:max-w-lg">
                     <form wire:submit="addTransaction" class="space-y-6">
                         <div>
                             <flux:heading size="lg">Add transaction</flux:heading>
@@ -283,7 +283,9 @@ new #[Title('Account')] class extends Component
 
                         <flux:date-picker wire:model="date" label="Date" required />
 
-                        <div class="flex gap-2">
+                        <div
+                            class="sticky bottom-0 flex gap-2 border-t border-zinc-100 bg-white py-6 dark:border-white/5 dark:bg-zinc-800"
+                        >
                             <flux:spacer />
                             <flux:modal.close>
                                 <flux:button variant="ghost" size="sm">Cancel</flux:button>
