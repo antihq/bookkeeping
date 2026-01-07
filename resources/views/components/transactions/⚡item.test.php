@@ -24,9 +24,9 @@ test('transaction can be edited with category', function () {
     actingAs($user);
 
     Livewire::test('transactions.item', ['transaction' => $transaction])
-        ->set('category_id', $category->id)
+        ->set('category', $category->id)
         ->set('payee', 'Updated Grocery')
-        ->call('editTransaction')
+        ->call('edit')
         ->assertHasNoErrors();
 
     $transaction->refresh();
@@ -54,9 +54,9 @@ test('transaction category can be changed', function () {
     actingAs($user);
 
     Livewire::test('transactions.item', ['transaction' => $transaction])
-        ->assertSet('category_id', $category1->id)
-        ->set('category_id', $category2->id)
-        ->call('editTransaction')
+        ->assertSet('category', $category1->id)
+        ->set('category', $category2->id)
+        ->call('edit')
         ->assertHasNoErrors();
 
     $transaction->refresh();
@@ -82,7 +82,7 @@ test('category can be created when editing transaction', function () {
     Livewire::test('transactions.item', ['transaction' => $transaction])
         ->set('category_search', 'Entertainment')
         ->call('createCategory')
-        ->assertSet('category_id', Category::where('name', 'Entertainment')->first()->id)
+        ->assertSet('category', Category::where('name', 'Entertainment')->first()->id)
         ->assertSet('category_search', '');
 
     expect(Category::where('name', 'Entertainment')->exists())->toBeTrue();

@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Category;
+use App\Models\Team;
 use App\Models\Transaction;
 use Flux\Flux;
 use Livewire\Attributes\Computed;
@@ -18,7 +18,7 @@ new class extends Component
 
     public string $amount = '';
 
-    public ?int $category_id = null;
+    public ?int $category = null;
 
     public string $category_search = '';
 
@@ -28,10 +28,10 @@ new class extends Component
         $this->payee = $this->transaction->payee;
         $this->note = $this->transaction->note;
         $this->amount = (string) ($this->transaction->amount / 100);
-        $this->category_id = $this->transaction->category_id;
+        $this->category = $this->transaction->category_id;
     }
 
-    public function editTransaction()
+    public function edit()
     {
         $this->authorize('update', $this->transaction);
 
@@ -39,15 +39,17 @@ new class extends Component
             'date' => ['required', 'date'],
             'payee' => ['required', 'string', 'max:255'],
             'amount' => ['required'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'category' => ['nullable', 'exists:categories,id'],
         ]);
+
+        $category = $this->category ? $this->team->categories()->findOrFail($this->category) : null;
 
         $this->transaction->update([
             'date' => $this->date,
             'payee' => $this->payee,
             'note' => $this->note,
             'amount' => (int) round((float) $this->amount * 100),
-            'category_id' => $this->category_id,
+            'category_id' => $category->id,
         ]);
 
         Flux::toast('Transaction updated successfully.', variant: 'success');
@@ -63,8 +65,8 @@ new class extends Component
     #[Computed]
     public function categories()
     {
-        return Category::query()
-            ->where('team_id', $this->transaction->team_id)
+        return $this->team
+            ->categories()
             ->when(
                 $this->category_search,
                 fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
@@ -79,18 +81,17 @@ new class extends Component
             'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->transaction->team_id],
         ]);
 
-        $category = Category::create([
-            'name' => $this->category_search,
-            'team_id' => $this->transaction->team_id,
+        $category = $this->team->categories()->create([
+            'name' => $this->pull('category_search'),
         ]);
 
-        $this->category_id = $category->id;
-        $this->category_search = '';
+        $this->category = $category->id;
     }
 
-    public function updatedCategorySearch()
+    #[Computed]
+    public function team(): Team
     {
-        $this->resetErrorBag('category_search');
+        return $this->transaction->account->team;
     }
 };
 ?>
@@ -196,7 +197,7 @@ new class extends Component
                     :show="$errors->isNotEmpty()"
                     class="w-full sm:max-w-lg"
                 >
-                    <form wire:submit="editTransaction" class="space-y-6">
+                    <form wire:submit="edit" class="space-y-6">
                         <div>
                             <flux:heading size="lg">Edit transaction</flux:heading>
                             <flux:text class="mt-2">Make changes to this transaction.</flux:text>
@@ -206,12 +207,7 @@ new class extends Component
 
                         <flux:input wire:model="payee" label="Payee" type="text" required />
 
-                        <flux:select
-                            wire:model="category_id"
-                            variant="combobox"
-                            label="Category"
-                            placeholder="Optional"
-                        >
+                        <flux:select wire:model="category" variant="combobox" label="Category" placeholder="Optional">
                             <x-slot name="input">
                                 <flux:select.input wire:model="category_search" />
                             </x-slot>
