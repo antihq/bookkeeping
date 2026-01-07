@@ -1,29 +1,19 @@
 <?php
 
 use App\Models\Account;
-use App\Models\User;
+use App\Models\Currency;
+use App\Models\Team;
+use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Accounts')] class extends Component
-{
-    public function mount()
-    {
-        $this->authorize('viewAny', Account::class);
-    }
-
+new #[Title('Accounts')] class extends Component {
     #[Computed]
-    public function user(): User
+    public function team(): Team
     {
-        return Auth::user();
-    }
-
-    #[Computed]
-    public function team()
-    {
-        return $this->user->currentTeam;
+        return Auth::user()->currentTeam;
     }
 
     #[Computed]
@@ -43,13 +33,24 @@ new #[Title('Accounts')] class extends Component
             ->map(function ($accounts, $currency) {
                 $total = $accounts->sum('balance_in_dollars');
 
-                $currencyModel = App\Models\Currency::all()->firstWhere('iso', $currency);
+                $currencyModel = Currency::all()->firstWhere('iso', $currency);
                 $symbol = $currencyModel ? $currencyModel->symbol : '$';
                 $value = number_format($total, 2);
 
                 return "{$symbol}{$value}";
             })
             ->toArray();
+    }
+
+    public function delete(int $accountId): void
+    {
+        $account = $this->team->accounts()->findOrFail($accountId);
+
+        $this->authorize('delete', $account);
+
+        $account->delete();
+
+        Flux::toast('Account deleted successfully.', variant: 'success');
     }
 };
 ?>
@@ -68,7 +69,7 @@ new #[Title('Accounts')] class extends Component
                 </div>
             </div>
 
-            @can('create', App\Models\Account::class)
+            @can('create', Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" size="sm" wire:navigate>
                     Create account
                 </flux:button>
@@ -80,7 +81,7 @@ new #[Title('Accounts')] class extends Component
         <div class="flex flex-col items-center justify-center py-12">
             <flux:icon icon="credit-card" size="lg" class="text-gray-400 dark:text-gray-600" />
             <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No accounts yet</flux:text>
-            @can('create', App\Models\Account::class)
+            @can('create', Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" class="mt-4" size="sm">
                     Create your first account
                 </flux:button>
@@ -143,8 +144,8 @@ new #[Title('Accounts')] class extends Component
                                         <div>
                                             <flux:heading size="lg">Delete account?</flux:heading>
                                             <flux:text class="mt-2">
-                                                You're about to delete "{{ $account->name }}". This action cannot be
-                                                reversed.
+                                                You're about to delete "{{ $account->name }}". All associated
+                                                transactions will also be deleted. This action cannot be reversed.
                                             </flux:text>
                                         </div>
                                         <div class="flex gap-2">

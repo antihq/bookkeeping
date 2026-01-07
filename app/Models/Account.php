@@ -77,6 +77,13 @@ class Account extends Model
         ]);
     }
 
+    public function delete(): bool
+    {
+        $this->transactions()->delete();
+
+        return parent::delete();
+    }
+
     protected function setTypeAttribute(string $value): void
     {
         $this->attributes['type'] = strtolower($value);
