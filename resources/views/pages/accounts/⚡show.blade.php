@@ -22,6 +22,8 @@ new #[Title('Account')] class extends Component
 
     public string $amount = '';
 
+    public string $type = 'expense';
+
     public ?int $category = null;
 
     public string $category_search = '';
@@ -52,7 +54,9 @@ new #[Title('Account')] class extends Component
             input: [
                 'date' => $this->date,
                 'payee' => $this->payee,
-                'amount' => (int) round((float) $this->amount * 100),
+                'amount' => $this->type === 'expense'
+                        ? (int) -round((float) $this->amount * 100)
+                        : (int) round((float) $this->amount * 100),
                 'note' => $this->note,
             ],
             createdBy: $this->user,
@@ -63,7 +67,7 @@ new #[Title('Account')] class extends Component
 
         Flux::modals()->close();
 
-        $this->reset(['payee', 'note', 'amount', 'category', 'page']);
+        $this->reset(['payee', 'note', 'amount', 'category', 'page', 'type']);
     }
 
     public function createCategory()
@@ -221,11 +225,38 @@ new #[Title('Account')] class extends Component
                             <flux:text class="mt-2">Add a new transaction to this account.</flux:text>
                         </div>
 
-                        <flux:date-picker wire:model="date" label="Date" required />
+                        <flux:radio.group wire:model="type" label="Transaction type" variant="segmented" label:sr-only>
+                            <flux:radio value="expense" icon="minus">Expense</flux:radio>
+                            <flux:radio value="income" icon="plus">Income</flux:radio>
+                        </flux:radio.group>
 
-                        <flux:input wire:model="payee" label="Payee" type="text" required />
+                        <flux:input
+                            wire:model="amount"
+                            label="Amount"
+                            type="text"
+                            mask:dynamic="$money($input)"
+                            inputmode="decimal"
+                            placeholder="0.00"
+                            label:sr-only
+                            required
+                        />
 
-                        <flux:select wire:model="category" variant="combobox" label="Category" placeholder="Optional">
+                        <flux:input
+                            wire:model="payee"
+                            label="Payee"
+                            type="text"
+                            placeholder="Payee"
+                            label:sr-only
+                            required
+                        />
+
+                        <flux:select
+                            wire:model="category"
+                            variant="combobox"
+                            label="Category"
+                            placeholder="Category"
+                            label:sr-only
+                        >
                             <x-slot name="input">
                                 <flux:select.input wire:model="category_search" />
                             </x-slot>
@@ -243,16 +274,9 @@ new #[Title('Account')] class extends Component
                             </flux:select.option.create>
                         </flux:select>
 
-                        <flux:input wire:model="note" label="Note" type="text" placeholder="Optional" />
+                        <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
 
-                        <flux:input
-                            wire:model="amount"
-                            label="Amount"
-                            type="text"
-                            mask:dynamic="$money($input)"
-                            placeholder="Use negative values for expenses"
-                            required
-                        />
+                        <flux:date-picker wire:model="date" label="Date" required />
 
                         <div class="flex gap-2">
                             <flux:spacer />

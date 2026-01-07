@@ -55,6 +55,7 @@ it('can add transactions', function () {
         ->set('date', now()->toDateString())
         ->set('payee', 'New Deposit')
         ->set('amount', 100.50)
+        ->set('type', 'income')
         ->set('note', null)
         ->call('addTransaction')
         ->assertHasNoErrors();
@@ -65,6 +66,33 @@ it('can add transactions', function () {
     expect($account->transactions->first()->payee)->toBe('New Deposit');
     expect($account->transactions->first()->amount)->toBe(10050);
     expect($account->balanceInDollars)->toBe(1100.50);
+});
+
+it('can add expense transactions', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create([
+        'name' => 'Test Account',
+        'type' => 'checking',
+        'currency' => 'usd',
+        'start_balance' => 100000,
+        'created_by' => $user->id,
+    ]);
+
+    Livewire::actingAs($user)->test('pages::accounts.show', ['account' => $account])
+        ->set('date', now()->toDateString())
+        ->set('payee', 'Coffee')
+        ->set('amount', 5.50)
+        ->set('type', 'expense')
+        ->set('note', null)
+        ->call('addTransaction')
+        ->assertHasNoErrors();
+
+    $account->refresh();
+
+    expect($account->transactions)->toHaveCount(1);
+    expect($account->transactions->first()->payee)->toBe('Coffee');
+    expect($account->transactions->first()->amount)->toBe(-550);
+    expect($account->balanceInDollars)->toBe(994.50);
 });
 
 it('can create new categories', function () {
