@@ -7,7 +7,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Edit Account')] class extends Component
+new #[Title('Edit account')] class extends Component
 {
     public Account $account;
 

@@ -9,7 +9,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Add Account')] class extends Component
+new #[Title('Add account')] class extends Component
 {
     public string $type = 'checking';
 

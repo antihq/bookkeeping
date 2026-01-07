@@ -11,7 +11,7 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\Response;
 
-new #[Title('Two Factor Authentication')] class extends Component
+new #[Title('Two Factor authentication')] class extends Component
 {
     #[Locked]
     public bool $twoFactorEnabled;
