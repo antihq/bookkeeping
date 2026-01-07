@@ -9,7 +9,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Create Account')] class extends Component
+new #[Title('Add Account')] class extends Component
 {
     public string $type = 'checking';
 
@@ -71,7 +71,7 @@ new #[Title('Create Account')] class extends Component
 
 <section class="mx-auto max-w-6xl space-y-8">
     <div class="flex items-center justify-between gap-4">
-        <flux:heading size="lg">Create account</flux:heading>
+        <flux:heading size="lg">Add account</flux:heading>
         <flux:button href="{{ route('accounts.index') }}" size="sm" inset="top bottom" wire:navigate>
             Cancel
         </flux:button>
@@ -81,7 +81,7 @@ new #[Title('Create Account')] class extends Component
         <div class="space-y-8">
             <header class="space-y-1">
                 <flux:heading>Account details</flux:heading>
-                <flux:text>Create a new account to track your finances.</flux:text>
+                <flux:text>Add a new account to track your finances.</flux:text>
             </header>
 
             <form wire:submit="create" class="w-full max-w-lg space-y-8">
@@ -114,9 +114,7 @@ new #[Title('Create Account')] class extends Component
 
                 <div class="flex items-center gap-4">
                     <div class="flex items-center justify-end">
-                        <flux:button variant="primary" type="submit" class="w-full" size="sm">
-                            Create account
-                        </flux:button>
+                        <flux:button variant="primary" type="submit" class="w-full" size="sm">Add account</flux:button>
                     </div>
                 </div>
             </form>

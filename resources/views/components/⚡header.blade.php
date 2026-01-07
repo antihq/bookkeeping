@@ -65,7 +65,7 @@ new class extends Component
                 @endif
 
                 <flux:menu.item :href="route('accounts.create')" icon="plus" wire:navigate>
-                    Create new account
+                    Add new account
                 </flux:menu.item>
             </flux:menu>
         </flux:dropdown>

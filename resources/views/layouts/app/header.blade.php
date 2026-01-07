@@ -40,7 +40,7 @@
                             :accent="false"
                             wire:navigate
                         >
-                            <span class="inline-flex w-full items-center justify-between gap-4">
+                            <span class="inline-flex w-full items-center justify-between gap-3">
                                 {{ $account->name }}
                                 <flux:text class="text-[13px] font-normal tabular-nums" inline>
                                     {{ $account->formatted_balance }}
@@ -50,7 +50,7 @@
                     @endforeach
 
                     <flux:sidebar.item :href="route('accounts.create')" :accent="false" icon="plus" wire:navigate>
-                        Create new account
+                        Add new account
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>

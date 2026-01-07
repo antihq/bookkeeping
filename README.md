@@ -90,7 +90,7 @@ This will start the Laravel server, queue worker, log watcher, and Vite dev serv
 ### Creating an Account
 
 1. Navigate to Accounts page
-2. Click "Create account"
+2. Click "Add account"
 3. Select account type, name, currency, and starting balance
 4. Save the account
 

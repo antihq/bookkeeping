@@ -71,7 +71,7 @@ new #[Title('Accounts')] class extends Component
 
             @can('create', Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" size="sm" wire:navigate>
-                    Create account
+                    Add account
                 </flux:button>
             @endcan
         </div>
@@ -83,7 +83,7 @@ new #[Title('Accounts')] class extends Component
             <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No accounts yet</flux:text>
             @can('create', Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" class="mt-4" size="sm">
-                    Create your first account
+                    Add your first account
                 </flux:button>
             @endcan
         </div>
@@ -91,7 +91,7 @@ new #[Title('Accounts')] class extends Component
         <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
             @foreach ($this->accounts as $account)
                 <div wire:key="account-{{ $account->id }}" class="flex items-center justify-between gap-4 py-4">
-                    <div class="flex min-w-0 items-center gap-2">
+                    <div class="flex min-w-0 flex-col gap-2 md:flex-row md:items-center">
                         <flux:text>
                             <flux:link
                                 href="{{ route('accounts.show', $account) }}"
@@ -102,12 +102,9 @@ new #[Title('Accounts')] class extends Component
                                 {{ $account->name }}
                             </flux:link>
                         </flux:text>
-                        <flux:badge size="sm" variant="subtle">
+                        <flux:text class="text-[13px]">
                             {{ $account->display_type }}
-                        </flux:badge>
-                        <flux:badge size="sm">
-                            {{ $account->currency }}
-                        </flux:badge>
+                        </flux:text>
                     </div>
 
                     <div class="flex items-center gap-4">
