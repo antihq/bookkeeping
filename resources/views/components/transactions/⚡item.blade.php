@@ -29,7 +29,7 @@ new class extends Component
         $this->date = $this->transaction->date;
         $this->payee = $this->transaction->payee;
         $this->note = $this->transaction->note;
-        $this->amount = (string) ($this->transaction->amount / 100);
+        $this->amount = (string) (abs($this->transaction->amount) / 100);
         $this->type = $this->transaction->amount < 0 ? 'expense' : 'income';
         $this->category = $this->transaction->category_id;
     }
