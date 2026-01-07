@@ -7,7 +7,7 @@ use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
 
-test('transaction can be edited with category', function () {
+it('can edit transaction with category', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $category = Category::factory()->for($user->currentTeam, 'team')->create(['name' => 'Food']);
@@ -35,7 +35,7 @@ test('transaction can be edited with category', function () {
     expect($transaction->payee)->toBe('Updated Grocery');
 });
 
-test('transaction category can be changed', function () {
+it('can change transaction category', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $category1 = Category::factory()->for($user->currentTeam, 'team')->create(['name' => 'Food']);
@@ -64,7 +64,7 @@ test('transaction category can be changed', function () {
     expect($transaction->category_id)->toBe($category2->id);
 });
 
-test('category can be created when editing transaction', function () {
+it('can create category when editing transaction', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $transaction = $account->addTransaction(
@@ -88,7 +88,7 @@ test('category can be created when editing transaction', function () {
     expect(Category::where('name', 'Entertainment')->exists())->toBeTrue();
 });
 
-test('expense transaction can be edited', function () {
+it('can edit expense transaction', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $transaction = $account->addTransaction(
@@ -117,7 +117,7 @@ test('expense transaction can be edited', function () {
     expect($transaction->amount)->toBe(-750);
 });
 
-test('income transaction can be edited', function () {
+it('can edit income transaction', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $transaction = $account->addTransaction(
@@ -146,7 +146,7 @@ test('income transaction can be edited', function () {
     expect($transaction->amount)->toBe(520000);
 });
 
-test('transaction type can be changed from expense to income', function () {
+it('can change transaction type from expense to income', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $transaction = $account->addTransaction(
@@ -173,7 +173,7 @@ test('transaction type can be changed from expense to income', function () {
     expect($transaction->amount)->toBe(2000);
 });
 
-test('transaction type can be changed from income to expense', function () {
+it('can change transaction type from income to expense', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
     $transaction = $account->addTransaction(
