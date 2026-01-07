@@ -239,6 +239,7 @@ new #[Title('Account')] class extends Component
                             placeholder="0.00"
                             label:sr-only
                             required
+                            prefix="{{ $account->currencySymbol }}"
                         />
 
                         <flux:input

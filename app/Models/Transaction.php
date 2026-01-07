@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -41,34 +42,45 @@ class Transaction extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function getFormattedAmountAttribute(): string
+    protected function formattedAmount(): Attribute
     {
-        $currency = Currency::all()->firstWhere('iso', $this->account->currency);
-        $symbol = $currency ? $currency->symbol : '$';
-        $value = number_format(abs($this->amount) / 100, 2);
-
-        return "{$symbol}{$value}";
+        return Attribute::make(
+            get: fn () => match (true) {
+                ! $this->account => '$' . number_format(abs($this->amount) / 100, 2),
+                default => match (true) {
+                    ! $this->account->currency => '$' . number_format(abs($this->amount) / 100, 2),
+                    default => match (true) {
+                        $currency = Currency::where('iso', $this->account->currency)->first() => $currency->symbol . number_format(abs($this->amount) / 100, 2),
+                        default => '$' . number_format(abs($this->amount) / 100, 2),
+                    },
+                },
+            },
+        );
     }
 
-    public function getDisplayAmountAttribute(): string
+    protected function displayAmount(): Attribute
     {
-        $prefix = $this->amount >= 0 ? '+' : '-';
-
-        return "{$prefix}{$this->formatted_amount}";
+        return Attribute::make(
+            get: fn () => ($this->amount >= 0 ? '+' : '-') . $this->formatted_amount,
+        );
     }
 
-    public function getDisplayDateAttribute(): string
+    protected function displayDate(): Attribute
     {
-        $date = Carbon::parse($this->date);
+        return Attribute::make(
+            get: function () {
+                $date = Carbon::parse($this->date);
 
-        if ($date->isToday()) {
-            return 'Today';
-        }
+                if ($date->isToday()) {
+                    return 'Today';
+                }
 
-        if ($date->isYesterday()) {
-            return 'Yesterday';
-        }
+                if ($date->isYesterday()) {
+                    return 'Yesterday';
+                }
 
-        return $date->format('d M Y');
+                return $date->format('d M Y');
+            },
+        );
     }
 }

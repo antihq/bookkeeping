@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,39 +29,14 @@ class Account extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function currency()
+    {
+        return Currency::where('iso', $this->attributes['currency'] ?? null)->first();
+    }
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class)->orderBy('date', 'desc')->latest();
-    }
-
-    public function getFormattedBalanceAttribute(): string
-    {
-        $currency = Currency::all()->firstWhere('iso', $this->currency);
-        $symbol = $currency ? $currency->symbol : '$';
-        $balance = $this->start_balance + $this->transactions()->sum('amount');
-        $value = number_format($balance / 100, 2);
-
-        return "{$symbol}{$value}";
-    }
-
-    public function getDisplayTypeAttribute(): string
-    {
-        return str($this->type)->title()->toString();
-    }
-
-    public function getBalanceInDollarsAttribute(): float
-    {
-        return ($this->start_balance + $this->transactions()->sum('amount')) / 100;
-    }
-
-    public function getStartBalanceInDollarsAttribute(): float
-    {
-        return $this->start_balance / 100;
-    }
-
-    public function setStartBalanceInDollarsAttribute(float $value): void
-    {
-        $this->attributes['start_balance'] = (int) round($value * 100);
     }
 
     public function addTransaction(array $input, User $createdBy, ?Category $category = null): Transaction
@@ -83,13 +59,46 @@ class Account extends Model
         return parent::delete();
     }
 
-    protected function setTypeAttribute(string $value): void
+    protected function formattedBalance(): Attribute
     {
-        $this->attributes['type'] = strtolower($value);
+        return Attribute::make(
+            get: fn () => $this->currencySymbol . number_format(($this->start_balance + $this->transactions()->sum('amount')) / 100, 2),
+        );
     }
 
-    protected function setCurrencyAttribute(string $value): void
+    protected function currencySymbol(): Attribute
     {
-        $this->attributes['currency'] = strtolower($value);
+        return Attribute::make(
+            get: fn () => $this->currency?->symbol ?? '$',
+        );
+    }
+
+    protected function displayType(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => str($this->type)->title()->toString(),
+        );
+    }
+
+    protected function balanceInDollars(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => ($this->start_balance + $this->transactions()->sum('amount')) / 100,
+        );
+    }
+
+    protected function startBalanceInDollars(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->start_balance / 100,
+            set: fn (float $value) => (int) round($value * 100),
+        );
+    }
+
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => strtolower($value),
+        );
     }
 }
