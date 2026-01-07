@@ -5,7 +5,7 @@ use App\Models\Category;
 use App\Models\User;
 use Livewire\Livewire;
 
-test('accounts can be deleted', function () {
+it('allows deleting accounts', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
     $account = Account::factory()->for($user->currentTeam)->create([
@@ -23,7 +23,7 @@ test('accounts can be deleted', function () {
     expect($user->currentTeam->accounts()->count())->toBe(0);
 });
 
-test('non-owners cannot delete accounts', function () {
+it('prevents non-owners from deleting accounts', function () {
     $owner = User::factory()->withPersonalTeam()->create();
     $member = User::factory()->withPersonalTeam()->create();
 
