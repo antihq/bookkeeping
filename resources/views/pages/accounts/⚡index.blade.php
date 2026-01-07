@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Account;
 use App\Models\Currency;
 use App\Models\Team;
 use Flux\Flux;
@@ -9,17 +8,18 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Accounts')] class extends Component {
-    #[Computed]
-    public function team(): Team
-    {
-        return Auth::user()->currentTeam;
-    }
-
+new #[Title('Accounts')] class extends Component
+{
     #[Computed]
     public function accounts()
     {
         return $this->team->accounts()->get();
+    }
+
+    #[Computed]
+    public function team(): Team
+    {
+        return Auth::user()->currentTeam;
     }
 
     #[Computed]

@@ -35,28 +35,6 @@ new #[Title('Account')] class extends Component
         $this->date = now()->format('Y-m-d');
     }
 
-    public function delete()
-    {
-        $this->authorize('delete', $this->account);
-
-        $this->account->delete();
-
-        Flux::toast('Account deleted successfully.', variant: 'success');
-
-        return $this->redirectRoute('accounts.index');
-    }
-
-    public function deleteTransaction(int $id)
-    {
-        $transaction = $this->account->transactions()->findOrFail($id);
-
-        $this->authorize('delete', $transaction);
-
-        $transaction->delete();
-
-        Flux::toast('Transaction deleted successfully.', variant: 'success');
-    }
-
     public function addTransaction()
     {
         $this->authorize('create', Transaction::class);
@@ -88,9 +66,39 @@ new #[Title('Account')] class extends Component
         $this->reset(['payee', 'note', 'amount', 'category']);
     }
 
-    public function updatedAmount($value)
+    public function createCategory()
     {
-        $this->amount = str_replace(['$', ','], '', $value);
+        $this->validate([
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->team->id],
+        ]);
+
+        $category = $this->team->categories()->create([
+            'name' => $this->pull('category_search'),
+        ]);
+
+        $this->category = $category->id;
+    }
+
+    public function delete()
+    {
+        $this->authorize('delete', $this->account);
+
+        $this->account->delete();
+
+        Flux::toast('Account deleted successfully.', variant: 'success');
+
+        return $this->redirectRoute('accounts.index');
+    }
+
+    public function deleteTransaction(int $id)
+    {
+        $transaction = $this->account->transactions()->findOrFail($id);
+
+        $this->authorize('delete', $transaction);
+
+        $transaction->delete();
+
+        Flux::toast('Transaction deleted successfully.', variant: 'success');
     }
 
     public function loadMore()
@@ -98,10 +106,22 @@ new #[Title('Account')] class extends Component
         $this->page++;
     }
 
-    #[Computed]
-    public function user(): User
+    public function updatedAmount($value)
     {
-        return Auth::user();
+        $this->amount = str_replace(['$', ','], '', $value);
+    }
+
+    #[Computed]
+    public function categories()
+    {
+        return $this->team
+            ->categories()
+            ->when(
+                $this->category_search,
+                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+            )
+            ->limit(20)
+            ->get();
     }
 
     #[Computed]
@@ -120,29 +140,9 @@ new #[Title('Account')] class extends Component
     }
 
     #[Computed]
-    public function categories()
+    public function user(): User
     {
-        return $this->team
-            ->categories()
-            ->when(
-                $this->category_search,
-                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
-            )
-            ->limit(20)
-            ->get();
-    }
-
-    public function createCategory()
-    {
-        $this->validate([
-            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->team->id],
-        ]);
-
-        $category = $this->team->categories()->create([
-            'name' => $this->pull('category_search'),
-        ]);
-
-        $this->category = $category->id;
+        return Auth::user();
     }
 };
 ?>

@@ -31,6 +31,19 @@ new class extends Component
         $this->category = $this->transaction->category_id;
     }
 
+    public function createCategory()
+    {
+        $this->validate([
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->transaction->team_id],
+        ]);
+
+        $category = $this->team->categories()->create([
+            'name' => $this->pull('category_search'),
+        ]);
+
+        $this->category = $category->id;
+    }
+
     public function edit()
     {
         $this->authorize('update', $this->transaction);
@@ -73,19 +86,6 @@ new class extends Component
             )
             ->limit(20)
             ->get();
-    }
-
-    public function createCategory()
-    {
-        $this->validate([
-            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->transaction->team_id],
-        ]);
-
-        $category = $this->team->categories()->create([
-            'name' => $this->pull('category_search'),
-        ]);
-
-        $this->category = $category->id;
     }
 
     #[Computed]

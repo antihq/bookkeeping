@@ -50,9 +50,9 @@ new #[Title('Create Account')] class extends Component
     }
 
     #[Computed]
-    public function user(): User
+    public function currencies()
     {
-        return Auth::user();
+        return Currency::all()->sortBy('currency');
     }
 
     #[Computed]
@@ -62,9 +62,9 @@ new #[Title('Create Account')] class extends Component
     }
 
     #[Computed]
-    public function currencies()
+    public function user(): User
     {
-        return Currency::all()->sortBy('currency');
+        return Auth::user();
     }
 };
 ?>
