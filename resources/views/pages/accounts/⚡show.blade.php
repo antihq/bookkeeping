@@ -230,17 +230,21 @@ new #[Title('Account')] class extends Component
                             <flux:radio value="income" icon="plus">Income</flux:radio>
                         </flux:radio.group>
 
-                        <flux:input
-                            wire:model="amount"
-                            label="Amount"
-                            type="text"
-                            mask:dynamic="$money($input)"
-                            inputmode="decimal"
-                            placeholder="0.00"
-                            label:sr-only
-                            required
-                            prefix="{{ $account->currencySymbol }}"
-                        />
+                        <flux:field>
+                            <flux:input.group>
+                                <flux:label sr-only>Amount</flux:label>
+                                <flux:input.group.prefix>{{ $account->currencySymbol }}</flux:input.group.prefix>
+                                <flux:input
+                                    wire:model="amount"
+                                    type="text"
+                                    mask:dynamic="$money($input)"
+                                    inputmode="decimal"
+                                    placeholder="0.00"
+                                    required
+                                />
+                            </flux:input.group>
+                            <flux:error name="amount" />
+                        </flux:field>
 
                         <flux:input
                             wire:model="payee"
