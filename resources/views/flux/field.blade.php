@@ -13,7 +13,7 @@ $classes = Flux::classes()
     ->add(match ($variant) {
         default => 'block',
         'inline' => [
-            'grid gap-x-3 gap-y-1',
+            'grid gap-x-4 gap-y-1',
             'has-[[data-flux-label]~[data-flux-control]]:grid-cols-[1fr_auto]',
             'has-[[data-flux-control]~[data-flux-label]]:grid-cols-[auto_1fr]',
             '[&>[data-flux-control]~[data-flux-description]]:row-start-2 [&>[data-flux-control]~[data-flux-description]]:col-start-2',
