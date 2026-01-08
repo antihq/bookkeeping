@@ -4,8 +4,7 @@ use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-new class extends Component
-{
+new class extends Component {
     public ?int $team = null;
 
     public function mount(): void
@@ -115,7 +114,7 @@ new class extends Component
             <flux:menu.group heading="Team">
                 <flux:menu.item
                     :href="route('teams.edit', auth()->user()->currentTeam)"
-                    icon="cog"
+                    icon="cog-8-tooth"
                     icon:variant="micro"
                     wire:navigate
                 >
@@ -153,7 +152,7 @@ new class extends Component
                     icon:variant="micro"
                     class="w-full"
                 >
-                    Log Out
+                    Log out
                 </flux:menu.item>
             </form>
         </flux:menu>
