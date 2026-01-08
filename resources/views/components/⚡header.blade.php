@@ -28,7 +28,7 @@ new class extends Component {
 <flux:header {{ $attributes }}>
     <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" size="sm" />
 
-    <flux:navbar class="-mb-px max-lg:hidden">
+    <flux:navbar class="max-lg:hidden">
         <flux:navbar.item
             :href="route('dashboard')"
             :current="request()->routeIs('accounts.index')"

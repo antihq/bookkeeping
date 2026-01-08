@@ -28,7 +28,7 @@ $classes = Flux::classes()
     ->add($square ? '' : '')
     ->add('text-zinc-950 dark:text-white')
     // Styles for when this link is the "current" one...
-    ->add('data-current:after:absolute data-current:after:-bottom-3 data-current:after:inset-x-2.5 data-current:after:h-[2px]')
+    ->add('data-current:after:absolute data-current:after:-bottom-2.5 data-current:after:inset-x-2 data-current:after:h-0.5 data-current:after:rounded-full')
     ->add([
         '[--hover-fill:color-mix(in_oklab,_var(--color-accent-content),_transparent_90%)]',
 
@@ -42,7 +42,7 @@ $classes = Flux::classes()
         false => [
             '',
             'data-current:text-zinc-800 dark:data-current:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/10',
-            'data-current:after:bg-zinc-800 dark:data-current:after:bg-white',
+            'data-current:after:bg-zinc-950 dark:data-current:after:bg-white',
         ],
     })
     ;
