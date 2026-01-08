@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Account;
 use App\Models\Currency;
 use App\Models\Team;
 use Flux\Flux;
@@ -56,21 +57,23 @@ new #[Title('Accounts')] class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-        <flux:heading size="lg">Accounts</flux:heading>
+    <div class="space-y-2.5">
+        <flux:heading size="xl">Accounts</flux:heading>
 
-        <div class="flex items-center gap-6">
-            <div class="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
-                <flux:text>Overall balance</flux:text>
-                <div class="inline-flex flex-wrap items-center gap-x-1 gap-y-2">
-                    @foreach ($this->teamBalances as $currency => $balance)
-                        <flux:badge>{{ strtoupper($currency) }}: {{ $balance }}</flux:badge>
-                    @endforeach
-                </div>
+        <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
+            <div class="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
+                <span class="flex items-center gap-3">
+                    <flux:text>Overall balance</flux:text>
+                    <span class="flex items-center gap-3">
+                        @foreach ($this->teamBalances as $currency => $balance)
+                            <flux:text variant="strong">{{ strtoupper($currency) }} {{ $balance }}</flux:text>
+                        @endforeach
+                    </span>
+                </span>
             </div>
 
             @can('create', Account::class)
-                <flux:button href="{{ route('accounts.create') }}" variant="primary" size="sm" wire:navigate>
+                <flux:button href="{{ route('accounts.create') }}" variant="primary" wire:navigate>
                     Add account
                 </flux:button>
             @endcan
@@ -88,21 +91,22 @@ new #[Title('Accounts')] class extends Component
             @endcan
         </div>
     @else
-        <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
+        <ul class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
             @foreach ($this->accounts as $account)
-                <div wire:key="account-{{ $account->id }}" class="flex items-center justify-between gap-4 py-4">
-                    <div class="flex min-w-0 flex-col gap-2 md:flex-row md:items-center">
+                <li wire:key="account-{{ $account->id }}" class="relative flex items-center justify-between gap-4 py-4">
+                    <a href="{{ route('accounts.show', $account) }}" class="absolute inset-0 z-10"></a>
+                    <div class="flex min-w-0 flex-col gap-2 md:flex-row md:items-center" href="{{ route('accounts.show', $account) }}" wire:navigate>
                         <flux:text>
                             <flux:link
                                 href="{{ route('accounts.show', $account) }}"
-                                class="truncate"
-                                :accent="false"
+                                class="truncate z-10 relative"
+                                variant="ghost"
                                 wire:navigate
                             >
                                 {{ $account->name }}
                             </flux:link>
                         </flux:text>
-                        <flux:text class="text-[13px]">
+                        <flux:text class="text-sm/6 sm:text-[13px]/6">
                             {{ $account->display_type }}
                         </flux:text>
                     </div>
@@ -112,7 +116,7 @@ new #[Title('Accounts')] class extends Component
 
                         <div>
                             <flux:dropdown align="end">
-                                <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" />
+                                <flux:button variant="subtle" square icon="ellipsis-horizontal" class="z-10" />
                                 <flux:menu>
                                     @can('update', $account)
                                         <flux:menu.item
@@ -163,8 +167,8 @@ new #[Title('Accounts')] class extends Component
                             @endcan
                         </div>
                     </div>
-                </div>
+                </li>
             @endforeach
-        </div>
+        </ul>
     @endif
 </section>
