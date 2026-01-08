@@ -276,9 +276,7 @@ new #[Title('Account')] class extends Component
                             @endforeach
 
                             <flux:select.option.create wire:click="createCategory" min-length="1">
-                                Create "
-                                <span wire:text="category_search"></span>
-                                "
+                                Create "<span wire:text="category_search"></span>"
                             </flux:select.option.create>
                         </flux:select>
 
