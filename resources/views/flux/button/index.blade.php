@@ -70,11 +70,15 @@ $classes = Flux::classes()
         'end' => 'justify-end',
     })
     ->add(match ($size) { // Size...
-        'base' => 'py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)] text-base/6 sm:text-sm/6 rounded-lg' . ' ' . (
+        'base' => 'text-base/6 sm:text-sm/6 rounded-lg' . ' ' . (
             $square
-                ? 'w-9'
+                ? 'size-11 sm:size-9'
                 // If we have an icon, we want to reduce the padding on the side that has the icon...
-                : ($iconLeading && $iconLeading !== '' ? 'ps-[calc(--spacing(2.5)-1px)] sm:ps-[calc(--spacing(2.5)-1px)]' : 'ps-[calc(--spacing(3.5)-1px)] sm:ps-[calc(--spacing(3)-1px)]') . ' ' . ($iconTrailing && $iconTrailing !== '' ? 'pe-2' : 'pe-3')
+                : 'py-[calc(--spacing(2.5)-1px)] sm:py-[calc(--spacing(1.5)-1px)]' . ' ' . ($iconLeading && $iconLeading !== ''
+                    ? 'ps-[calc(--spacing(2.5)-1px)] sm:ps-[calc(--spacing(2.5)-1px)]'
+                    : 'ps-[calc(--spacing(3.5)-1px)] sm:ps-[calc(--spacing(3)-1px)]') . ' ' . ($iconTrailing && $iconTrailing !== ''
+                        ? 'pe-[calc(--spacing(2.5)-1px)] sm:pe-[calc(--spacing(2.5)-1px)]'
+                        : 'pe-[calc(--spacing(3.5)-1px)] sm:pe-[calc(--spacing(3)-1px)]')
         ),
         'sm' => 'h-8 text-sm rounded-md' . ' ' . ($square ? 'w-8' : 'px-3'),
         'xs' => 'h-6 text-xs rounded-md' . ' ' . ($square ? 'w-6' : 'px-2'),
@@ -96,15 +100,15 @@ $classes = Flux::classes()
         'filled' => 'bg-zinc-800/5 hover:bg-zinc-800/10 dark:bg-white/10 dark:hover:bg-white/20',
         'outline' => 'bg-white hover:bg-zinc-50 dark:bg-zinc-700 dark:hover:bg-zinc-600/75',
         'danger' => 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500',
-        'ghost' => 'bg-transparent hover:bg-zinc-800/5 dark:hover:bg-white/15',
-        'subtle' => 'bg-transparent hover:bg-zinc-800/5 dark:hover:bg-white/15',
+        'ghost' => 'bg-transparent hover:bg-zinc-950/5 dark:hover:bg-white/10',
+        'subtle' => 'bg-transparent hover:bg-zinc-950/5 dark:hover:bg-white/10',
     })
     ->add(match ($variant) { // Text color...
         'primary' => 'text-[var(--color-accent-foreground)]',
         'filled' => 'text-zinc-800 dark:text-white',
         'outline' => 'text-zinc-800 dark:text-white',
         'danger' => 'text-white',
-        'ghost' => 'text-zinc-800 dark:text-white',
+        'ghost' => 'text-zinc-950 dark:text-white',
         'subtle' => 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white',
     })
     ->add(match ($variant) { // Border color...
@@ -142,7 +146,7 @@ $classes = Flux::classes()
         'zinc' => '[--color-accent:var(--color-zinc-800)] [--color-accent-content:var(--color-zinc-800)] [--color-accent-foreground:var(--color-white)] dark:[--color-accent:var(--color-white)] dark:[--color-accent-content:var(--color-white)] dark:[--color-accent-foreground:var(--color-zinc-800)]',
         'neutral' => '[--color-accent:var(--color-neutral-800)] [--color-accent-content:var(--color-neutral-800)] [--color-accent-foreground:var(--color-white)] dark:[--color-accent:var(--color-white)] dark:[--color-accent-content:var(--color-white)] dark:[--color-accent-foreground:var(--color-neutral-800)]',
         'stone' => '[--color-accent:var(--color-stone-800)] [--color-accent-content:var(--color-stone-800)] [--color-accent-foreground:var(--color-white)] dark:[--color-accent:var(--color-white)] dark:[--color-accent-content:var(--color-white)] dark:[--color-accent-foreground:var(--color-stone-800)]',
-        'red' => '[--color-accent:var(--color-red-500)] [--color-accent-content:var(--color-red-600)] [--color-accent-foreground:var(--color-white)] dark:[--color-accent:var(--color-red-500)] dark:[--color-accent-content:var(--color-red-400)] dark:[--color-accent-foreground:var(--color-white)]',
+        'red' => '[--color-accent:var(--color-red-600)] [--color-accent-content:var(--color-red-600)] [--color-accent-foreground:var(--color-white)] dark:[--color-accent:var(--color-red-600)] dark:[--color-accent-content:var(--color-red-400)] dark:[--color-accent-foreground:var(--color-white)]',
         'orange' => '[--color-accent:var(--color-orange-500)] [--color-accent-content:var(--color-orange-600)] [--color-accent-foreground:var(--color-white)] dark:[--color-accent:var(--color-orange-400)] dark:[--color-accent-content:var(--color-orange-400)] dark:[--color-accent-foreground:var(--color-orange-950)]',
         'amber' => '[--color-accent:var(--color-amber-400)] [--color-accent-content:var(--color-amber-600)] [--color-accent-foreground:var(--color-amber-950)] dark:[--color-accent:var(--color-amber-400)] dark:[--color-accent-content:var(--color-amber-400)] dark:[--color-accent-foreground:var(--color-amber-950)]',
         'yellow' => '[--color-accent:var(--color-yellow-400)] [--color-accent-content:var(--color-yellow-600)] [--color-accent-foreground:var(--color-yellow-950)] dark:[--color-accent:var(--color-yellow-400)] dark:[--color-accent-content:var(--color-yellow-400)] dark:[--color-accent-foreground:var(--color-yellow-950)]',
@@ -171,36 +175,36 @@ $classes = Flux::classes()
 
 <flux:with-tooltip :$attributes>
     <flux:button-or-link-pure :$type :attributes="$attributes->class($classes)" data-flux-button>
-        <?php if ($loading) { ?>
+        <?php if ($loading): ?>
             <div class="absolute inset-0 flex items-center justify-center opacity-0" data-flux-loading-indicator>
                 <flux:icon icon="loading" :variant="$iconVariant" :class="$iconClasses" />
             </div>
-        <?php } ?>
+        <?php endif; ?>
 
-        <?php if (is_string($iconLeading) && $iconLeading !== '') { ?>
+        <?php if (is_string($iconLeading) && $iconLeading !== ''): ?>
             <flux:icon :icon="$iconLeading" :variant="$iconVariant" :class="$iconClasses" />
-        <?php } elseif ($iconLeading) { ?>
+        <?php elseif ($iconLeading): ?>
             {{ $iconLeading }}
-        <?php } ?>
+        <?php endif; ?>
 
-        <?php if (($loading || $iconLeading || $iconTrailing) && ! $slot->isEmpty()) { ?>
+        <?php if (($loading || $iconLeading || $iconTrailing) && ! $slot->isEmpty()): ?>
             {{-- If we have a loading indicator, we need to wrap it in a span so it can be a target of *:opacity-0... --}}
             {{-- Also, if we have an icon, we need to wrap it in a span so it can be recognized as a child of the button for :first-child selectors... --}}
             <span>{{ $slot }}</span>
-        <?php } else { ?>
+        <?php else: ?>
             {{ $slot }}
-        <?php } ?>
+        <?php endif; ?>
 
-        <?php if ($kbd) { ?>
+        <?php if ($kbd): ?>
             <div class="text-xs text-zinc-400 dark:text-zinc-400">{{ $kbd }}</div>
-        <?php } ?>
+        <?php endif; ?>
 
-        <?php if (is_string($iconTrailing) && $iconTrailing !== '') { ?>
+        <?php if (is_string($iconTrailing) && $iconTrailing !== ''): ?>
             {{-- Adding the extra margin class inline on the icon component below was causing a double up, so it needs to be added here first... --}}
             <?php $iconClasses->add($square ? '' : '-ms-1'); ?>
             <flux:icon :icon="$iconTrailing" :variant="$iconTrailingVariant" :class="$iconTrailingClasses" />
-        <?php } elseif ($iconTrailing) { ?>
+        <?php elseif ($iconTrailing): ?>
             {{ $iconTrailing }}
-        <?php } ?>
+        <?php endif; ?>
     </flux:button-or-link-pure>
 </flux:with-tooltip>

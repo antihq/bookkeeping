@@ -7,13 +7,13 @@
         @include('partials.head')
     </head>
     <body class="flex min-h-svh w-full flex-col bg-white lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
-        <livewire:header class="px-6!" />
+        <livewire:header />
 
         <!-- Mobile Menu -->
         <flux:sidebar
             sticky
             collapsible="mobile"
-            class="rounded-r-lg bg-white shadow-xs ring-1 ring-zinc-950/5 lg:hidden dark:bg-zinc-900 dark:ring-white/10"
+            class="bg-zinc-50 shadow-xs ring-1 ring-zinc-950/5 lg:hidden dark:bg-zinc-900 dark:ring-white/10"
         >
             <flux:sidebar.header>
                 <flux:spacer />
@@ -25,8 +25,7 @@
             <flux:sidebar.nav>
                 <flux:sidebar.item
                     :href="route('dashboard')"
-                    :current="request()->routeIs('dashboard')"
-                    :accent="false"
+                    :current="request()->routeIs('accounts.index')"
                     wire:navigate
                 >
                     Dashboard
@@ -37,7 +36,6 @@
                         <flux:sidebar.item
                             :href="route('accounts.show', $account)"
                             :current="request()->account?->is($account)"
-                            :accent="false"
                             wire:navigate
                         >
                             <span class="inline-flex w-full items-center justify-between gap-3">
@@ -49,7 +47,7 @@
                         </flux:sidebar.item>
                     @endforeach
 
-                    <flux:sidebar.item :href="route('accounts.create')" :accent="false" icon="plus" wire:navigate>
+                    <flux:sidebar.item :href="route('accounts.create')" icon="plus" wire:navigate>
                         Add new account
                     </flux:sidebar.item>
                 </flux:sidebar.group>

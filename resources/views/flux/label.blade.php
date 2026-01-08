@@ -1,8 +1,6 @@
 @blaze
 
-@php
-    $srOnly = $srOnly ??= $attributes->pluck('sr-only');
-@endphp
+@php $srOnly = $srOnly ??= $attributes->pluck('sr-only'); @endphp
 
 @props([
     'badge' => null,
@@ -17,45 +15,32 @@
         ->add('text-base/6 sm:text-sm/6 font-medium')
         ->add($srOnly ? 'sr-only' : '')
         ->add('[:where(&)]:text-zinc-950 [:where(&)]:dark:text-white')
-        ->add('[&:has([data-flux-label-trailing])]:flex');
+        ->add('[&:has([data-flux-label-trailing])]:flex')
+        ;
 @endphp
 
 <ui-label {{ $attributes->class($classes) }} data-flux-label>
     {{ $slot }}
 
-    <?php if (is_string($badge)) { ?>
+    <?php if (is_string($badge)): ?>
+        <span class="ms-1.5 text-zinc-800/70 text-xs bg-zinc-800/5 px-1.5 py-1 -my-1 rounded-[4px] dark:bg-white/10 dark:text-zinc-300" aria-hidden="true">
+            {{ $badge }}
+        </span>
+    <?php elseif ($badge): ?>
+        <span class="ms-1.5" aria-hidden="true">
+            {{ $badge }}
+        </span>
+    <?php endif; ?>
 
-    <span
-        class="-my-1 ms-1.5 rounded-[4px] bg-zinc-800/5 px-1.5 py-1 text-xs text-zinc-800/70 dark:bg-white/10 dark:text-zinc-300"
-        aria-hidden="true"
-    >
-        {{ $badge }}
-    </span>
+    <?php if ($aside): ?>
+        <span class="ms-1.5 text-zinc-800/70 text-xs bg-zinc-800/5 px-1.5 py-1 -my-1 rounded-[4px] dark:bg-white/10 dark:text-zinc-300" aria-hidden="true">
+            {{ $aside }}
+        </span>
+    <?php endif; ?>
 
-    <?php } elseif ($badge) { ?>
-
-    <span class="ms-1.5" aria-hidden="true">
-        {{ $badge }}
-    </span>
-
-    <?php } ?>
-
-    <?php if ($aside) { ?>
-
-    <span
-        class="-my-1 ms-1.5 rounded-[4px] bg-zinc-800/5 px-1.5 py-1 text-xs text-zinc-800/70 dark:bg-white/10 dark:text-zinc-300"
-        aria-hidden="true"
-    >
-        {{ $aside }}
-    </span>
-
-    <?php } ?>
-
-    <?php if ($trailing) { ?>
-
-    <div class="ml-auto" data-flux-label-trailing>
-        {{ $trailing }}
-    </div>
-
-    <?php } ?>
+    <?php if ($trailing): ?>
+        <div class="ml-auto" data-flux-label-trailing>
+            {{ $trailing }}
+        </div>
+    <?php endif; ?>
 </ui-label>

@@ -32,14 +32,13 @@ new class extends Component {
         <flux:navbar.item
             :href="route('dashboard')"
             :current="request()->routeIs('accounts.index')"
-            :accent="false"
             wire:navigate
         >
             Dashboard
         </flux:navbar.item>
 
         <flux:dropdown position="bottom">
-            <flux:navbar.item :accent="false" icon:trailing="chevron-down" icon:variant="micro">
+            <flux:navbar.item icon:trailing="chevron-down" icon:variant="micro">
                 Accounts
             </flux:navbar.item>
 

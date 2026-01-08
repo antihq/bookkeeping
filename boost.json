@@ -1,4 +1,7 @@
 {
-    "agents": ["codex", "opencode"],
+    "agents": [
+        "codex",
+        "opencode"
+    ],
     "guidelines": []
 }
