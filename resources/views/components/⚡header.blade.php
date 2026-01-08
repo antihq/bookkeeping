@@ -81,7 +81,7 @@ new class extends Component {
             :chevron="false"
         />
 
-        <flux:menu>
+        <flux:menu class="min-w-64">
             <flux:menu.group heading="Account">
                 <flux:menu.item :href="route('profile.edit')" icon="user" icon:variant="micro" wire:navigate>
                     Profile
