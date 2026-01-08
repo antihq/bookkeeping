@@ -6,8 +6,7 @@ use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-new class extends Component
-{
+new class extends Component {
     public Transaction $transaction;
 
     public string $date = '';
@@ -64,7 +63,8 @@ new class extends Component
             'date' => $this->date,
             'payee' => $this->payee,
             'note' => $this->note,
-            'amount' => $this->type === 'expense'
+            'amount' =>
+                $this->type === 'expense'
                     ? (int) -round((float) $this->amount * 100)
                     : (int) round((float) $this->amount * 100),
             'category_id' => $category?->id,
@@ -150,13 +150,15 @@ new class extends Component
         <div class="flex min-w-fit flex-1 items-center justify-end gap-4">
             <div class="text-right tabular-nums">
                 @if ($transaction->amount === 0)
-                    <flux:text variant="strong" class="font-medium">{{ $transaction->display_amount }}</flux:text>
+                    <flux:text variant="strong" class="font-medium whitespace-nowrap">
+                        {{ $transaction->display_amount }}
+                    </flux:text>
                 @elseif ($transaction->amount > 0)
-                    <flux:text variant="strong" color="green" class="font-medium">
+                    <flux:text variant="strong" color="green" class="font-medium whitespace-nowrap">
                         {{ $transaction->display_amount }}
                     </flux:text>
                 @else
-                    <flux:text variant="strong" color="red" class="font-medium">
+                    <flux:text variant="strong" color="red" class="font-medium whitespace-nowrap">
                         {{ $transaction->display_amount }}
                     </flux:text>
                 @endif
@@ -167,7 +169,7 @@ new class extends Component
 
             <div>
                 <flux:dropdown align="end">
-                    <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" />
+                    <flux:button variant="subtle" square icon="ellipsis-horizontal" />
                     <flux:menu>
                         <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}">
                             <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
@@ -177,25 +179,25 @@ new class extends Component
                         </flux:modal.trigger>
                     </flux:menu>
                 </flux:dropdown>
-                <flux:modal name="delete-transaction-{{ $transaction->id }}" class="min-w-[22rem]">
-                    <div class="space-y-6">
+
+                <flux:modal name="delete-transaction-{{ $transaction->id }}" class="w-full max-w-xs sm:max-w-md">
+                    <div class="space-y-6 sm:space-y-4">
                         <div>
-                            <flux:heading size="lg">Delete transaction?</flux:heading>
+                            <flux:heading>Delete transaction?</flux:heading>
                             <flux:text class="mt-2">
                                 You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
                             </flux:text>
                         </div>
-                        <div class="flex gap-2">
-                            <flux:spacer />
+                        <div class="flex flex-col-reverse items-center justify-end gap-3 sm:flex-row">
                             <flux:modal.close>
-                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                                <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
                             </flux:modal.close>
                             <flux:button
                                 wire:click="$parent.deleteTransaction({{ $transaction->id }})"
-                                variant="danger"
-                                size="sm"
+                                variant="primary"
+                                class="w-full sm:w-auto"
                             >
-                                Delete transaction
+                                Delete
                             </flux:button>
                         </div>
                     </div>
@@ -276,9 +278,9 @@ new class extends Component
                         >
                             <flux:spacer />
                             <flux:modal.close>
-                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                                <flux:button variant="ghost">Cancel</flux:button>
                             </flux:modal.close>
-                            <flux:button variant="primary" size="sm" type="submit">Save changes</flux:button>
+                            <flux:button variant="primary" type="submit">Save changes</flux:button>
                         </div>
                     </form>
                 </flux:modal>
