@@ -152,43 +152,45 @@ new #[Title('Account')] class extends Component
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-8">
-            <flux:heading size="lg">{{ $account->name }}</flux:heading>
-        </div>
+    <div class="space-y-2.5">
+        <flux:heading size="xl">{{ $account->name }}</flux:heading>
 
-        <div class="flex items-center gap-6">
-            <div class="inline-flex flex-wrap gap-1">
-                <flux:text>Overall balance:</flux:text>
-                <flux:heading>{{ $account->formatted_balance }}</flux:heading>
+        <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
+            <div class="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
+                <span class="flex flex-wrap items-center gap-3">
+                    <flux:text>Overall balance</flux:text>
+                    <flux:text variant="strong">{{ $account->formatted_balance }}</flux:text>
+                </span>
             </div>
-            @can('create', Transaction::class)
-                <flux:modal.trigger name="add-transaction">
-                    <flux:button variant="primary" size="sm">Add transaction</flux:button>
-                </flux:modal.trigger>
-            @endcan
+            <div class="flex gap-2">
+                @can('create', Transaction::class)
+                    <flux:modal.trigger name="add-transaction">
+                        <flux:button variant="primary">Add transaction</flux:button>
+                    </flux:modal.trigger>
+                @endcan
 
-            <flux:dropdown align="end">
-                <flux:button variant="subtle" size="sm" square icon="ellipsis-horizontal" inset="left" />
-                <flux:menu>
-                    @can('update', $account)
-                        <flux:menu.item
-                            href="{{ route('accounts.edit', $account) }}"
-                            icon="pencil-square"
-                            icon:variant="micro"
-                            wire:navigate
-                        >
-                            Edit
-                        </flux:menu.item>
-                    @endcan
+                <flux:dropdown align="end">
+                    <flux:button variant="subtle" square icon="ellipsis-horizontal" />
+                    <flux:menu>
+                        @can('update', $account)
+                            <flux:menu.item
+                                href="{{ route('accounts.edit', $account) }}"
+                                icon="pencil-square"
+                                icon:variant="micro"
+                                wire:navigate
+                            >
+                                Edit
+                            </flux:menu.item>
+                        @endcan
 
-                    @can('delete', $account)
-                        <flux:modal.trigger name="delete">
-                            <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
-                        </flux:modal.trigger>
-                    @endcan
-                </flux:menu>
-            </flux:dropdown>
+                        @can('delete', $account)
+                            <flux:modal.trigger name="delete">
+                                <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
+                            </flux:modal.trigger>
+                        @endcan
+                    </flux:menu>
+                </flux:dropdown>
+            </div>
         </div>
     </div>
 
@@ -218,7 +220,7 @@ new #[Title('Account')] class extends Component
             @endif
 
             @can('create', Transaction::class)
-                <flux:modal name="add-transaction" class="w-full pb-0 sm:max-w-lg">
+                <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
                     <form wire:submit="addTransaction" class="space-y-6">
                         <div>
                             <flux:heading size="lg">Add transaction</flux:heading>
@@ -285,13 +287,13 @@ new #[Title('Account')] class extends Component
                         <flux:date-picker wire:model="date" label="Date" required />
 
                         <div
-                            class="sticky bottom-0 flex gap-2 border-t border-zinc-100 bg-white py-6 dark:border-white/5 dark:bg-zinc-800"
+                            class="flex gap-2"
                         >
                             <flux:spacer />
                             <flux:modal.close>
-                                <flux:button variant="ghost" size="sm">Cancel</flux:button>
+                                <flux:button variant="ghost">Cancel</flux:button>
                             </flux:modal.close>
-                            <flux:button variant="primary" size="sm" type="submit">Add transaction</flux:button>
+                            <flux:button variant="primary" type="submit">Add transaction</flux:button>
                         </div>
                     </form>
                 </flux:modal>
