@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Account;
 use App\Models\Currency;
 use App\Models\Team;
 use Flux\Flux;
@@ -9,8 +8,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Accounts')] class extends Component
-{
+new #[Title('Accounts')] class extends Component {
     #[Computed]
     public function accounts()
     {
@@ -62,9 +60,9 @@ new #[Title('Accounts')] class extends Component
 
         <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
             <div class="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
-                <span class="flex items-center gap-3">
+                <span class="flex flex-wrap items-center gap-3">
                     <flux:text>Overall balance</flux:text>
-                    <span class="flex items-center gap-3">
+                    <span class="flex flex-wrap items-center gap-3">
                         @foreach ($this->teamBalances as $currency => $balance)
                             <flux:text variant="strong">{{ strtoupper($currency) }} {{ $balance }}</flux:text>
                         @endforeach
@@ -72,7 +70,7 @@ new #[Title('Accounts')] class extends Component
                 </span>
             </div>
 
-            @can('create', Account::class)
+            @can('create', App\Models\Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" wire:navigate>
                     Add account
                 </flux:button>
@@ -93,13 +91,20 @@ new #[Title('Accounts')] class extends Component
     @else
         <ul class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
             @foreach ($this->accounts as $account)
-                <li wire:key="account-{{ $account->id }}" class="relative flex items-center justify-between gap-4 py-4">
+                <li
+                    wire:key="account-{{ $account->id }}"
+                    class="relative flex items-center justify-between gap-4 py-4"
+                >
                     <a href="{{ route('accounts.show', $account) }}" class="absolute inset-0 z-10"></a>
-                    <div class="flex min-w-0 flex-col gap-2 md:flex-row md:items-center" href="{{ route('accounts.show', $account) }}" wire:navigate>
+                    <div
+                        class="flex min-w-0 flex-col gap-x-2 gap-y-1 md:flex-row md:items-center"
+                        href="{{ route('accounts.show', $account) }}"
+                        wire:navigate
+                    >
                         <flux:text>
                             <flux:link
                                 href="{{ route('accounts.show', $account) }}"
-                                class="truncate z-10 relative"
+                                class="relative z-10 truncate"
                                 variant="ghost"
                                 wire:navigate
                             >
