@@ -11,7 +11,7 @@
 @php
 $classes = Flux::classes()
     ->add('inline font-medium')
-    ->add('underline hover:decoration-current')
+    ->add('hover:decoration-current')
     ->add(match ($variant) {
         'ghost' => 'no-underline hover:underline',
         'subtle' => 'no-underline',
