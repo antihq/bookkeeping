@@ -9,8 +9,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Add account')] class extends Component
-{
+new #[Title('Add account')] class extends Component {
     public string $type = 'checking';
 
     public string $name = '';
@@ -76,16 +75,13 @@ new #[Title('Add account')] class extends Component
 
 <section class="mx-auto max-w-6xl space-y-8">
     <div class="flex items-center justify-between gap-4">
-        <flux:heading size="lg">Add account</flux:heading>
-        <flux:button href="{{ route('accounts.index') }}" size="sm" inset="top bottom" wire:navigate>
-            Cancel
-        </flux:button>
+        <flux:heading size="xl">Add account</flux:heading>
     </div>
 
-    <div class="space-y-14">
+    <div class="space-y-14">s
         <div class="space-y-8">
             <header class="space-y-1">
-                <flux:heading>Account details</flux:heading>
+                <flux:heading class="lg">Account details</flux:heading>
                 <flux:text>Add a new account to track your finances.</flux:text>
             </header>
 
@@ -98,9 +94,9 @@ new #[Title('Add account')] class extends Component
                     <flux:radio label="Other" value="other" />
                 </flux:radio.group>
 
-                <flux:input wire:model="name" label="Account name" type="text" size="sm" required autofocus />
+                <flux:input wire:model="name" label="Account name" type="text" required autofocus />
 
-                <flux:select wire:model="currency" label="Currency" size="sm" required>
+                <flux:select wire:model="currency" label="Currency" required>
                     @foreach ($this->currencies as $currency)
                         <option value="{{ $currency->iso }}">
                             {{ $currency->currency }} ({{ $currency->iso }})
@@ -114,13 +110,12 @@ new #[Title('Add account')] class extends Component
                     type="text"
                     mask:dynamic="$money($input)"
                     placeholder="0.00"
-                    size="sm"
                     required
                 />
 
                 <div class="flex items-center gap-4">
                     <div class="flex items-center justify-end">
-                        <flux:button variant="primary" type="submit" class="w-full" size="sm">Add account</flux:button>
+                        <flux:button variant="primary" type="submit" class="w-full">Add account</flux:button>
                     </div>
                 </div>
             </form>

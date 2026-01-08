@@ -117,7 +117,13 @@ new #[Title('Accounts')] class extends Component {
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <flux:text>{{ $account->formatted_balance }}</flux:text>
+                        @if ($account->balance_in_dollars === 0)
+                            <flux:text>{{ $account->formatted_balance }}</flux:text>
+                        @elseif ($account->balance_in_dollars > 0)
+                            <flux:text color="green">{{ $account->formatted_balance }}</flux:text>
+                        @else
+                            <flux:text color="red">{{ $account->formatted_balance }}</flux:text>
+                        @endif
 
                         <div>
                             <flux:dropdown align="end">
