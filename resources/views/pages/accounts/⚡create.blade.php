@@ -74,14 +74,12 @@ new #[Title('Add account')] class extends Component {
 ?>
 
 <section class="mx-auto max-w-6xl space-y-8">
-    <div class="flex items-center justify-between gap-4">
-        <flux:heading size="xl">Add account</flux:heading>
-    </div>
+    <flux:heading size="xl">Add account</flux:heading>
 
-    <div class="space-y-14">s
+    <div class="space-y-14">
         <div class="space-y-8">
             <header class="space-y-1">
-                <flux:heading class="lg">Account details</flux:heading>
+                <flux:heading size="lg">Account details</flux:heading>
                 <flux:text>Add a new account to track your finances.</flux:text>
             </header>
 
@@ -113,10 +111,9 @@ new #[Title('Add account')] class extends Component {
                     required
                 />
 
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center justify-end">
-                        <flux:button variant="primary" type="submit" class="w-full">Add account</flux:button>
-                    </div>
+                <div class="flex justify-end gap-4">
+                    <flux:button href="{{ route('accounts.index') }}" variant="ghost" wire:navigate>Cancel</flux:button>
+                    <flux:button variant="primary" type="submit">Add account</flux:button>
                 </div>
             </form>
         </div>
