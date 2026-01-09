@@ -273,11 +273,10 @@ new class extends Component {
                         <flux:date-picker wire:model="date" label="Date" required />
 
                         <div
-                            class="flex gap-2"
+                            class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto"
                         >
-                            <flux:spacer />
                             <flux:modal.close>
-                                <flux:button variant="ghost">Cancel</flux:button>
+                                <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
                             </flux:modal.close>
                             <flux:button variant="primary" type="submit">Save changes</flux:button>
                         </div>
