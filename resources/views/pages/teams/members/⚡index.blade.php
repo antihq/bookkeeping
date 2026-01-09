@@ -200,7 +200,7 @@ new class extends Component
         @if ($team->users->isNotEmpty())
             <div class="space-y-6">
                 <header class="space-y-1">
-                    <flux:heading>Team members</flux:heading>
+                    <flux:heading size="lg">Team members</flux:heading>
                     <flux:text>All team members that currently have access to this team.</flux:text>
                 </header>
 
@@ -215,7 +215,7 @@ new class extends Component
         @if (Gate::check('addTeamMember', $team))
             <div class="space-y-6">
                 <header class="space-y-1">
-                    <flux:heading>Add team member</flux:heading>
+                    <flux:heading size="lg">Add team member</flux:heading>
                     <flux:text>
                         @if (Features::sendsTeamInvitations())
                             Add a new team member to your team, allowing them to collaborate with you.
@@ -261,7 +261,7 @@ new class extends Component
         @if ($team->teamInvitations->isNotEmpty() && Gate::check('addTeamMember', $team))
             <div class="space-y-6">
                 <header class="space-y-1">
-                    <flux:heading>Pending invitations</flux:heading>
+                    <flux:heading size="lg">Pending invitations</flux:heading>
                     <flux:text>These people have been invited to your team and haven't accepted yet.</flux:text>
                 </header>
 
@@ -300,7 +300,7 @@ new class extends Component
         @if ($team->owner->id !== $this->user->id)
             <div class="space-y-6">
                 <header class="space-y-1">
-                    <flux:heading>Leave team</flux:heading>
+                    <flux:heading size="lg">Leave team</flux:heading>
                     <flux:text>Are you sure you want to leave this team?</flux:text>
                 </header>
 
