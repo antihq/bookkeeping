@@ -188,14 +188,13 @@ new class extends Component {
                                 You're about to delete "{{ $transaction->payee }}". This action cannot be reversed.
                             </flux:text>
                         </div>
-                        <div class="flex flex-col-reverse items-center justify-end gap-3 sm:flex-row">
+                        <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
                             <flux:modal.close>
                                 <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
                             </flux:modal.close>
                             <flux:button
                                 wire:click="$parent.deleteTransaction({{ $transaction->id }})"
                                 variant="primary"
-                                class="w-full sm:w-auto"
                             >
                                 Delete
                             </flux:button>
