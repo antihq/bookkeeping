@@ -190,26 +190,6 @@ new #[Title('Account')] class extends Component
                         @endcan
                     </flux:menu>
                 </flux:dropdown>
-
-                @can('delete', $account)
-                    <flux:modal name="delete" class="w-full max-w-xs sm:max-w-md">
-                        <div class="space-y-6 sm:space-y-4">
-                            <div>
-                                <flux:heading>Delete account?</flux:heading>
-                                <flux:text class="mt-2">
-                                    You're about to delete "{{ $account->name }}". All associated
-                                    transactions will also be deleted. This action cannot be reversed.
-                                </flux:text>
-                            </div>
-                            <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
-                                <flux:modal.close>
-                                    <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
-                                </flux:modal.close>
-                                <flux:button wire:click="delete" variant="primary">Delete</flux:button>
-                            </div>
-                        </div>
-                    </flux:modal>
-                @endcan
             </div>
         </div>
     </div>
@@ -317,4 +297,24 @@ new #[Title('Account')] class extends Component
             @endcan
         </div>
     </div>
+
+    @can('delete', $account)
+        <flux:modal name="delete" class="w-full max-w-xs sm:max-w-md">
+            <div class="space-y-6 sm:space-y-4">
+                <div>
+                    <flux:heading>Delete account?</flux:heading>
+                    <flux:text class="mt-2">
+                        You're about to delete "{{ $account->name }}". All associated
+                        transactions will also be deleted. This action cannot be reversed.
+                    </flux:text>
+                </div>
+                <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
+                    <flux:modal.close>
+                        <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
+                    </flux:modal.close>
+                    <flux:button wire:click="delete" variant="primary">Delete</flux:button>
+                </div>
+            </div>
+        </flux:modal>
+    @endcan
 </section>
