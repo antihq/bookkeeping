@@ -38,7 +38,7 @@ new class extends Component
         $this->user->teams()->detach();
 
         $this->user->ownedTeams->each(function (Team $team) {
-            $this->deletesTeams->delete($team);
+            $team->delete;
         });
     }
 };
