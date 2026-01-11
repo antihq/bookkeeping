@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password as PasswordRule;
@@ -13,26 +14,34 @@ new #[Title('Password')] class extends Component
 
     public string $password = '';
 
-    public string $password_confirmation = '';
-
     public function updatePassword(): void
     {
+        $user = Auth::user();
+        if (! $user instanceof User) {
+            return;
+        }
+
+        $rules = [
+            'password' => ['required', 'string', PasswordRule::defaults()],
+        ];
+
+        if ($user->hasPassword()) {
+            $rules['current_password'] = ['required', 'string', 'current_password'];
+        }
+
         try {
-            $validated = $this->validate([
-                'current_password' => ['required', 'string', 'current_password'],
-                'password' => ['required', 'string', PasswordRule::defaults(), 'confirmed'],
-            ]);
+            $validated = $this->validate($rules);
         } catch (ValidationException $e) {
-            $this->reset('current_password', 'password', 'password_confirmation');
+            $this->reset('current_password', 'password');
 
             throw $e;
         }
 
-        Auth::user()->update([
+        $user->update([
             'password' => $validated['password'],
         ]);
 
-        $this->reset('current_password', 'password', 'password_confirmation');
+        $this->reset('current_password', 'password');
 
         Flux::toast('Password has been updated.', variant: 'success');
     }
@@ -45,28 +54,23 @@ new #[Title('Password')] class extends Component
     <div class="space-y-14">
         <div class="space-y-6">
             <header class="space-y-1">
-                <flux:heading>Update password</flux:heading>
-                <flux:text>Ensure your account is using a long, random password to stay secure.</flux:text>
+                <flux:heading size="lg">{{ auth()->user()->hasPassword() ? 'Update password' : 'Set password' }}</flux:heading>
+                <flux:text>{{ auth()->user()->hasPassword() ? 'Ensure your account is using a long, random password to stay secure.' : 'Set a password for your account to enhance security.' }}</flux:text>
             </header>
 
             <form wire:submit="updatePassword" class="w-full max-w-lg space-y-8">
-                <flux:input
-                    wire:model="current_password"
-                    :label="'Current password'"
-                    type="password"
-                    required
-                    autocomplete="current-password"
-                />
+                @if(auth()->user()->hasPassword())
+                    <flux:input
+                        wire:model="current_password"
+                        :label="'Current password'"
+                        type="password"
+                        required
+                        autocomplete="current-password"
+                    />
+                @endif
                 <flux:input
                     wire:model="password"
-                    :label="'New password'"
-                    type="password"
-                    required
-                    autocomplete="new-password"
-                />
-                <flux:input
-                    wire:model="password_confirmation"
-                    :label="'Confirm Password'"
+                    :label="(auth()->user()->hasPassword() ? 'New password' : 'Password')"
                     type="password"
                     required
                     autocomplete="new-password"

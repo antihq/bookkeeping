@@ -1,45 +1,22 @@
 <x-layouts::auth>
-    <div class="flex flex-col gap-6">
-        <x-auth-header title="Create an account" description="Enter your details below to create your account" />
+    <div class="flex flex-col gap-8">
+        <x-auth-header title="Create your account" />
 
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
-        <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
+        <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-8">
             @csrf
-
-            <!-- Name -->
-            <flux:input
-                name="name"
-                :label="'Name'"
-                :value="old('name')"
-                type="text"
-                required
-                autofocus
-                autocomplete="name"
-                :placeholder="'Full name'"
-            />
 
             <!-- Email Address -->
             <flux:input
                 name="email"
-                :label="'Email address'"
+                label="Email"
                 :value="old('email')"
                 type="email"
                 required
+                autofocus
                 autocomplete="email"
-                placeholder="email@example.com"
-            />
-
-            <!-- Password -->
-            <flux:input
-                name="password"
-                :label="'Password'"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="'Password'"
-                viewable
             />
 
             <div class="flex items-center justify-end">
@@ -47,9 +24,9 @@
             </div>
         </form>
 
-        <div class="space-x-1 text-center text-sm text-zinc-600 rtl:space-x-reverse dark:text-zinc-400">
-            <span>Already have an account?</span>
-            <flux:link :href="route('login')" wire:navigate>Log in</flux:link>
-        </div>
+        <flux:text>
+            Already have an account?
+            <flux:link :href="route('login')" wire:navigate>Sign in</flux:link>
+        </flux:text>
     </div>
 </x-layouts::auth>

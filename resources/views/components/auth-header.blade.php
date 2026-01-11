@@ -3,7 +3,9 @@
     'description',
 ])
 
-<div class="flex w-full flex-col text-center">
+<div class="flex w-full flex-col space-y-2">
     <flux:heading size="xl">{{ $title }}</flux:heading>
-    <flux:subheading>{{ $description }}</flux:subheading>
+    @if (! empty($description))
+        <flux:text>{{ $description }}</flux:text>
+    @endif
 </div>

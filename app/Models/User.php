@@ -43,15 +43,28 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the user's initials
+     * Get user's initials
      */
     public function initials(): string
     {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+        if ($this->name) {
+            return Str::of($this->name)
+                ->explode(' ')
+                ->take(2)
+                ->map(fn ($word) => Str::substr($word, 0, 1))
+                ->implode('');
+        }
+
+        return Str::of($this->email)
+            ->explode('@')
+            ->take(1)
+            ->map(fn ($word) => Str::ucfirst(Str::before($word, '.')))
             ->implode('');
+    }
+
+    public function hasPassword(): bool
+    {
+        return ! is_null($this->password);
     }
 
     /**

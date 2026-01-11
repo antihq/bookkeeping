@@ -34,7 +34,7 @@ it('can verify email', function () {
     $response->assertRedirect(route('dashboard', absolute: false) . '?verified=1');
 });
 
-it('cannot verify email with invalid hash', function () {
+it('is not verified with invalid hash', function () {
     $user = User::factory()->unverified()->create();
 
     $verificationUrl = URL::temporarySignedRoute(

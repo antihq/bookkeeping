@@ -12,7 +12,7 @@ new #[Title('Appearance')] class extends Component {};
     <div class="space-y-14">
         <div class="space-y-6">
             <header class="space-y-1">
-                <flux:heading>Theme preference</flux:heading>
+                <flux:heading size="lg">Theme preference</flux:heading>
                 <flux:text>Select your preferred color scheme.</flux:text>
             </header>
 

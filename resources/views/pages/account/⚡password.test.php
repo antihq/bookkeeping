@@ -26,7 +26,6 @@ it('password can be updated', function () {
     $response = Livewire::test('pages::account.password')
         ->set('current_password', 'password')
         ->set('password', 'new-password')
-        ->set('password_confirmation', 'new-password')
         ->call('updatePassword');
 
     $response->assertHasNoErrors();
@@ -44,8 +43,23 @@ it('correct password must be provided to update password', function () {
     $response = Livewire::test('pages::account.password')
         ->set('current_password', 'wrong-password')
         ->set('password', 'new-password')
-        ->set('password_confirmation', 'new-password')
         ->call('updatePassword');
 
     $response->assertHasErrors(['current_password']);
+});
+
+it('password can be set when user has no password', function () {
+    $user = User::factory()->create([
+        'password' => null,
+    ]);
+
+    actingAs($user);
+
+    $response = Livewire::test('pages::account.password')
+        ->set('password', 'new-password')
+        ->call('updatePassword');
+
+    $response->assertHasNoErrors();
+
+    expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
 });

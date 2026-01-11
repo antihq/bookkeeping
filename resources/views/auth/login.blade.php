@@ -1,41 +1,41 @@
 <x-layouts::auth>
-    <div class="flex flex-col gap-6">
-        <x-auth-header title="Log in to your account" description="Enter your email and password below to log in" />
+    <div class="flex flex-col gap-8">
+        <x-auth-header title="Sign in to your account" />
 
         <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+        <x-auth-session-status :status="session('status')" />
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
+        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-8">
             @csrf
 
             <!-- Email Address -->
             <flux:input
                 name="email"
-                :label="'Email address'"
+                label="Email"
                 :value="old('email')"
                 type="email"
                 required
                 autofocus
                 autocomplete="email"
-                placeholder="email@example.com"
             />
 
             <!-- Password -->
             <div class="relative">
                 <flux:input
                     name="password"
-                    :label="'Password'"
+                    label="Password"
                     type="password"
                     required
                     autocomplete="current-password"
-                    :placeholder="'Password'"
                     viewable
                 />
 
                 @if (Route::has('password.request'))
-                    <flux:link class="absolute end-0 top-0 text-sm" :href="route('password.request')" wire:navigate>
-                        Forgot your password?
-                    </flux:link>
+                    <flux:text class="absolute end-0 top-0">
+                        <flux:link :href="route('password.request')" wire:navigate>
+                            Forgot password?
+                        </flux:link>
+                    </flux:text>
                 @endif
             </div>
 
@@ -43,16 +43,16 @@
 
             <div class="flex items-center justify-end">
                 <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    Log in
+                    Login
                 </flux:button>
             </div>
         </form>
 
         @if (Route::has('register'))
-            <div class="space-x-1 text-center text-sm text-zinc-600 rtl:space-x-reverse dark:text-zinc-400">
-                <span>Don't have an account?</span>
+            <flux:text>
+                Don't have an account?
                 <flux:link :href="route('register')" wire:navigate>Sign up</flux:link>
-            </div>
+            </flux:text>
         @endif
     </div>
 </x-layouts::auth>

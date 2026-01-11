@@ -159,8 +159,10 @@ new #[Title('Two Factor Authentication')] class extends Component
     <div class="space-y-14">
         <div class="space-y-6">
             <header class="space-y-1">
-                <flux:heading>Authentication status</flux:heading>
-                <flux:text>Add an extra layer of security to your account using two-factor authentication.</flux:text>
+                <flux:heading size="lg">Authentication status</flux:heading>
+                <flux:text>
+                    Add an extra layer of security to your account using two-factor authentication.
+                </flux:text>
             </header>
 
             <div class="flex w-full max-w-lg flex-col space-y-6 text-sm" wire:cloak>
@@ -194,7 +196,12 @@ new #[Title('Two Factor Authentication')] class extends Component
                             When you enable two-factor authentication, you will be prompted for a secure pin during
                             login. This pin can be retrieved from a TOTP-supported application on your phone.
                         </flux:text>
-                        <flux:button variant="primary" icon="shield-check" icon:variant="outline" wire:click="enable">
+                        <flux:button
+                            variant="primary"
+                            icon="shield-check"
+                            icon:variant="outline"
+                            wire:click="enable"
+                        >
                             Enable 2FA
                         </flux:button>
                     </div>

@@ -15,7 +15,7 @@ it('can render login screen', function () {
     $response->assertStatus(200);
 });
 
-it('can authenticate users using the login screen', function () {
+it('can authenticate using the login screen', function () {
     $user = User::factory()->withoutTwoFactor()->create();
 
     $response = post(route('login.store'), [
@@ -30,7 +30,7 @@ it('can authenticate users using the login screen', function () {
     assertAuthenticated();
 });
 
-it('cannot authenticate with invalid password', function () {
+it('can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
     $response = post(route('login.store'), [
@@ -43,7 +43,7 @@ it('cannot authenticate with invalid password', function () {
     assertGuest();
 });
 
-it('redirects users with two factor enabled to two factor challenge', function () {
+it('redirects to two factor challenge when two factor is enabled', function () {
     if (! Features::canManageTwoFactorAuthentication()) {
         $this->markTestSkipped('Two-factor authentication is not enabled.');
     }
@@ -63,11 +63,24 @@ it('redirects users with two factor enabled to two factor challenge', function (
     assertGuest();
 });
 
-it('can logout users', function () {
+it('can logout', function () {
     $user = User::factory()->create();
 
     $response = actingAs($user)->post(route('logout'));
 
     $response->assertRedirect(route('home'));
+    assertGuest();
+});
+
+it('can not authenticate user with null password', function () {
+    $user = User::factory()->create(['password' => null]);
+
+    $response = post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $response->assertSessionHasErrors();
+
     assertGuest();
 });
