@@ -63,7 +63,7 @@ $countOfTrailingIcons = collect([
 
 $iconClasses = Flux::classes()
     // When using the outline icon variant, we need to size it down to match the default icon sizes...
-    ->add($iconVariant === 'outline' ? 'size-5' : '')
+    ->add($iconVariant === 'outline' ? 'size-5 sm:size-4' : 'size-5 sm:size-4')
     ;
 
 $inputLoadingClasses = Flux::classes()
@@ -94,12 +94,12 @@ $classes = Flux::classes()
     ->add(match ($countOfTrailingIcons) {
         // Make sure there's enough padding on the right side of the input to account for all the icons...
         0 => 'pe-[calc(--spacing(3.5)-1px)] sm:pe-[calc(--spacing(3)-1px)]',
-        1 => 'pe-10',
-        2 => 'pe-16',
-        3 => 'pe-23',
-        4 => 'pe-30',
-        5 => 'pe-37',
-        6 => 'pe-44',
+        1 => 'pe-9',
+        2 => 'pe-18',
+        3 => 'pe-27',
+        4 => 'pe-39',
+        5 => 'pe-46',
+        6 => 'pe-53',
     })
     ->add(match ($variant) { // Background...
         'outline' => 'bg-white dark:bg-white/10 dark:disabled:bg-white/[7%]',
@@ -111,7 +111,7 @@ $classes = Flux::classes()
     })
     ->add(match ($variant) { // Border...
         'outline' => 'shadow-xs border-zinc-200 border-b-zinc-300/80 disabled:border-b-zinc-200 dark:border-white/10 dark:disabled:border-white/5',
-        'filled'  => 'border-0',
+        'filled'  => 'border-transparent',
     })
     ->add(match ($variant) { // Invalid...
         'outline' => 'data-invalid:shadow-none data-invalid:border-red-500 dark:data-invalid:border-red-500 disabled:data-invalid:border-red-500 dark:disabled:data-invalid:border-red-500',
@@ -153,14 +153,14 @@ $classes = Flux::classes()
             >
 
             <?php if ($loading || $countOfTrailingIcons > 0): ?>
-                <div class="absolute top-0 bottom-0 flex items-center gap-x-1.5 pe-2 border-e border-transparent end-0 text-xs text-zinc-400">
+                <div class="absolute top-0 bottom-0 flex items-center gap-x-1.5 pe-[calc(--spacing(2)-1px)] border-e border-transparent end-0 text-xs text-zinc-400 sm:pe-[calc(--spacing(2)-1px)]">
                     {{-- Icon should be text-zinc-400/75 --}}
                     <?php if ($loading): ?>
                         <flux:icon name="loading" :variant="$iconVariant" :class="$iconClasses" wire:loading :wire:target="$wireTarget" />
                     <?php endif; ?>
 
                     <?php if ($clearable): ?>
-                        <flux:input.clearable inset="left right" :$size />
+                        <flux:input.clearable :$size />
                     <?php endif; ?>
 
                     <?php if ($kbd): ?>
@@ -168,15 +168,15 @@ $classes = Flux::classes()
                     <?php endif; ?>
 
                     <?php if ($expandable): ?>
-                        <flux:input.expandable inset="left right" :$size />
+                        <flux:input.expandable :$size />
                     <?php endif; ?>
 
                     <?php if ($copyable): ?>
-                        <flux:input.copyable inset="left right" :$size />
+                        <flux:input.copyable :$size />
                     <?php endif; ?>
 
                     <?php if ($viewable): ?>
-                        <flux:input.viewable inset="left right" :$size />
+                        <flux:input.viewable :$size />
                     <?php endif; ?>
 
                     <?php if (is_string($iconTrailing)): ?>
