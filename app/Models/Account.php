@@ -36,7 +36,7 @@ class Account extends Model
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class)->orderBy('date', 'desc')->latest();
+        return $this->hasMany(Transaction::class)->orderBy('date', 'desc');
     }
 
     public function addTransaction(array $input, User $createdBy, ?Category $category = null): Transaction
