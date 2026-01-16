@@ -11,7 +11,6 @@ it('allows deleting accounts', function () {
     $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $user->id,
     ]);
@@ -32,7 +31,6 @@ it('prevents non-owners from deleting accounts', function () {
     $account = Account::factory()->for($owner->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $owner->id,
     ]);
@@ -46,7 +44,6 @@ it('can add transactions', function () {
     $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $user->id,
     ]);
@@ -73,7 +70,6 @@ it('can add expense transactions', function () {
     $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $user->id,
     ]);

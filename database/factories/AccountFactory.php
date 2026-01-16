@@ -12,7 +12,6 @@ class AccountFactory extends Factory
         return [
             'type' => fake()->randomElement(['checking', 'savings', 'credit card', 'cash', 'other']),
             'name' => fake()->words(3, true),
-            'currency' => fake()->randomElement(['usd', 'eur', 'gbp', 'jpy']),
             'start_balance' => fake()->numberBetween(0, 1000000),
             'created_by' => User::factory(),
         ];

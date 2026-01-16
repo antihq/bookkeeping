@@ -9,7 +9,6 @@ it('can create accounts', function () {
     Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'savings')
         ->set('name', 'Test Savings Account')
-        ->set('currency', 'usd')
         ->set('start_balance', 1234.56)
         ->call('create')
         ->assertHasNoErrors()
@@ -19,7 +18,6 @@ it('can create accounts', function () {
 
     expect($account->name)->toBe('Test Savings Account');
     expect($account->type)->toBe('savings');
-    expect($account->currency)->toBe('usd');
     expect($account->start_balance)->toBe(123456);
 });
 
@@ -29,7 +27,6 @@ it('prevents invalid account types', function () {
     Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'invalid')
         ->set('name', 'Test Account')
-        ->set('currency', 'usd')
         ->set('start_balance', 100)
         ->call('create')
         ->assertHasErrors(['type']);
@@ -41,21 +38,12 @@ it('stores balance in cents', function () {
     Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'checking')
         ->set('name', 'Test Account')
-        ->set('currency', 'usd')
         ->set('start_balance', 99.99)
         ->call('create');
 
     $account = $user->currentTeam->accounts()->latest()->first();
 
     expect($account->start_balance)->toBe(9999);
-});
-
-it('defaults currency to usd', function () {
-    $user = User::factory()->withPersonalTeam()->create();
-
-    $component = Livewire::actingAs($user)->test('pages::accounts.create');
-
-    expect($component->get('currency'))->toBe('usd');
 });
 
 it('prevents non-owners from creating accounts', function () {
@@ -76,7 +64,6 @@ it('allows negative starting balances', function () {
     Livewire::actingAs($user)->test('pages::accounts.create')
         ->set('type', 'credit card')
         ->set('name', 'Credit Card')
-        ->set('currency', 'usd')
         ->set('start_balance', -500.00)
         ->call('create')
         ->assertHasNoErrors();

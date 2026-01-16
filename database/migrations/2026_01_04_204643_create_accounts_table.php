@@ -14,7 +14,6 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users');
             $table->string('type');
             $table->string('name');
-            $table->string('currency', 3);
             $table->integer('start_balance');
             $table->timestamps();
         });

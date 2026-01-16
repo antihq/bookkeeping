@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Account;
-use App\Models\Currency;
 use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -15,8 +14,6 @@ new #[Title('Edit account')] class extends Component
 
     public string $name = '';
 
-    public string $currency = 'usd';
-
     public string $start_balance = '';
 
     public function mount()
@@ -26,7 +23,6 @@ new #[Title('Edit account')] class extends Component
         $this->account = $this->account;
         $this->type = $this->account->type;
         $this->name = $this->account->name;
-        $this->currency = $this->account->currency;
         $this->start_balance = (string) ($this->account->start_balance / 100);
     }
 
@@ -42,26 +38,18 @@ new #[Title('Edit account')] class extends Component
         $this->validate([
             'type' => ['required', 'in:checking,savings,credit card,cash,other'],
             'name' => ['required', 'string', 'max:255'],
-            'currency' => ['required', 'string', 'size:3'],
             'start_balance' => ['required', 'numeric'],
         ]);
 
         $this->account->update([
             'type' => $this->type,
             'name' => $this->name,
-            'currency' => $this->currency,
             'start_balance' => (int) round($this->start_balance * 100),
         ]);
 
         Flux::toast('Account updated successfully.', variant: 'success');
 
         return $this->redirectRoute('accounts.show', $this->account);
-    }
-
-    #[Computed]
-    public function currencies()
-    {
-        return Currency::all()->sortBy('currency');
     }
 };
 ?>
@@ -86,14 +74,6 @@ new #[Title('Edit account')] class extends Component
                 </flux:radio.group>
 
                 <flux:input wire:model="name" label="Account name" type="text" required autofocus />
-
-                <flux:select wire:model="currency" label="Currency" required>
-                    @foreach ($this->currencies as $currency)
-                        <option value="{{ $currency->iso }}">
-                            {{ $currency->currency }} ({{ $currency->iso }})
-                        </option>
-                    @endforeach
-                </flux:select>
 
                 <flux:input
                     wire:model="start_balance"

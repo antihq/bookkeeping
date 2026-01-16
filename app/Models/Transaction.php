@@ -45,23 +45,14 @@ class Transaction extends Model
     protected function formattedAmount(): Attribute
     {
         return Attribute::make(
-            get: fn () => match (true) {
-                ! $this->account => '$' . number_format(abs($this->amount) / 100, 2),
-                default => match (true) {
-                    ! $this->account->currency => '$' . number_format(abs($this->amount) / 100, 2),
-                    default => match (true) {
-                        $currency = Currency::where('iso', $this->account->currency)->first() => $currency->symbol . number_format(abs($this->amount) / 100, 2),
-                        default => '$' . number_format(abs($this->amount) / 100, 2),
-                    },
-                },
-            },
+            get: fn () => '$'.number_format(abs($this->amount) / 100, 2),
         );
     }
 
     protected function displayAmount(): Attribute
     {
         return Attribute::make(
-            get: fn () => ($this->amount < 0 ? '-' : '') . $this->formatted_amount,
+            get: fn () => ($this->amount < 0 ? '-' : '').$this->formatted_amount,
         );
     }
 

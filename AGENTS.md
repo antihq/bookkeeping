@@ -1,66 +1,4 @@
 <laravel-boost-guidelines>
-=== .ai/core rules ===
-
-## Livewire v4
-
-### Component Creation
-- Prefer single-file components (`.blade.php` with embedded PHP) or multi-file components over class-based components.
-- Use `php artisan make:livewire post.create` for single-file (default) or `php artisan make:livewire post.create --mfc` for multi-file.
-- Convert between formats with `php artisan livewire:convert post.create`.
-
-### Routing
-- Use `Route::livewire()` with component names for single-file and multi-file components:
-
-<code-snippet name="Routing to component example" lang="php">
-    Route::livewire('/dashboard', 'pages::dashboard');
-</code-snippet>
-
-### Directives and Modifiers
-- Use to `wire:navigate:scroll` for scroll preservation with `@persist`:
-
-    ```blade
-    @persist('sidebar')
-        <div class="overflow-y-scroll" wire:navigate:scroll>
-            <!-- ... -->
-        </div>
-    @endpersist
-    ```
-
-- New v4 directives: `wire:sort`, `wire:intersect`, `wire:ref`, `wire:show`, `wire:text`
-- New v4 modifiers: `.renderless`, `.preserve-scroll`
-
-### Streaming
-- Use to v4 streaming method signature:
-
-    ```php
-    $this->stream(content: 'Hello', replace: true, el: '#container');
-    ```
-
-### JavaScript Hooks
-- Use to new `$wire.$js` syntax:
-
-<code-snippet name="livewire:load example" lang="js">
-    $wire.$js.bookmark = () => {
-        // Toggle bookmark...
-    }
-</code-snippet>
-
-### New Features in v4
-- Islands architecture (`@island` directive)
-- Single-file components (`.blade.php` with embedded PHP)
-- Multi-file components
-- Viewport intersection with `wire:intersect`
-- Drag-and-drop sorting with `wire:sort`
-- Async actions with `.async` modifier or `#[Async]` attribute
-- Defer loading with `#[Defer]` attribute
-- Renderless actions with `#[Renderless]` attribute or `.renderless` modifier
-- Automatic scroll preservation with `.preserve-scroll` modifier
-- `data-loading` attribute for styling loading states
-- JavaScript access to `$errors` magic property
-
-- Slots and attribute forwarding with `{{ $attributes }}`
-- JavaScript in view-based components without `@script` wrapper
-
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -174,13 +112,6 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ## Enums
 - Typically, keys in an Enum should be TitleCase. For example: `FavoritePerson`, `BestLake`, `Monthly`.
 
-=== herd rules ===
-
-## Laravel Herd
-
-- The application is served by Laravel Herd and will be available at: `https?://[kebab-case-project-dir].test`. Use the `get-absolute-url` tool to generate URLs for the user to ensure valid URLs.
-- You must not run any commands to make the site available via HTTP(S). It is always available through Laravel Herd.
-
 === tests rules ===
 
 ## Test Enforcement
@@ -279,11 +210,12 @@ accordion, autocomplete, avatar, badge, brand, breadcrumbs, button, calendar, ca
 
 === livewire/core rules ===
 
-## Livewire Core
-- Use the `search-docs` tool to find exact version specific documentation for how to write Livewire & Livewire tests.
-- Use the `php artisan make:livewire post.create` artisan command to create new components
+## Livewire
+
+- Use the `search-docs` tool to find exact version-specific documentation for how to write Livewire and Livewire tests.
+- Use the `php artisan make:livewire [Posts\CreatePost]` Artisan command to create new components.
 - State should live on the server, with the UI reflecting it.
-- All Livewire requests hit the Laravel backend, they're like regular HTTP requests. Always validate form data, and run authorization checks in Livewire actions.
+- All Livewire requests hit the Laravel backend; they're like regular HTTP requests. Always validate form data and run authorization checks in Livewire actions.
 
 ## Livewire Best Practices
 - Livewire components require a single root element.
@@ -300,15 +232,15 @@ accordion, autocomplete, avatar, badge, brand, breadcrumbs, button, calendar, ca
 
 - Prefer lifecycle hooks like `mount()`, `updatedFoo()` for initialization and reactive side effects:
 
-<code-snippet name="Lifecycle hook examples" lang="php">
+<code-snippet name="Lifecycle Hook Examples" lang="php">
     public function mount(User $user) { $this->user = $user; }
     public function updatedSearch() { $this->resetPage(); }
 </code-snippet>
 
 ## Testing Livewire
 
-<code-snippet name="Example Livewire component test" lang="php">
-    Livewire::test('counter')
+<code-snippet name="Example Livewire Component Test" lang="php">
+    Livewire::test(Counter::class)
         ->assertSet('count', 0)
         ->call('increment')
         ->assertSet('count', 1)
@@ -316,9 +248,9 @@ accordion, autocomplete, avatar, badge, brand, breadcrumbs, button, calendar, ca
         ->assertStatus(200);
 </code-snippet>
 
-<code-snippet name="Testing a Livewire component exists within a page" lang="php">
-    get('/posts/create')
-    ->assertSeeLivewire('post.create');
+<code-snippet name="Testing Livewire Component Exists on Page" lang="php">
+    $this->get('/posts/create')
+    ->assertSeeLivewire(CreatePost::class);
 </code-snippet>
 
 === pint/core rules ===

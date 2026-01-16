@@ -15,7 +15,6 @@ class Account extends Model
         'created_by',
         'type',
         'name',
-        'currency',
         'start_balance',
     ];
 
@@ -27,11 +26,6 @@ class Account extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function currency()
-    {
-        return Currency::where('iso', $this->attributes['currency'] ?? null)->first();
     }
 
     public function transactions()
@@ -141,7 +135,7 @@ class Account extends Model
     protected function currencySymbol(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->currency?->symbol ?? '$',
+            get: fn () => '$',
         );
     }
 

@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Account;
-use App\Models\Currency;
 use App\Models\User;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
@@ -13,8 +12,6 @@ new #[Title('Add account')] class extends Component {
     public string $type = 'checking';
 
     public string $name = '';
-
-    public string $currency = 'usd';
 
     public string $start_balance = '';
 
@@ -35,7 +32,6 @@ new #[Title('Add account')] class extends Component {
         $this->validate([
             'type' => ['required', 'in:checking,savings,credit card,cash,other'],
             'name' => ['required', 'string', 'max:255'],
-            'currency' => ['required', 'string', 'size:3'],
             'start_balance' => ['required', 'numeric'],
         ]);
 
@@ -44,19 +40,12 @@ new #[Title('Add account')] class extends Component {
             'created_by' => $this->user->id,
             'type' => $this->type,
             'name' => $this->name,
-            'currency' => $this->currency,
             'start_balance' => (int) round($this->start_balance * 100),
         ]);
 
         Flux::toast('Account created successfully.', variant: 'success');
 
         return $this->redirectRoute('accounts.index', navigate: true);
-    }
-
-    #[Computed]
-    public function currencies()
-    {
-        return Currency::all()->sortBy('currency');
     }
 
     #[Computed]
@@ -93,14 +82,6 @@ new #[Title('Add account')] class extends Component {
                 </flux:radio.group>
 
                 <flux:input wire:model="name" label="Account name" type="text" required autofocus />
-
-                <flux:select wire:model="currency" label="Currency" required>
-                    @foreach ($this->currencies as $currency)
-                        <option value="{{ $currency->iso }}">
-                            {{ $currency->currency }} ({{ $currency->iso }})
-                        </option>
-                    @endforeach
-                </flux:select>
 
                 <flux:input
                     wire:model="start_balance"

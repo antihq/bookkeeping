@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Currency;
 use App\Models\Team;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
@@ -22,23 +21,13 @@ new #[Title('Accounts')] class extends Component {
     }
 
     #[Computed]
-    public function teamBalances(): array
+    public function teamBalances(): string
     {
         return $this->team
             ->accounts()
             ->with('transactions')
             ->get()
-            ->groupBy('currency')
-            ->map(function ($accounts, $currency) {
-                $total = $accounts->sum('balance_in_dollars');
-
-                $currencyModel = Currency::all()->firstWhere('iso', $currency);
-                $symbol = $currencyModel ? $currencyModel->symbol : '$';
-                $value = number_format($total, 2);
-
-                return "{$symbol}{$value}";
-            })
-            ->toArray();
+            ->sum('balance_in_dollars');
     }
 
     #[Computed]
@@ -57,41 +46,34 @@ new #[Title('Accounts')] class extends Component {
 
     private function getMonthlySummary(int $month, int $year): array
     {
-        return $this->team
+        $income = 0;
+        $expenses = 0;
+
+        $this->team
             ->accounts()
             ->with(['transactions' => function ($query) use ($month, $year) {
                 $query->whereMonth('date', $month)
                     ->whereYear('date', $year);
             }])
             ->get()
-            ->groupBy('currency')
-            ->map(function ($accounts, $currency) {
-                $income = 0;
-                $expenses = 0;
-
-                foreach ($accounts as $account) {
-                    foreach ($account->transactions as $transaction) {
-                        if ($transaction->amount > 0) {
-                            $income += $transaction->amount;
-                        } else {
-                            $expenses += abs($transaction->amount);
-                        }
+            ->each(function ($account) use (&$income, &$expenses) {
+                foreach ($account->transactions as $transaction) {
+                    if ($transaction->amount > 0) {
+                        $income += $transaction->amount;
+                    } else {
+                        $expenses += abs($transaction->amount);
                     }
                 }
+            });
 
-                $currencyModel = Currency::all()->firstWhere('iso', $currency);
-                $symbol = $currencyModel ? $currencyModel->symbol : '$';
+        $net = $income - $expenses;
 
-                $net = $income - $expenses;
-
-                return [
-                    'income' => "{$symbol}" . number_format($income / 100, 2),
-                    'expenses' => "{$symbol}" . number_format($expenses / 100, 2),
-                    'net' => "{$symbol}" . number_format(abs($net) / 100, 2),
-                    'net_positive' => $net >= 0,
-                ];
-            })
-            ->toArray();
+        return [
+            'income' => number_format($income / 100, 2),
+            'expenses' => number_format($expenses / 100, 2),
+            'net' => number_format(abs($net) / 100, 2),
+            'net_positive' => $net >= 0,
+        ];
     }
 
     public function delete(int $accountId): void
@@ -117,11 +99,9 @@ new #[Title('Accounts')] class extends Component {
             <div class="overflow-hidden p-[.3125rem]">
                 <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
                     <flux:text>Overall balance</flux:text>
-                    @foreach ($this->teamBalances as $currency => $balance)
-                        <flux:text variant="strong" class="font-medium whitespace-nowrap">
-                            {{ strtoupper($currency) }} {{ $balance }}
-                        </flux:text>
-                    @endforeach
+                    <flux:text variant="strong" class="font-medium whitespace-nowrap">
+                        ${{ number_format($this->teamBalances, 2) }}
+                    </flux:text>
                 </div>
                 @if (!empty($this->monthlySummary))
                     <div class="mx-3.5 my-1 h-px sm:mx-3">
@@ -130,29 +110,27 @@ new #[Title('Accounts')] class extends Component {
                     <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
                         <flux:text>This month</flux:text>
                         <span class="flex flex-col gap-y-1">
-                            @foreach ($this->monthlySummary as $currency => $data)
-                                <flux:text
-                                    variant="strong"
-                                    color="green"
-                                    class="text-right font-medium whitespace-nowrap tabular-nums"
-                                >
-                                    {{ strtoupper($currency) }} {{ $data['income'] }}
-                                </flux:text>
-                                <flux:text
-                                    variant="strong"
-                                    color="red"
-                                    class="text-right font-medium whitespace-nowrap tabular-nums"
-                                >
-                                    {{ strtoupper($currency) }} {{ $data['expenses'] }}
-                                </flux:text>
-                                <flux:text
-                                    variant="strong"
-                                    :color="$data['net_positive'] ? 'green' : 'red'"
-                                    class="text-right font-medium whitespace-nowrap tabular-nums"
-                                >
-                                    {{ strtoupper($currency) }} {{ $data['net'] }}
-                                </flux:text>
-                            @endforeach
+                            <flux:text
+                                variant="strong"
+                                color="green"
+                                class="text-right font-medium whitespace-nowrap tabular-nums"
+                            >
+                                ${{ $this->monthlySummary['income'] }}
+                            </flux:text>
+                            <flux:text
+                                variant="strong"
+                                color="red"
+                                class="text-right font-medium whitespace-nowrap tabular-nums"
+                            >
+                                ${{ $this->monthlySummary['expenses'] }}
+                            </flux:text>
+                            <flux:text
+                                variant="strong"
+                                :color="$this->monthlySummary['net_positive'] ? 'green' : 'red'"
+                                class="text-right font-medium whitespace-nowrap tabular-nums"
+                            >
+                                ${{ $this->monthlySummary['net'] }}
+                            </flux:text>
                         </span>
                     </div>
                 @endif
@@ -164,29 +142,27 @@ new #[Title('Accounts')] class extends Component {
                     <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
                         <flux:text>Last month</flux:text>
                         <span class="flex flex-col gap-y-1">
-                            @foreach ($this->lastMonthSummary as $currency => $data)
-                                <flux:text
-                                    variant="strong"
-                                    color="green"
-                                    class="text-right font-medium whitespace-nowrap tabular-nums"
-                                >
-                                    {{ strtoupper($currency) }} {{ $data['income'] }}
-                                </flux:text>
-                                <flux:text
-                                    variant="strong"
-                                    color="red"
-                                    class="text-right font-medium whitespace-nowrap tabular-nums"
-                                >
-                                    {{ strtoupper($currency) }} {{ $data['expenses'] }}
-                                </flux:text>
-                                <flux:text
-                                    variant="strong"
-                                    class="text-right font-medium whitespace-nowrap tabular-nums"
-                                    :color="$data['net_positive'] ? 'green' : 'red'"
-                                >
-                                    {{ strtoupper($currency) }} {{ $data['net'] }}
-                                </flux:text>
-                            @endforeach
+                            <flux:text
+                                variant="strong"
+                                color="green"
+                                class="text-right font-medium whitespace-nowrap tabular-nums"
+                            >
+                                ${{ $this->lastMonthSummary['income'] }}
+                            </flux:text>
+                            <flux:text
+                                variant="strong"
+                                color="red"
+                                class="text-right font-medium whitespace-nowrap tabular-nums"
+                            >
+                                ${{ $this->lastMonthSummary['expenses'] }}
+                            </flux:text>
+                            <flux:text
+                                variant="strong"
+                                :color="$this->lastMonthSummary['net_positive'] ? 'green' : 'red'"
+                                class="text-right font-medium whitespace-nowrap tabular-nums"
+                            >
+                                ${{ $this->lastMonthSummary['net'] }}
+                            </flux:text>
                         </span>
                     </div>
                 @endif

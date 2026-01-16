@@ -10,7 +10,6 @@ it('can edit accounts', function () {
     $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Old Name',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $user->id,
     ]);
@@ -18,7 +17,6 @@ it('can edit accounts', function () {
     Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account])
         ->set('type', 'savings')
         ->set('name', 'New Name')
-        ->set('currency', 'eur')
         ->set('start_balance', 2000.50)
         ->call('update')
         ->assertHasNoErrors()
@@ -28,7 +26,6 @@ it('can edit accounts', function () {
 
     expect($account->name)->toBe('New Name');
     expect($account->type)->toBe('savings');
-    expect($account->currency)->toBe('eur');
     expect($account->start_balance)->toBe(200050);
 });
 
@@ -38,7 +35,6 @@ it('prevents invalid account types', function () {
     $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $user->id,
     ]);
@@ -46,7 +42,6 @@ it('prevents invalid account types', function () {
     Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account])
         ->set('type', 'invalid')
         ->set('name', 'Test Account')
-        ->set('currency', 'usd')
         ->set('start_balance', 100)
         ->call('update')
         ->assertHasErrors(['type']);
@@ -58,7 +53,6 @@ it('converts balance from dollars to cents', function () {
     $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 9999,
         'created_by' => $user->id,
     ]);
@@ -84,7 +78,6 @@ it('prevents non-owners from editing accounts', function () {
     $account = Account::factory()->for($owner->currentTeam, 'team')->create([
         'name' => 'Test Account',
         'type' => 'checking',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $owner->id,
     ]);
@@ -99,7 +92,6 @@ it('allows negative starting balances', function () {
     $account = Account::factory()->for($user->currentTeam, 'team')->create([
         'name' => 'Credit Card',
         'type' => 'credit card',
-        'currency' => 'usd',
         'start_balance' => 100000,
         'created_by' => $user->id,
     ]);

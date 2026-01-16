@@ -68,7 +68,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $user->id,
             'type' => 'checking',
             'name' => 'Main Checking Account',
-            'currency' => 'usd',
             'start_balance' => 500000,
         ]);
 
@@ -77,7 +76,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $user->id,
             'type' => 'savings',
             'name' => 'Emergency Fund',
-            'currency' => 'usd',
             'start_balance' => 2500000,
         ]);
 
@@ -86,7 +84,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $user->id,
             'type' => 'savings',
             'name' => 'Vacation Savings',
-            'currency' => 'usd',
             'start_balance' => 800000,
         ]);
 
@@ -95,7 +92,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $user->id,
             'type' => 'credit card',
             'name' => 'Chase Sapphire',
-            'currency' => 'usd',
             'start_balance' => -125000,
         ]);
 
@@ -104,7 +100,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $user->id,
             'type' => 'credit card',
             'name' => 'Amex Gold',
-            'currency' => 'usd',
             'start_balance' => -45000,
         ]);
 
@@ -113,7 +108,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $user->id,
             'type' => 'cash',
             'name' => 'Wallet Cash',
-            'currency' => 'usd',
             'start_balance' => 25000,
         ]);
 
@@ -122,7 +116,6 @@ class DatabaseSeeder extends Seeder
             'created_by' => $user->id,
             'type' => 'checking',
             'name' => 'Joint Checking',
-            'currency' => 'usd',
             'start_balance' => 325000,
         ]);
 
@@ -283,7 +276,7 @@ class DatabaseSeeder extends Seeder
                     'team_id' => $team->id,
                     'created_by' => $user->id,
                     'date' => $date->format('Y-m-d'),
-                    'payee' => 'Transfer to ' . $transfer['to']->name,
+                    'payee' => 'Transfer to '.$transfer['to']->name,
                     'amount' => $transfer['amount'],
                     'note' => 'Monthly transfer',
                     'category_id' => $categories[$transfer['category']]->id,
@@ -294,7 +287,7 @@ class DatabaseSeeder extends Seeder
                     'team_id' => $team->id,
                     'created_by' => $user->id,
                     'date' => $date->copy()->addDay()->format('Y-m-d'),
-                    'payee' => 'Transfer from ' . $transfer['from']->name,
+                    'payee' => 'Transfer from '.$transfer['from']->name,
                     'amount' => abs($transfer['amount']),
                     'note' => 'Monthly transfer',
                     'category_id' => $categories[$transfer['category']]->id,
@@ -408,7 +401,7 @@ class DatabaseSeeder extends Seeder
                 'team_id' => $team->id,
                 'created_by' => $user->id,
                 'date' => $date->format('Y-m-d'),
-                'payee' => 'Unknown Merchant ' . random_int(1000, 9999),
+                'payee' => 'Unknown Merchant '.random_int(1000, 9999),
                 'amount' => random_int(1, 2) === 1 ? random_int(-5000, -500) : random_int(500, 5000),
                 'note' => random_int(0, 1) ? 'Uncategorized transaction' : null,
             ]);
