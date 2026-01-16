@@ -138,7 +138,7 @@ new class extends Component {
             </div>
 
             <flux:dropdown align="end">
-                <flux:button variant="subtle" square icon="ellipsis-horizontal" />
+                <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-mr-2" />
                 <flux:menu>
                     <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}">
                         <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
