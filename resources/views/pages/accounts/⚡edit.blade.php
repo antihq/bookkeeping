@@ -66,7 +66,7 @@ new #[Title('Edit account')] class extends Component
 };
 ?>
 
-<section class="mx-auto max-w-6xl space-y-8">
+<section class="mx-auto max-w-lg space-y-8">
     <flux:heading size="xl">Edit account</flux:heading>
 
     <div class="space-y-14">

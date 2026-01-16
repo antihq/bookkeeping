@@ -181,51 +181,61 @@ new #[Title('Account')] class extends Component {
             </flux:dropdown>
         </div>
 
-        <div class="flex flex-col gap-y-4">
-            <span class="flex flex-wrap items-center justify-between gap-3">
-                <flux:text>Overall balance</flux:text>
-                <flux:text variant="strong" class="font-medium whitespace-nowrap">
-                    {{ $account->formatted_balance }}
-                </flux:text>
-            </span>
-            <span class="flex flex-wrap items-start justify-between gap-3">
-                <flux:text>This month</flux:text>
-                <span class="flex flex-col gap-y-1">
-                    <flux:text
-                        variant="strong"
-                        color="green"
-                        class="text-right font-medium whitespace-nowrap tabular-nums"
-                    >
-                        {{ $account->current_month_income_formatted }}
+        <div
+            class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
+        >
+            <div class="overflow-hidden p-[.3125rem]">
+                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
+                    <flux:text>Overall balance</flux:text>
+                    <flux:text variant="strong" class="font-medium whitespace-nowrap">
+                        {{ $account->formatted_balance }}
                     </flux:text>
-                    <flux:text
-                        variant="strong"
-                        color="red"
-                        class="text-right font-medium whitespace-nowrap tabular-nums"
-                    >
-                        {{ $account->current_month_expenses_formatted }}
-                    </flux:text>
-                </span>
-            </span>
-            <span class="flex flex-wrap items-start justify-between gap-3">
-                <flux:text>Last month</flux:text>
-                <span class="flex flex-col gap-y-1">
-                    <flux:text
-                        variant="strong"
-                        color="green"
-                        class="text-right font-medium whitespace-nowrap tabular-nums"
-                    >
-                        {{ $account->last_month_income_formatted }}
-                    </flux:text>
-                    <flux:text
-                        variant="strong"
-                        color="red"
-                        class="text-right font-medium whitespace-nowrap tabular-nums"
-                    >
-                        {{ $account->last_month_expenses_formatted }}
-                    </flux:text>
-                </span>
-            </span>
+                </div>
+                <div class="mx-3.5 my-1 h-px sm:mx-3">
+                    <flux:separator variant="subtle" />
+                </div>
+                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
+                    <flux:text>This month</flux:text>
+                    <span class="flex flex-col gap-y-1">
+                        <flux:text
+                            variant="strong"
+                            color="green"
+                            class="text-right font-medium whitespace-nowrap tabular-nums"
+                        >
+                            {{ $account->current_month_income_formatted }}
+                        </flux:text>
+                        <flux:text
+                            variant="strong"
+                            color="red"
+                            class="text-right font-medium whitespace-nowrap tabular-nums"
+                        >
+                            {{ $account->current_month_expenses_formatted }}
+                        </flux:text>
+                    </span>
+                </div>
+                <div class="mx-3.5 my-1 h-px sm:mx-3">
+                    <flux:separator variant="subtle" />
+                </div>
+                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
+                    <flux:text>Last month</flux:text>
+                    <span class="flex flex-col gap-y-1">
+                        <flux:text
+                            variant="strong"
+                            color="green"
+                            class="text-right font-medium whitespace-nowrap tabular-nums"
+                        >
+                            {{ $account->last_month_income_formatted }}
+                        </flux:text>
+                        <flux:text
+                            variant="strong"
+                            color="red"
+                            class="text-right font-medium whitespace-nowrap tabular-nums"
+                        >
+                            {{ $account->last_month_expenses_formatted }}
+                        </flux:text>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -236,7 +246,7 @@ new #[Title('Account')] class extends Component {
 
                 @can('create', Transaction::class)
                     <flux:modal.trigger name="add-transaction">
-                        <flux:button variant="primary" class="-my-1.5">Add transaction</flux:button>
+                        <flux:button variant="primary" class="-my-2.5 sm:-my-1.5">Add transaction</flux:button>
                     </flux:modal.trigger>
                 @endcan
             </div>
