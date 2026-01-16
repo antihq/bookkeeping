@@ -10,8 +10,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Account')] class extends Component
-{
+new #[Title('Account')] class extends Component {
     public Account $account;
 
     public string $date = '';
@@ -54,7 +53,8 @@ new #[Title('Account')] class extends Component
             input: [
                 'date' => $this->date,
                 'payee' => $this->payee,
-                'amount' => $this->type === 'expense'
+                'amount' =>
+                    $this->type === 'expense'
                         ? (int) -round((float) $this->amount * 100)
                         : (int) round((float) $this->amount * 100),
                 'note' => $this->note,
@@ -151,51 +151,76 @@ new #[Title('Account')] class extends Component
 };
 ?>
 
-<section class="mx-auto max-w-6xl space-y-8">
-    <div class="space-y-2.5">
-        <flux:heading size="xl">{{ $account->name }}</flux:heading>
+<section class="mx-auto max-w-lg space-y-8">
+    <div class="space-y-4">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+            <flux:heading size="xl">{{ $account->name }}</flux:heading>
 
-        <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
-            <div class="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
-                <span class="flex flex-wrap items-center gap-3">
-                    <flux:text>Overall balance</flux:text>
-                    <flux:text variant="strong">{{ $account->formatted_balance }}</flux:text>
+            <flux:dropdown align="end">
+                <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-my-0.5" />
+                <flux:menu>
+                    @can('update', $account)
+                        <flux:menu.item
+                            href="{{ route('accounts.edit', $account) }}"
+                            icon="pencil-square"
+                            icon:variant="micro"
+                            wire:navigate
+                        >
+                            Edit
+                        </flux:menu.item>
+                    @endcan
+
+                    @can('delete', $account)
+                        <flux:modal.trigger name="delete">
+                            <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
+                        </flux:modal.trigger>
+                    @endcan
+                </flux:menu>
+            </flux:dropdown>
+        </div>
+
+        <div class="flex flex-col gap-y-4">
+            <span class="flex flex-wrap items-center gap-3 justify-between">
+                <flux:text>Overall balance</flux:text>
+                <flux:text variant="strong" class="whitespace-nowrap font-medium">{{ $account->formatted_balance }}</flux:text>
+            </span>
+            <span class="flex flex-wrap items-start gap-3 justify-between">
+                <flux:text>This month</flux:text>
+                <span class="flex flex-col gap-y-1">
+                    <flux:text variant="strong" color="green" class="whitespace-nowrap font-medium tabular-nums text-right">
+                        {{ $account->current_month_income_formatted }}
+                    </flux:text>
+                    <flux:text variant="strong" color="red" class="whitespace-nowrap font-medium tabular-nums text-right">
+                        {{ $account->current_month_expenses_formatted }}
+                    </flux:text>
                 </span>
-            </div>
-            <div class="flex gap-2">
-                @can('create', Transaction::class)
-                    <flux:modal.trigger name="add-transaction">
-                        <flux:button variant="primary">Add transaction</flux:button>
-                    </flux:modal.trigger>
-                @endcan
-
-                <flux:dropdown align="end">
-                    <flux:button variant="subtle" square icon="ellipsis-horizontal" />
-                    <flux:menu>
-                        @can('update', $account)
-                            <flux:menu.item
-                                href="{{ route('accounts.edit', $account) }}"
-                                icon="pencil-square"
-                                icon:variant="micro"
-                                wire:navigate
-                            >
-                                Edit
-                            </flux:menu.item>
-                        @endcan
-
-                        @can('delete', $account)
-                            <flux:modal.trigger name="delete">
-                                <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
-                            </flux:modal.trigger>
-                        @endcan
-                    </flux:menu>
-                </flux:dropdown>
-            </div>
+            </span>
+            <span class="flex flex-wrap items-start gap-3 justify-between">
+                <flux:text>Last month</flux:text>
+                <span class="flex flex-col gap-y-1">
+                    <flux:text variant="strong" color="green" class="whitespace-nowrap font-medium tabular-nums text-right">
+                        {{ $account->last_month_income_formatted }}
+                    </flux:text>
+                    <flux:text variant="strong" color="red" class="whitespace-nowrap font-medium tabular-nums text-right">
+                        {{ $account->last_month_expenses_formatted }}
+                    </flux:text>
+                </span>
+            </span>
         </div>
     </div>
 
     <div class="space-y-14">
         <div class="space-y-6">
+            <div class="flex items-end justify-between gap-4">
+                <flux:heading size="lg">All transactions</flux:heading>
+
+                @can('create', Transaction::class)
+                    <flux:modal.trigger name="add-transaction">
+                        <flux:button variant="primary" class="-my-1.5">Add transaction</flux:button>
+                    </flux:modal.trigger>
+                @endcan
+            </div>
+
             @if ($this->transactions->count() > 0)
                 <div>
                     <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
@@ -276,7 +301,9 @@ new #[Title('Account')] class extends Component
                             @endforeach
 
                             <flux:select.option.create wire:click="createCategory" min-length="1">
-                                Create "<span wire:text="category_search"></span>"
+                                Create "
+                                <span wire:text="category_search"></span>
+                                "
                             </flux:select.option.create>
                         </flux:select>
 
@@ -304,8 +331,8 @@ new #[Title('Account')] class extends Component
                 <div>
                     <flux:heading>Delete account?</flux:heading>
                     <flux:text class="mt-2">
-                        You're about to delete "{{ $account->name }}". All associated
-                        transactions will also be deleted. This action cannot be reversed.
+                        You're about to delete "{{ $account->name }}". All associated transactions will also be
+                        deleted. This action cannot be reversed.
                     </flux:text>
                 </div>
                 <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">

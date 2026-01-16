@@ -62,7 +62,79 @@ class Account extends Model
     protected function formattedBalance(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->currencySymbol . number_format(($this->start_balance + $this->transactions()->sum('amount')) / 100, 2),
+            get: fn () => $this->currencySymbol.number_format(($this->start_balance + $this->transactions()->sum('amount')) / 100, 2),
+        );
+    }
+
+    protected function currentMonthIncome(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->transactions()
+                ->whereMonth('date', now()->month)
+                ->whereYear('date', now()->year)
+                ->where('amount', '>', 0)
+                ->sum('amount') / 100,
+        );
+    }
+
+    protected function currentMonthExpenses(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => abs($this->transactions()
+                ->whereMonth('date', now()->month)
+                ->whereYear('date', now()->year)
+                ->where('amount', '<', 0)
+                ->sum('amount')) / 100,
+        );
+    }
+
+    protected function currentMonthIncomeFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->currencySymbol.number_format($this->current_month_income, 2),
+        );
+    }
+
+    protected function currentMonthExpensesFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->currencySymbol.number_format($this->current_month_expenses, 2),
+        );
+    }
+
+    protected function lastMonthIncome(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->transactions()
+                ->whereMonth('date', now()->subMonth()->month)
+                ->whereYear('date', now()->subMonth()->year)
+                ->where('amount', '>', 0)
+                ->sum('amount') / 100,
+        );
+    }
+
+    protected function lastMonthExpenses(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => abs($this->transactions()
+                ->whereMonth('date', now()->subMonth()->month)
+                ->whereYear('date', now()->subMonth()->year)
+                ->where('amount', '<', 0)
+                ->sum('amount')) / 100,
+        );
+    }
+
+    protected function lastMonthIncomeFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->currencySymbol.number_format($this->last_month_income, 2),
+        );
+    }
+
+    protected function lastMonthExpensesFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->currencySymbol.number_format($this->last_month_expenses, 2),
         );
     }
 

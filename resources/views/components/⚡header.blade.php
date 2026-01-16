@@ -26,15 +26,15 @@ new class extends Component {
 ?>
 
 <flux:header {{ $attributes }}>
-    <flux:sidebar.toggle class="lg:hidden" icon="bars-2" />
+    <flux:spacer />
 
-    <flux:navbar class="max-lg:hidden">
+    <flux:navbar>
         <flux:navbar.item
             :href="route('dashboard')"
             :current="request()->routeIs('accounts.index')"
             wire:navigate
         >
-            Dashboard
+            Overview
         </flux:navbar.item>
 
         <flux:dropdown position="bottom">

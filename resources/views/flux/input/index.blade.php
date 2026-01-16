@@ -94,12 +94,12 @@ $classes = Flux::classes()
     ->add(match ($countOfTrailingIcons) {
         // Make sure there's enough padding on the right side of the input to account for all the icons...
         0 => 'pe-[calc(--spacing(3.5)-1px)] sm:pe-[calc(--spacing(3)-1px)]',
-        1 => 'pe-9',
-        2 => 'pe-18',
-        3 => 'pe-27',
-        4 => 'pe-39',
-        5 => 'pe-46',
-        6 => 'pe-53',
+        1 => 'pe-12 sm:pe-9',
+        2 => 'pe-21 sm:pe-18',
+        3 => 'pe-30 sm:pe-24',
+        4 => 'pe-42 sm:pe-39',
+        5 => 'pe-49 sm:pe-46',
+        6 => 'pe-53 sm:pe-53',
     })
     ->add(match ($variant) { // Background...
         'outline' => 'bg-white dark:bg-white/10 dark:disabled:bg-white/[7%]',

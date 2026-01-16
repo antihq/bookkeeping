@@ -54,7 +54,7 @@ new #[Title('Accounts')] class extends Component {
 };
 ?>
 
-<section class="mx-auto max-w-6xl space-y-8">
+<section class="mx-auto max-w-lg space-y-8">
     <div class="space-y-2.5">
         <flux:heading size="xl">Accounts</flux:heading>
 
