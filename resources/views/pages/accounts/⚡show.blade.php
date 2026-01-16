@@ -139,7 +139,7 @@ new #[Title('Account')] class extends Component {
     {
         return $this->account
             ->transactions()
-            ->forPage($this->page, 10)
+            ->forPage($this->page, 25)
             ->get();
     }
 
@@ -180,28 +180,46 @@ new #[Title('Account')] class extends Component {
         </div>
 
         <div class="flex flex-col gap-y-4">
-            <span class="flex flex-wrap items-center gap-3 justify-between">
+            <span class="flex flex-wrap items-center justify-between gap-3">
                 <flux:text>Overall balance</flux:text>
-                <flux:text variant="strong" class="whitespace-nowrap font-medium">{{ $account->formatted_balance }}</flux:text>
+                <flux:text variant="strong" class="font-medium whitespace-nowrap">
+                    {{ $account->formatted_balance }}
+                </flux:text>
             </span>
-            <span class="flex flex-wrap items-start gap-3 justify-between">
+            <span class="flex flex-wrap items-start justify-between gap-3">
                 <flux:text>This month</flux:text>
                 <span class="flex flex-col gap-y-1">
-                    <flux:text variant="strong" color="green" class="whitespace-nowrap font-medium tabular-nums text-right">
+                    <flux:text
+                        variant="strong"
+                        color="green"
+                        class="text-right font-medium whitespace-nowrap tabular-nums"
+                    >
                         {{ $account->current_month_income_formatted }}
                     </flux:text>
-                    <flux:text variant="strong" color="red" class="whitespace-nowrap font-medium tabular-nums text-right">
+                    <flux:text
+                        variant="strong"
+                        color="red"
+                        class="text-right font-medium whitespace-nowrap tabular-nums"
+                    >
                         {{ $account->current_month_expenses_formatted }}
                     </flux:text>
                 </span>
             </span>
-            <span class="flex flex-wrap items-start gap-3 justify-between">
+            <span class="flex flex-wrap items-start justify-between gap-3">
                 <flux:text>Last month</flux:text>
                 <span class="flex flex-col gap-y-1">
-                    <flux:text variant="strong" color="green" class="whitespace-nowrap font-medium tabular-nums text-right">
+                    <flux:text
+                        variant="strong"
+                        color="green"
+                        class="text-right font-medium whitespace-nowrap tabular-nums"
+                    >
                         {{ $account->last_month_income_formatted }}
                     </flux:text>
-                    <flux:text variant="strong" color="red" class="whitespace-nowrap font-medium tabular-nums text-right">
+                    <flux:text
+                        variant="strong"
+                        color="red"
+                        class="text-right font-medium whitespace-nowrap tabular-nums"
+                    >
                         {{ $account->last_month_expenses_formatted }}
                     </flux:text>
                 </span>
@@ -221,21 +239,36 @@ new #[Title('Account')] class extends Component {
                 @endcan
             </div>
 
-            @if ($this->transactions->count() > 0)
-                <div>
-                    <div class="divide-y divide-zinc-100 text-zinc-950 dark:divide-white/5 dark:text-white">
-                        @island(name: 'transactions', always: true)
+            @if ($this->transactions->isNotEmpty())
+                <div
+                    class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
+                >
+                    <ul role="list" class="overflow-hidden p-[.3125rem]">
+                        @island(name: 'transactions', lazy: true)
                             @foreach ($this->transactions as $transaction)
                                 <livewire:transactions.item
                                     :$transaction
                                     wire:key="transaction-{{ $transaction->id }}"
-                                    lazy
                                 />
+                                @unless ($loop->last)
+                                    <li class="mx-3.5 my-1 h-px sm:mx-3">
+                                        <flux:separator variant="subtle" wire:key="separator-{{ $transaction->id }}" />
+                                    </li>
+                                @endunless
                             @endforeach
                         @endisland
-                    </div>
+                    </ul>
 
-                    <div wire:intersect.append="loadMore" wire:island="transactions"></div>
+                    <div class="p-[.3125rem]">
+                        <flux:button
+                            wire:click="loadMore"
+                            wire:island.append="transactions"
+                            variant="subtle"
+                            class="w-full"
+                        >
+                            Load more
+                        </flux:button>
+                    </div>
                 </div>
             @else
                 <div class="flex flex-col items-center justify-center py-12">
