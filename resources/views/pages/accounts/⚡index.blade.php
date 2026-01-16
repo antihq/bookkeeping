@@ -20,61 +20,7 @@ new #[Title('Accounts')] class extends Component {
         return Auth::user()->currentTeam;
     }
 
-    #[Computed]
-    public function teamBalances(): string
-    {
-        return $this->team
-            ->accounts()
-            ->with('transactions')
-            ->get()
-            ->sum('balance_in_dollars');
-    }
 
-    #[Computed]
-    public function monthlySummary(): array
-    {
-        return $this->getMonthlySummary(now()->month, now()->year);
-    }
-
-    #[Computed]
-    public function lastMonthSummary(): array
-    {
-        $lastMonth = now()->subMonth();
-
-        return $this->getMonthlySummary($lastMonth->month, $lastMonth->year);
-    }
-
-    private function getMonthlySummary(int $month, int $year): array
-    {
-        $income = 0;
-        $expenses = 0;
-
-        $this->team
-            ->accounts()
-            ->with(['transactions' => function ($query) use ($month, $year) {
-                $query->whereMonth('date', $month)
-                    ->whereYear('date', $year);
-            }])
-            ->get()
-            ->each(function ($account) use (&$income, &$expenses) {
-                foreach ($account->transactions as $transaction) {
-                    if ($transaction->amount > 0) {
-                        $income += $transaction->amount;
-                    } else {
-                        $expenses += abs($transaction->amount);
-                    }
-                }
-            });
-
-        $net = $income - $expenses;
-
-        return [
-            'income' => number_format($income / 100, 2),
-            'expenses' => number_format($expenses / 100, 2),
-            'net' => number_format(abs($net) / 100, 2),
-            'net_positive' => $net >= 0,
-        ];
-    }
 
     public function delete(int $accountId): void
     {
@@ -90,86 +36,6 @@ new #[Title('Accounts')] class extends Component {
 ?>
 
 <section class="mx-auto max-w-lg space-y-8">
-    <div class="space-y-2.5">
-        <flux:heading size="xl">Overview</flux:heading>
-
-        <div
-            class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
-        >
-            <div class="overflow-hidden p-[.3125rem]">
-                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                    <flux:text>Overall balance</flux:text>
-                    <flux:text variant="strong" class="font-medium whitespace-nowrap">
-                        ${{ number_format($this->teamBalances, 2) }}
-                    </flux:text>
-                </div>
-                @if (!empty($this->monthlySummary))
-                    <div class="mx-3.5 my-1 h-px sm:mx-3">
-                        <flux:separator variant="subtle" />
-                    </div>
-                    <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                        <flux:text>This month</flux:text>
-                        <span class="flex flex-col gap-y-1">
-                            <flux:text
-                                variant="strong"
-                                color="green"
-                                class="text-right font-medium whitespace-nowrap tabular-nums"
-                            >
-                                ${{ $this->monthlySummary['income'] }}
-                            </flux:text>
-                            <flux:text
-                                variant="strong"
-                                color="red"
-                                class="text-right font-medium whitespace-nowrap tabular-nums"
-                            >
-                                ${{ $this->monthlySummary['expenses'] }}
-                            </flux:text>
-                            <flux:text
-                                variant="strong"
-                                :color="$this->monthlySummary['net_positive'] ? 'green' : 'red'"
-                                class="text-right font-medium whitespace-nowrap tabular-nums"
-                            >
-                                ${{ $this->monthlySummary['net'] }}
-                            </flux:text>
-                        </span>
-                    </div>
-                @endif
-
-                @if (!empty($this->lastMonthSummary))
-                    <div class="mx-3.5 my-1 h-px sm:mx-3">
-                        <flux:separator variant="subtle" />
-                    </div>
-                    <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                        <flux:text>Last month</flux:text>
-                        <span class="flex flex-col gap-y-1">
-                            <flux:text
-                                variant="strong"
-                                color="green"
-                                class="text-right font-medium whitespace-nowrap tabular-nums"
-                            >
-                                ${{ $this->lastMonthSummary['income'] }}
-                            </flux:text>
-                            <flux:text
-                                variant="strong"
-                                color="red"
-                                class="text-right font-medium whitespace-nowrap tabular-nums"
-                            >
-                                ${{ $this->lastMonthSummary['expenses'] }}
-                            </flux:text>
-                            <flux:text
-                                variant="strong"
-                                :color="$this->lastMonthSummary['net_positive'] ? 'green' : 'red'"
-                                class="text-right font-medium whitespace-nowrap tabular-nums"
-                            >
-                                ${{ $this->lastMonthSummary['net'] }}
-                            </flux:text>
-                        </span>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
     @if ($this->accounts->count() === 0)
         <div class="flex flex-col items-center justify-center py-12">
             <flux:icon icon="credit-card" size="lg" class="text-gray-400 dark:text-gray-600" />
