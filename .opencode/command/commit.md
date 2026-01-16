@@ -4,7 +4,7 @@ model: zai-coding-plan/glm-4.7
 subtask: true
 ---
 
-commit and push
+commit
 
 make sure it includes a prefix like
 docs:
