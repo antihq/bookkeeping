@@ -20,6 +20,12 @@ new #[Title('Accounts')] class extends Component {
         return Auth::user()->currentTeam;
     }
 
+    #[Computed]
+    public function totalBalance(): float
+    {
+        return $this->team->total_balance_in_dollars;
+    }
+
     public function delete(int $accountId): void
     {
         $account = $this->team->accounts()->findOrFail($accountId);
@@ -66,10 +72,22 @@ new #[Title('Accounts')] class extends Component {
                             </a>
                         </flux:heading>
 
-                        <div class="flex shrink-0 items-center gap-x-4">
-                            <div class="text-right tabular-nums">
-                                {{--  --}}
-                            </div>
+                            <div class="flex shrink-0 items-center gap-x-4">
+                                <div class="text-right tabular-nums">
+                                    @if ($this->totalBalance === 0)
+                                        <flux:text variant="strong" class="font-medium whitespace-nowrap">
+                                            {{ $this->team->formatted_total_balance }}
+                                        </flux:text>
+                                    @elseif ($this->totalBalance > 0)
+                                        <flux:text variant="strong" color="green" class="font-medium whitespace-nowrap">
+                                            {{ $this->team->formatted_total_balance }}
+                                        </flux:text>
+                                    @else
+                                        <flux:text variant="strong" color="red" class="font-medium whitespace-nowrap">
+                                            {{ $this->team->formatted_total_balance }}
+                                        </flux:text>
+                                    @endif
+                                </div>
 
                             <flux:dropdown align="end">
                                 <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-mr-2" />
