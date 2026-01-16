@@ -20,8 +20,6 @@ new #[Title('Accounts')] class extends Component {
         return Auth::user()->currentTeam;
     }
 
-
-
     public function delete(int $accountId): void
     {
         $account = $this->team->accounts()->findOrFail($accountId);
@@ -47,8 +45,6 @@ new #[Title('Accounts')] class extends Component {
             @endcan
         </div>
     @else
-
-
         <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
             @can('create', App\Models\Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" wire:navigate>
@@ -56,6 +52,44 @@ new #[Title('Accounts')] class extends Component {
                 </flux:button>
             @endcan
         </div>
+
+        <div
+            class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
+        >
+            <ul role="list" class="overflow-hidden p-[.3125rem]">
+                <li>
+                    <div class="relative flex justify-between gap-x-6 rounded-lg px-3.5 py-2.5 hover:bg-zinc-950/2.5 sm:px-3 sm:py-1.5 dark:hover:bg-white/2.5">
+                        <flux:heading>
+                            <a href="{{ route('transactions.index') }}" wire:navigate>
+                                <span class="absolute inset-x-0 -top-px bottom-0"></span>
+                                All accounts
+                            </a>
+                        </flux:heading>
+
+                        <div class="flex shrink-0 items-center gap-x-4">
+                            <div class="text-right tabular-nums">
+                                {{--  --}}
+                            </div>
+
+                            <flux:dropdown align="end">
+                                <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-mr-2" />
+                                <flux:menu>
+                                    <flux:menu.item
+                                        href="{{ route('transactions.index') }}"
+                                        icon="eye"
+                                        icon:variant="micro"
+                                        wire:navigate
+                                    >
+                                        View
+                                    </flux:menu.item>
+                                </flux:menu>
+                            </flux:dropdown>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
         <div
             class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
         >
