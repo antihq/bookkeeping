@@ -68,6 +68,8 @@ new #[Title('Account')] class extends Component {
         Flux::modals()->close();
 
         $this->reset(['payee', 'note', 'amount', 'category', 'page', 'type']);
+
+        $this->renderIsland('transactions');
     }
 
     public function createCategory()
