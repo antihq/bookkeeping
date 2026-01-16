@@ -43,24 +43,30 @@ new class extends Component {
             </flux:navbar.item>
 
             <flux:menu>
-                @foreach (auth()->user()->currentTeam->accounts as $account)
-                    <flux:menu.item
-                        :href="route('accounts.show', $account)"
-                        :icon="request()->account?->is($account) ? 'check' : null"
-                        wire:navigate
-                    >
-                        <span class="inline-flex w-full items-center justify-between gap-4">
-                            {{ $account->name }}
-                            <flux:text class="text-[13px] font-normal tabular-nums" inline>
-                                {{ $account->formatted_balance }}
-                            </flux:text>
-                        </span>
-                    </flux:menu.item>
-                @endforeach
+                <flux:menu.item :href="route('transactions.index')" icon="rectangle-stack" wire:navigate>
+                    All accounts
+                </flux:menu.item>
 
                 @if (auth()->user()->currentTeam->accounts->isNotEmpty())
                     <flux:menu.separator />
+
+                    @foreach (auth()->user()->currentTeam->accounts as $account)
+                        <flux:menu.item
+                            :href="route('accounts.show', $account)"
+                            :icon="request()->account?->is($account) ? 'check' : null"
+                            wire:navigate
+                        >
+                            <span class="inline-flex w-full items-center justify-between gap-4">
+                                {{ $account->name }}
+                                <flux:text class="text-[13px] font-normal tabular-nums" inline>
+                                    {{ $account->formatted_balance }}
+                                </flux:text>
+                            </span>
+                        </flux:menu.item>
+                    @endforeach
                 @endif
+
+                <flux:menu.separator />
 
                 <flux:menu.item :href="route('accounts.create')" icon="plus" wire:navigate>
                     Add new account

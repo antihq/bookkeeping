@@ -1,5 +1,5 @@
 ---
-description: git commit and push
+description: git commit
 model: zai-coding-plan/glm-4.7
 subtask: true
 ---
