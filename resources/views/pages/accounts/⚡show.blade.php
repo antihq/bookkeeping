@@ -240,7 +240,7 @@ new #[Title('Account')] class extends Component {
     </div>
 
     <div class="space-y-14">
-        <div class="space-y-6">
+        <div class="space-y-6 sm:space-y-4">
             <div class="flex items-end justify-between gap-4">
                 <flux:heading size="lg">All transactions</flux:heading>
 
