@@ -247,6 +247,18 @@ new #[Title('Account')] class extends Component {
                 >
                     <ul role="list" class="overflow-hidden p-[.3125rem]">
                         @island(name: 'transactions', lazy: true)
+                            @placeholder
+                                @foreach (range(1, rand(3, 8)) as $i)
+                                    <flux:skeleton.group animate="shimmer">
+                                        <flux:skeleton class="h-15 rounded-lg" />
+                                    </flux:skeleton.group>
+                                    @unless ($loop->last)
+                                        <li class="mx-3.5 my-1 h-px sm:mx-3">
+                                            <flux:separator variant="subtle" />
+                                        </li>
+                                    @endunless
+                                @endforeach
+                            @endplaceholder
                             @foreach ($this->transactions as $transaction)
                                 <livewire:transactions.item
                                     :$transaction

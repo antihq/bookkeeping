@@ -154,81 +154,84 @@ new class extends Component {
     <flux:modal
         name="edit-transaction-{{ $transaction->id }}"
         class="w-full sm:max-w-lg"
+        @close="$refresh"
     >
-        <form wire:submit="edit" class="space-y-6">
-            <div>
-                <flux:heading size="lg">Edit transaction</flux:heading>
-                <flux:text class="mt-2">Make changes to this transaction.</flux:text>
-            </div>
+        @island
+            <form wire:submit="edit" class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Edit transaction</flux:heading>
+                    <flux:text class="mt-2">Make changes to this transaction.</flux:text>
+                </div>
 
-            <flux:radio.group wire:model="type" label="Transaction type" variant="segmented" label:sr-only>
-                <flux:radio value="expense" icon="minus">Expense</flux:radio>
-                <flux:radio value="income" icon="plus">Income</flux:radio>
-            </flux:radio.group>
+                <flux:radio.group wire:model="type" label="Transaction type" variant="segmented" label:sr-only>
+                    <flux:radio value="expense" icon="minus">Expense</flux:radio>
+                    <flux:radio value="income" icon="plus">Income</flux:radio>
+                </flux:radio.group>
 
-            <flux:field>
-                <flux:input.group>
-                    <flux:label sr-only>Amount</flux:label>
-                    <flux:input.group.prefix>
-                        {{ $transaction->account->currencySymbol }}
-                    </flux:input.group.prefix>
-                    <flux:input
-                        wire:model="amount"
-                        type="text"
-                        mask:dynamic="$money($input)"
-                        inputmode="decimal"
-                        placeholder="0.00"
-                        required
-                    />
-                </flux:input.group>
-                <flux:error name="amount" />
-            </flux:field>
+                <flux:field>
+                    <flux:input.group>
+                        <flux:label sr-only>Amount</flux:label>
+                        <flux:input.group.prefix>
+                            {{ $transaction->account->currencySymbol }}
+                        </flux:input.group.prefix>
+                        <flux:input
+                            wire:model="amount"
+                            type="text"
+                            mask:dynamic="$money($input)"
+                            inputmode="decimal"
+                            placeholder="0.00"
+                            required
+                        />
+                    </flux:input.group>
+                    <flux:error name="amount" />
+                </flux:field>
 
-            <flux:input
-                wire:model="payee"
-                label="Payee"
-                type="text"
-                placeholder="Payee"
-                label:sr-only
-                required
-            />
+                <flux:input
+                    wire:model="payee"
+                    label="Payee"
+                    type="text"
+                    placeholder="Payee"
+                    label:sr-only
+                    required
+                />
 
-            <flux:select
-                wire:model="category"
-                variant="combobox"
-                label="Category"
-                placeholder="Category"
-                label:sr-only
-            >
-                <x-slot name="input">
-                    <flux:select.input wire:model="category_search" />
-                </x-slot>
-                @foreach ($this->categories as $category)
-                    <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
-                        {{ $category->name }}
-                    </flux:select.option>
-                @endforeach
+                <flux:select
+                    wire:model="category"
+                    variant="combobox"
+                    label="Category"
+                    placeholder="Category"
+                    label:sr-only
+                >
+                    <x-slot name="input">
+                        <flux:select.input wire:model="category_search" />
+                    </x-slot>
+                    @foreach ($this->categories as $category)
+                        <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
+                            {{ $category->name }}
+                        </flux:select.option>
+                    @endforeach
 
-                <flux:select.option.create wire:click="createCategory" min-length="1">
-                    Create "
-                    <span wire:text="category_search"></span>
-                    "
-                </flux:select.option.create>
-            </flux:select>
+                    <flux:select.option.create wire:click="createCategory" min-length="1">
+                        Create "
+                        <span wire:text="category_search"></span>
+                        "
+                    </flux:select.option.create>
+                </flux:select>
 
-            <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
+                <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
 
-            <flux:date-picker wire:model="date" label="Date" required />
+                <flux:date-picker wire:model="date" label="Date" required />
 
-            <div
-                class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto"
-            >
-                <flux:modal.close>
-                    <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
-                </flux:modal.close>
-                <flux:button variant="primary" type="submit">Save changes</flux:button>
-            </div>
-        </form>
+                <div
+                    class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto"
+                >
+                    <flux:modal.close>
+                        <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="primary" type="submit">Save changes</flux:button>
+                </div>
+            </form>
+        @endisland
     </flux:modal>
 
     <flux:modal name="delete-transaction-{{ $transaction->id }}" class="w-full max-w-xs sm:max-w-md">
