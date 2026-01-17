@@ -3,12 +3,12 @@
 use App\Models\Team;
 use App\Models\Transaction;
 use Flux\Flux;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Transaction')] class extends Component {
+new #[Title('Transaction')] class extends Component
+{
     public Transaction $transaction;
 
     public string $date = '';
@@ -54,8 +54,7 @@ new #[Title('Transaction')] class extends Component {
             'date' => $this->date,
             'payee' => $this->payee,
             'note' => $this->note,
-            'amount' =>
-                $this->type === 'expense'
+            'amount' => $this->type === 'expense'
                     ? (int) -round((float) $this->amount * 100)
                     : (int) round((float) $this->amount * 100),
             'category_id' => $category?->id,
@@ -80,7 +79,7 @@ new #[Title('Transaction')] class extends Component {
     public function createCategory()
     {
         $this->validate([
-            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->transaction->team_id],
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,'.$this->transaction->team_id],
         ]);
 
         $category = $this->team->categories()->create([
@@ -102,7 +101,7 @@ new #[Title('Transaction')] class extends Component {
             ->categories()
             ->when(
                 $this->category_search,
-                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
             )
             ->limit(20)
             ->get();
@@ -116,87 +115,79 @@ new #[Title('Transaction')] class extends Component {
 };
 ?>
 
-<section class="mx-auto max-w-lg space-y-8">
-    <div class="space-y-4">
-        <div class="flex flex-wrap items-end justify-between gap-4">
-            <flux:heading size="xl">Transaction</flux:heading>
-
-            <flux:dropdown align="end">
-                <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-my-0.5" />
-                <flux:menu>
-                    @can('update', $transaction)
-                        <flux:modal.trigger name="edit-transaction">
-                            <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
-                        </flux:modal.trigger>
-                    @endcan
-
-                    @can('delete', $transaction)
-                        <flux:modal.trigger name="delete-transaction">
-                            <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
-                        </flux:modal.trigger>
-                    @endcan
-                </flux:menu>
-            </flux:dropdown>
+<section class="mx-auto max-w-xl space-y-8">
+    <div class="mt-4 lg:mt-8">
+        <div class="flex items-center gap-4">
+            <flux:heading size="xl">{{ $transaction->payee }}</flux:heading>
+            @if ($transaction->amount >= 0)
+                <flux:badge color="lime" size="sm">Income</flux:badge>
+            @else
+                <flux:badge color="pink" size="sm">Expense</flux:badge>
+            @endif
         </div>
+        <div class="isolate mt-2.5 flex flex-wrap justify-between gap-x-6 gap-y-4">
+            <div class="flex flex-wrap gap-x-10 gap-y-4 py-1.5">
+                <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
+                    <flux:icon name="banknotes" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+                    <span>{{ $transaction->display_amount }}</span>
+                </span>
+                <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
+                    <flux:icon name="credit-card" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+                    <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
+                        {{ $transaction->account->name }}
+                    </a>
+                </span>
+                <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
+                    <flux:icon name="calendar" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+                    <span>{{ $transaction->display_date }}</span>
+                </span>
+            </div>
+            <div class="flex gap-4">
+                <flux:dropdown align="end">
+                    <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-my-0.5" />
+                    <flux:menu>
+                        @can('update', $transaction)
+                            <flux:modal.trigger name="edit-transaction">
+                                <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
+                            </flux:modal.trigger>
+                        @endcan
 
-        <div
-            class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
-        >
-            <div class="overflow-hidden p-[.3125rem]">
-                <div class="flex items-center justify-between gap-3 px-3.5 py-4 sm:px-3 sm:py-3">
-                    <div class="flex-1 overflow-hidden">
-                        <flux:heading class="truncate">{{ $transaction->payee }}</flux:heading>
-                        <flux:text class="mt-1 text-sm/5 sm:text-[13px]/5">
-                            {{ $transaction->account->name }}
-                        </flux:text>
-                    </div>
-                    <div class="text-right tabular-nums">
-                        @if ($transaction->amount === 0)
-                            <flux:text variant="strong" class="font-medium whitespace-nowrap text-xl">
-                                {{ $transaction->display_amount }}
-                            </flux:text>
-                        @elseif ($transaction->amount > 0)
-                            <flux:text variant="strong" color="green" class="font-medium whitespace-nowrap text-xl">
-                                {{ $transaction->display_amount }}
-                            </flux:text>
-                        @else
-                            <flux:text variant="strong" color="red" class="font-medium whitespace-nowrap text-xl">
-                                {{ $transaction->display_amount }}
-                            </flux:text>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="mx-3.5 my-1 h-px sm:mx-3">
-                    <flux:separator variant="subtle" />
-                </div>
-
-                <div class="space-y-3 px-3.5 py-4 sm:px-3 sm:py-3">
-                    <div class="flex items-start justify-between gap-4">
-                        <flux:text class="text-sm/5 sm:text-[13px]/5">Date</flux:text>
-                        <flux:text variant="strong" class="text-sm/5 sm:text-[13px]/5">{{ $transaction->display_date }}</flux:text>
-                    </div>
-
-                    <div class="flex items-start justify-between gap-4">
-                        <flux:text class="text-sm/5 sm:text-[13px]/5">Category</flux:text>
-                        <flux:text :variant="$transaction->category ? 'strong' : null" class="text-sm/5 sm:text-[13px]/5">
-                            {{ $transaction->category?->name ?? 'Uncategorized' }}
-                        </flux:text>
-                    </div>
-
-                    @if ($transaction->note)
-                        <div class="mx-3.5 my-1 h-px sm:mx-3">
-                            <flux:separator variant="subtle" />
-                        </div>
-
-                        <div class="space-y-1">
-                            <flux:text class="text-sm/5 sm:text-[13px]/5">Note</flux:text>
-                            <flux:text class="text-sm/5 sm:text-[13px]/5">{{ $transaction->note }}</flux:text>
-                        </div>
-                    @endif
-                </div>
+                        @can('delete', $transaction)
+                            <flux:modal.trigger name="delete-transaction">
+                                <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
+                            </flux:modal.trigger>
+                        @endcan
+                    </flux:menu>
+                </flux:dropdown>
             </div>
         </div>
+    </div>
+
+    <div class="mt-12">
+        <flux:heading level="2">Summary</flux:heading>
+        <flux:separator variant="subtle" class="mt-4" />
+        <x-description.list>
+            <x-description.term>Account</x-description.term>
+            <x-description.details>
+                <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
+                    {{ $transaction->account->name }}
+                </a>
+            </x-description.details>
+
+            <x-description.term>Date</x-description.term>
+            <x-description.details>{{ $transaction->display_date }}</x-description.details>
+
+            <x-description.term>Category</x-description.term>
+            <x-description.details>{{ $transaction->category?->name ?? 'Uncategorized' }}</x-description.details>
+
+            @if ($transaction->note)
+                <x-description.term>Note</x-description.term>
+                <x-description.details>{{ $transaction->note }}</x-description.details>
+            @endif
+
+            <x-description.term>Amount</x-description.term>
+            <x-description.details>{{ $transaction->display_amount }}</x-description.details>
+        </x-description.list>
     </div>
 
     @can('update', $transaction)
