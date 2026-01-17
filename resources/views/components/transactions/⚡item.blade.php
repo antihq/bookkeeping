@@ -321,12 +321,14 @@ new class extends Component
                             <flux:icon name="banknotes" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
                             <span>{{ $transaction->display_amount }}</span>
                         </span>
-                        <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
-                            <flux:icon name="credit-card" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
-                            <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
-                                {{ $transaction->account->name }}
-                            </a>
-                        </span>
+                        @if ($transaction->account)
+                            <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
+                                <flux:icon name="credit-card" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+                                <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
+                                    {{ $transaction->account->name }}
+                                </a>
+                            </span>
+                        @endif
                         <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
                             <flux:icon name="calendar" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
                             <span>{{ $transaction->display_date }}</span>
@@ -338,12 +340,14 @@ new class extends Component
                     <flux:heading level="2">Summary</flux:heading>
                     <flux:separator variant="subtle" class="mt-4" />
                     <x-description.list>
-                        <x-description.term>Account</x-description.term>
-                        <x-description.details>
-                            <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
-                                {{ $transaction->account->name }}
-                            </a>
-                        </x-description.details>
+                        @if ($transaction->account)
+                            <x-description.term>Account</x-description.term>
+                            <x-description.details>
+                                <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
+                                    {{ $transaction->account->name }}
+                                </a>
+                            </x-description.details>
+                        @endif
 
                         <x-description.term>Date</x-description.term>
                         <x-description.details>{{ $transaction->display_date }}</x-description.details>
