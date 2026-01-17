@@ -96,7 +96,7 @@ new class extends Component {
     #[Computed]
     public function team(): Team
     {
-        return $this->transaction->account->team;
+        return $this->transaction->team;
     }
 };
 ?>
@@ -166,7 +166,7 @@ new class extends Component {
                     <flux:input.group>
                         <flux:label sr-only>Amount</flux:label>
                         <flux:input.group.prefix>
-                            {{ $transaction->account->currencySymbol }}
+                            {{ $transaction->account?->currencySymbol ?? '$' }}
                         </flux:input.group.prefix>
                         <flux:input
                             wire:model="amount"
