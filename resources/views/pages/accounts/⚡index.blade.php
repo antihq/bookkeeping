@@ -52,28 +52,7 @@ new #[Title('Accounts')] class extends Component {
         </div>
     @else
         <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
-            <flux:heading size="xl">Accounts</flux:heading>
-        </div>
-
-        <div class="mt-8 flex items-end justify-between">
-            <flux:heading level="2">Overview</flux:heading>
-        </div>
-        <div class="mt-4 grid gap-8 sm:grid-cols-1">
-            <div>
-                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-                <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Overal balance</div>
-                <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                    @if ($this->totalBalance >= 0)
-                        {{ $this->team->formatted_total_balance }}
-                    @else
-                        -{{ $this->team->formatted_total_balance }}
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-14 flex items-end justify-between">
-            <flux:heading level="2">All accounts</flux:heading>
+            <flux:heading size="xl">All accounts</flux:heading>
             @can('create', App\Models\Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" class="-my-0.5" wire:navigate>
                     Add account
@@ -81,7 +60,7 @@ new #[Title('Accounts')] class extends Component {
             @endcan
         </div>
 
-        <div class=" mt-4">
+        <div class="mt-8">
             <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
             <div
                 class="divide-y divide-zinc-100 overflow-hidden dark:divide-white/5 dark:text-white"
