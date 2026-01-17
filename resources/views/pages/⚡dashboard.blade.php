@@ -285,9 +285,9 @@ new #[Title('Transactions')] class extends Component {
                                     </flux:badge>
                                 @endif
                             </div>
-                            <div class="mt-1 text-xs/6 text-zinc-500">
+                            <flux:text class="mt-1 leading-6!" size="sm">
                                 {{ $transaction->display_date }}
-                            </div>
+                            </flux:text>
                         </div>
                     </div>
                 @endforeach
