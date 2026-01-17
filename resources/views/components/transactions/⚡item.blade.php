@@ -17,6 +17,8 @@ new class extends Component {
 
     public string $amount = '';
 
+    public int $account = 0;
+
     public string $type = 'expense';
 
     public ?int $category = null;
@@ -31,6 +33,7 @@ new class extends Component {
         $this->amount = (string) (abs($this->transaction->amount) / 100);
         $this->type = $this->transaction->amount < 0 ? 'expense' : 'income';
         $this->category = $this->transaction->category_id;
+        $this->account = $this->transaction->account_id ?? 0;
     }
 
     public function createCategory()
@@ -55,8 +58,10 @@ new class extends Component {
             'payee' => ['required', 'string', 'max:255'],
             'amount' => ['required'],
             'category' => ['nullable', 'exists:categories,id'],
+            'account' => ['required', 'exists:accounts,id'],
         ]);
 
+        $account = $this->accounts->findOrFail($this->account);
         $category = $this->category ? $this->team->categories()->findOrFail($this->category) : null;
 
         $this->transaction->update([
@@ -68,6 +73,7 @@ new class extends Component {
                     ? (int) -round((float) $this->amount * 100)
                     : (int) round((float) $this->amount * 100),
             'category_id' => $category?->id,
+            'account_id' => $account?->id,
         ]);
 
         Flux::toast('Transaction updated successfully.', variant: 'success');
@@ -91,6 +97,12 @@ new class extends Component {
             )
             ->limit(20)
             ->get();
+    }
+
+    #[Computed]
+    public function accounts()
+    {
+        return $this->team->accounts;
     }
 
     #[Computed]
@@ -203,6 +215,14 @@ new class extends Component {
                         <span wire:text="category_search"></span>
                         "
                     </flux:select.option.create>
+                </flux:select>
+
+                <flux:select wire:model="account" label="Account" required label:sr-only>
+                    @foreach ($this->accounts as $acc)
+                        <flux:select.option :value="$acc->id" :wire:key="'acc-'.$acc->id">
+                            {{ $acc->name }} ({{ $acc->display_type }})
+                        </flux:select.option>
+                    @endforeach
                 </flux:select>
 
                 <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />

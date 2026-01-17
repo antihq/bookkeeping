@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::table('transactions', function (Blueprint $table) {
             $table->dropIndex('transactions_account_id_amount_index');
+            $table->dropIndex('transactions_team_id_account_id_index');
+            $table->dropIndex('transactions_account_id_index');
             $table->dropColumn('account_id');
         });
 

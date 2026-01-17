@@ -64,6 +64,33 @@ it('can change transaction category', function () {
     expect($transaction->category_id)->toBe($category2->id);
 });
 
+it('can change transaction account', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account1 = Account::factory()->for($user->currentTeam, 'team')->create(['name' => 'Checking']);
+    $account2 = Account::factory()->for($user->currentTeam, 'team')->create(['name' => 'Savings']);
+    $transaction = $account1->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Grocery',
+            'amount' => 1000,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
+
+    actingAs($user);
+
+    Livewire::test('transactions.item', ['transaction' => $transaction])
+        ->assertSet('account', $account1->id)
+        ->set('account', $account2->id)
+        ->call('edit')
+        ->assertHasNoErrors();
+
+    $transaction->refresh();
+
+    expect($transaction->account_id)->toBe($account2->id);
+});
+
 it('can create category when editing transaction', function () {
     $user = User::factory()->withPersonalTeam()->create();
     $account = Account::factory()->for($user->currentTeam, 'team')->create();
