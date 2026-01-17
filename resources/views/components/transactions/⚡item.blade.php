@@ -152,13 +152,13 @@ new class extends Component
                 <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-mr-2" />
                 <flux:menu>
                     <flux:modal.trigger name="view-transaction-{{ $transaction->id }}">
-                        <flux:menu.item icon="eye" icon:variant="micro">View</flux:menu.item>
+                        <flux:menu.item>View</flux:menu.item>
                     </flux:modal.trigger>
                     <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}">
-                        <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
+                        <flux:menu.item>Edit</flux:menu.item>
                     </flux:modal.trigger>
                     <flux:modal.trigger name="delete-transaction-{{ $transaction->id }}">
-                        <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
+                        <flux:menu.item variant="danger">Delete</flux:menu.item>
                     </flux:modal.trigger>
                 </flux:menu>
             </flux:dropdown>
