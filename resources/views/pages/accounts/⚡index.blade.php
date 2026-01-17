@@ -126,7 +126,7 @@ new #[Title('Accounts')] class extends Component {
                                         {{ $account->name }}
                                     </a>
                                 </flux:heading>
-                                <flux:text class="mt-1 text-sm/5 sm:text-[13px]/5">
+                                <flux:text class="text-sm/5 sm:text-[13px]/5">
                                     {{ $account->display_type }}
                                 </flux:text>
                             </div>
