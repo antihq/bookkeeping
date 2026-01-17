@@ -47,54 +47,41 @@ new #[Title('All transactions')] class extends Component {
 ?>
 
 <section class="mx-auto max-w-lg">
-    <div>
-        <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-4">
-            <flux:heading size="xl">All transactions</flux:heading>
-            <flux:button href="{{ route('transactions.create') }}" icon="plus" variant="primary" wire:navigate>Add transaction</flux:button>
-        </div>
+    <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-4">
+        <flux:heading size="xl">All transactions</flux:heading>
+        <flux:button href="{{ route('transactions.create') }}" icon="plus" variant="primary" wire:navigate>Add transaction</flux:button>
+    </div>
 
+    <div class="mt-8">
         @if ($this->transactions->isNotEmpty())
-            <div
-                class="relative mt-8 h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
-            >
-                <ul role="list" class="overflow-hidden p-[.3125rem]">
-                    @island(name: 'transactions', lazy: true)
-                        @placeholder
-                            @foreach (range(1, rand(3, 8)) as $i)
-                                <flux:skeleton.group animate="shimmer">
-                                    <flux:skeleton class="h-15 rounded-lg" />
-                                </flux:skeleton.group>
-                                @unless ($loop->last)
-                                    <li class="mx-3.5 my-1 h-px sm:mx-3">
-                                        <flux:separator variant="subtle" />
-                                    </li>
-                                @endunless
-                            @endforeach
-                        @endplaceholder
-                        @foreach ($this->transactions as $transaction)
-                            <livewire:transactions.item
-                                :$transaction
-                                wire:key="transaction-{{ $transaction->id }}"
-                            />
-                            @unless ($loop->last)
-                                <li class="mx-3.5 my-1 h-px sm:mx-3">
-                                    <flux:separator variant="subtle" wire:key="separator-{{ $transaction->id }}" />
-                                </li>
-                            @endunless
+            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+            <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
+                @island(name: 'transactions', lazy: true)
+                    @placeholder
+                        @foreach (range(1, rand(3, 8)) as $i)
+                            <flux:skeleton.group animate="shimmer" class="py-4">
+                                <flux:skeleton class="h-15" />
+                            </flux:skeleton.group>
                         @endforeach
-                    @endisland
-                </ul>
+                    @endplaceholder
+                    @foreach ($this->transactions as $transaction)
+                        <livewire:transactions.item
+                            :$transaction
+                            wire:key="transaction-{{ $transaction->id }}"
+                        />
+                    @endforeach
+                @endisland
+            </div>
 
-                <div class="p-[.3125rem]">
-                    <flux:button
-                        wire:click="loadMore"
-                        wire:island.append="transactions"
-                        variant="subtle"
-                        class="w-full"
-                    >
-                        Load more
-                    </flux:button>
-                </div>
+            <div class="p-[.3125rem]">
+                <flux:button
+                    wire:click="loadMore"
+                    wire:island.append="transactions"
+                    variant="subtle"
+                    class="w-full"
+                >
+                    Load more
+                </flux:button>
             </div>
         @else
             <div class="flex flex-col items-center justify-center py-12">

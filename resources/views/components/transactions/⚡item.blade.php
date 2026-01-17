@@ -101,38 +101,37 @@ new class extends Component {
 };
 ?>
 
-<li {{ $attributes }}>
-    <div
-        class="relative flex justify-between gap-x-6 rounded-lg px-3.5 py-2.5 hover:bg-zinc-950/2.5 sm:px-3 sm:py-1.5 dark:hover:bg-white/2.5"
-    >
-        <div class="overflow-hidden">
-            <flux:heading class="truncate">
+<div>
+    <div {{ $attributes }} class="flex items-center justify-between gap-4 py-4">
+        <div>
+            <flux:heading class="leading-6!">
                 <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}">
-                    <span class="absolute inset-x-0 -top-px bottom-0"></span>
-                    {{ $transaction->payee }}
+                    <button type="button">{{ $transaction->payee }}</button>
                 </flux:modal.trigger>
             </flux:heading>
-            <flux:text :variant="$transaction->category ? 'strong' : null" class="mt-1 text-sm/5 sm:text-[13px]/5">
+            <flux:text class="leading-6!" size="sm">
                 {{ $transaction->category?->name ?? 'Uncategorized' }}
             </flux:text>
         </div>
 
-        <div class="flex shrink-0 items-center gap-x-4">
+        <div class="flex shrink-0 items-center gap-4">
             <div class="text-right tabular-nums">
-                @if ($transaction->amount === 0)
-                    <flux:text variant="strong" class="font-medium whitespace-nowrap">
-                        {{ $transaction->display_amount }}
-                    </flux:text>
-                @elseif ($transaction->amount > 0)
-                    <flux:text variant="strong" color="green" class="font-medium whitespace-nowrap">
-                        {{ $transaction->display_amount }}
-                    </flux:text>
-                @else
-                    <flux:text variant="strong" color="red" class="font-medium whitespace-nowrap">
-                        {{ $transaction->display_amount }}
-                    </flux:text>
-                @endif
-                <flux:text class="mt-1 text-sm/5 sm:text-[13px]/5 tabular-nums">
+                <div class="tabular-nums">
+                    @if ($transaction->amount === 0)
+                        <flux:text variant="strong">
+                            {{ $transaction->display_amount }}
+                        </flux:text>
+                    @elseif ($transaction->amount > 0)
+                        <flux:badge color="lime" size="sm">
+                            {{ $transaction->display_amount }}
+                        </flux:badge>
+                    @else
+                        <flux:badge color="pink" size="sm">
+                            {{ $transaction->display_amount }}
+                        </flux:badge>
+                    @endif
+                </div>
+                <flux:text class="mt-1 leading-6!" size="sm">
                     {{ $transaction->display_date }}
                 </flux:text>
             </div>
@@ -150,12 +149,7 @@ new class extends Component {
             </flux:dropdown>
         </div>
     </div>
-
-    <flux:modal
-        name="edit-transaction-{{ $transaction->id }}"
-        class="w-full sm:max-w-lg"
-        @close="$refresh"
-    >
+    <flux:modal name="edit-transaction-{{ $transaction->id }}" class="w-full sm:max-w-lg" @close="$refresh">
         @island
             <form wire:submit="edit" class="space-y-6">
                 <div>
@@ -186,14 +180,7 @@ new class extends Component {
                     <flux:error name="amount" />
                 </flux:field>
 
-                <flux:input
-                    wire:model="payee"
-                    label="Payee"
-                    type="text"
-                    placeholder="Payee"
-                    label:sr-only
-                    required
-                />
+                <flux:input wire:model="payee" label="Payee" type="text" placeholder="Payee" label:sr-only required />
 
                 <flux:select
                     wire:model="category"
@@ -222,9 +209,7 @@ new class extends Component {
 
                 <flux:date-picker wire:model="date" label="Date" required />
 
-                <div
-                    class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto"
-                >
+                <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
                     <flux:modal.close>
                         <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
                     </flux:modal.close>
@@ -246,10 +231,7 @@ new class extends Component {
                 <flux:modal.close>
                     <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
                 </flux:modal.close>
-                <flux:button
-                    wire:click="$parent.deleteTransaction({{ $transaction->id }})"
-                    variant="primary"
-                >
+                <flux:button wire:click="$parent.deleteTransaction({{ $transaction->id }})" variant="primary">
                     Delete
                 </flux:button>
             </div>

@@ -184,12 +184,16 @@ new #[Title('Account')] class extends Component {
     #[Computed]
     public function lastMonthBalance(): float
     {
-        $lastMonthEnd = now()->subMonth()->endOfMonth();
+        $lastMonthEnd = now()
+            ->subMonth()
+            ->endOfMonth();
 
         return ($this->account->start_balance +
-                $this->account->transactions()
-                    ->where('date', '<=', $lastMonthEnd)
-                    ->sum('amount')) / 100;
+            $this->account
+                ->transactions()
+                ->where('date', '<=', $lastMonthEnd)
+                ->sum('amount')) /
+            100;
     }
 
     #[Computed]
@@ -245,7 +249,7 @@ new #[Title('Account')] class extends Component {
     {
         $change = $this->expensesChange;
 
-        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+        return ($change >= 0 ? '+' : '-') . '$' . number_format(abs($change), 2);
     }
 
     #[Computed]
@@ -253,7 +257,7 @@ new #[Title('Account')] class extends Component {
     {
         $change = $this->incomeChange;
 
-        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+        return ($change >= 0 ? '+' : '-') . '$' . number_format(abs($change), 2);
     }
 
     #[Computed]
@@ -261,7 +265,7 @@ new #[Title('Account')] class extends Component {
     {
         $change = $this->balanceChange;
 
-        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+        return ($change >= 0 ? '+' : '-') . '$' . number_format(abs($change), 2);
     }
 
     #[Computed]
@@ -284,235 +288,192 @@ new #[Title('Account')] class extends Component {
 };
 ?>
 
-<section class="mx-auto max-w-lg space-y-8">
-    <div class="space-y-4">
-        <div class="flex flex-wrap items-end justify-between gap-4">
-            <flux:heading size="xl">{{ $account->name }}</flux:heading>
+<section class="mx-auto max-w-lg">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <flux:heading size="xl">{{ $account->name }}</flux:heading>
+        <flux:dropdown align="end">
+            <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-my-0.5" />
+            <flux:menu>
+                @can('update', $account)
+                    <flux:menu.item
+                        href="{{ route('accounts.edit', $account) }}"
+                        icon="pencil-square"
+                        icon:variant="micro"
+                        wire:navigate
+                    >
+                        Edit
+                    </flux:menu.item>
+                @endcan
 
-            <flux:dropdown align="end">
-                <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-my-0.5" />
-                <flux:menu>
-                    @can('update', $account)
-                        <flux:menu.item
-                            href="{{ route('accounts.edit', $account) }}"
-                            icon="pencil-square"
-                            icon:variant="micro"
-                            wire:navigate
-                        >
-                            Edit
-                        </flux:menu.item>
-                    @endcan
-
-                    @can('delete', $account)
-                        <flux:modal.trigger name="delete">
-                            <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
-                        </flux:modal.trigger>
-                    @endcan
-                </flux:menu>
-            </flux:dropdown>
-        </div>
-    </div>
-
-    <div class="space-y-14">
-        <div class="space-y-6 sm:space-y-4">
-            <div class="mt-8 flex items-end justify-between">
-                <flux:heading level="2">Overview</flux:heading>
-                <flux:text>This month</flux:text>
-            </div>
-            <div class="mt-4 grid gap-8 sm:grid-cols-3">
-                <div>
-                    <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-                    <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Balance</div>
-                    <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                        @if ($this->accountBalance >= 0)
-                            {{ $account->formattedBalance }}
-                        @else
-                            -{{ $account->formattedBalance }}
-                        @endif
-                    </div>
-                    <div class="mt-3 text-sm/6 sm:text-xs/6">
-                        @if (!is_null($this->balanceChangePercentage))
-                            <flux:badge color="{{ $this->balanceChangeColor }}" size="sm">
-                                {{ number_format($this->balanceChangePercentage, 1) }}%
-                            </flux:badge>
-                            <flux:text size="sm" inline>from last month</flux:text>
-                        @endif
-                    </div>
-                </div>
-                <div>
-                    <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-                    <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Expenses</div>
-                    <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                        ${{ number_format(abs($this->monthlyExpenses), 2) }}
-                    </div>
-                    <div class="mt-3 text-sm/6 sm:text-xs/6">
-                        @if (!is_null($this->expensesChangePercentage))
-                            <flux:badge color="{{ $this->expensesChangeColor }}" size="sm">
-                                {{ number_format($this->expensesChangePercentage, 1) }}%
-                            </flux:badge>
-                            <flux:text size="sm" inline>from last month</flux:text>
-                        @endif
-                    </div>
-                </div>
-                <div>
-                    <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-                    <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
-                    <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                        ${{ number_format($this->monthlyIncome, 2) }}
-                    </div>
-                    <div class="mt-3 text-sm/6 sm:text-xs/6">
-                        @if (!is_null($this->incomeChangePercentage))
-                            <flux:badge color="{{ $this->incomeChangeColor }}" size="sm">
-                                {{ number_format($this->incomeChangePercentage, 1) }}%
-                            </flux:badge>
-                            <flux:text size="sm" inline>from last month</flux:text>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="space-y-6 sm:space-y-4">
-            <div class="flex items-end justify-between gap-4">
-                <flux:heading size="lg">Transactions</flux:heading>
-
-                @can('create', Transaction::class)
-                    <flux:modal.trigger name="add-transaction">
-                        <flux:button variant="primary" class="-my-2.5 sm:-my-1.5">Add transaction</flux:button>
+                @can('delete', $account)
+                    <flux:modal.trigger name="delete">
+                        <flux:menu.item variant="danger" icon="trash" icon:variant="micro">Delete</flux:menu.item>
                     </flux:modal.trigger>
                 @endcan
+            </flux:menu>
+        </flux:dropdown>
+    </div>
+
+    <div class="mt-8 flex items-end justify-between">
+        <flux:heading level="2">Overview</flux:heading>
+        <flux:text>This month</flux:text>
+    </div>
+    <div class="mt-4 grid gap-8 sm:grid-cols-3">
+        <div>
+            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+            <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Balance</div>
+            <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                @if ($this->accountBalance >= 0)
+                    {{ $account->formattedBalance }}
+                @else
+                    -{{ $account->formattedBalance }}
+                @endif
             </div>
-
-            @if ($this->transactions->isNotEmpty())
-                <div
-                    class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
-                >
-                    <ul role="list" class="overflow-hidden p-[.3125rem]">
-                        @island(name: 'transactions', lazy: true)
-                            @placeholder
-                                @foreach (range(1, rand(3, 8)) as $i)
-                                    <flux:skeleton.group animate="shimmer">
-                                        <flux:skeleton class="h-15 rounded-lg" />
-                                    </flux:skeleton.group>
-                                    @unless ($loop->last)
-                                        <li class="mx-3.5 my-1 h-px sm:mx-3">
-                                            <flux:separator variant="subtle" />
-                                        </li>
-                                    @endunless
-                                @endforeach
-                            @endplaceholder
-                            @foreach ($this->transactions as $transaction)
-                                <livewire:transactions.item
-                                    :$transaction
-                                    wire:key="transaction-{{ $transaction->id }}"
-                                />
-                                @unless ($loop->last)
-                                    <li class="mx-3.5 my-1 h-px sm:mx-3">
-                                        <flux:separator variant="subtle" wire:key="separator-{{ $transaction->id }}" />
-                                    </li>
-                                @endunless
-                            @endforeach
-                        @endisland
-                    </ul>
-
-                    <div class="p-[.3125rem]">
-                        <flux:button
-                            wire:click="loadMore"
-                            wire:island.append="transactions"
-                            variant="subtle"
-                            class="w-full"
-                        >
-                            Load more
-                        </flux:button>
-                    </div>
-                </div>
-            @else
-                <div class="flex flex-col items-center justify-center py-12">
-                    <flux:icon icon="credit-card" size="lg" class="text-zinc-400 dark:text-zinc-600" />
-                    <flux:text class="mt-4 text-zinc-500 dark:text-zinc-400">No transactions yet</flux:text>
-                </div>
-            @endif
-
-            @can('create', Transaction::class)
-                <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
-                    <form wire:submit="addTransaction" class="space-y-6">
-                        <div>
-                            <flux:heading size="lg">Add transaction</flux:heading>
-                            <flux:text class="mt-2">Add a new transaction to this account.</flux:text>
-                        </div>
-
-                        <flux:radio.group wire:model="type" label="Transaction type" variant="segmented" label:sr-only>
-                            <flux:radio value="expense" icon="minus">Expense</flux:radio>
-                            <flux:radio value="income" icon="plus">Income</flux:radio>
-                        </flux:radio.group>
-
-                        <flux:field>
-                            <flux:input.group>
-                                <flux:label sr-only>Amount</flux:label>
-                                <flux:input.group.prefix>{{ $account->currencySymbol }}</flux:input.group.prefix>
-                                <flux:input
-                                    wire:model="amount"
-                                    type="text"
-                                    mask:dynamic="$money($input)"
-                                    inputmode="decimal"
-                                    placeholder="0.00"
-                                    required
-                                    autofocus
-                                />
-                            </flux:input.group>
-                            <flux:error name="amount" />
-                        </flux:field>
-
-                        <flux:input
-                            wire:model="payee"
-                            label="Payee"
-                            type="text"
-                            placeholder="Payee"
-                            label:sr-only
-                            required
-                        />
-
-                        <flux:select
-                            wire:model="category"
-                            variant="combobox"
-                            label="Category"
-                            placeholder="Category"
-                            label:sr-only
-                        >
-                            <x-slot name="input">
-                                <flux:select.input wire:model="category_search" />
-                            </x-slot>
-
-                            @foreach ($this->categories as $category)
-                                <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
-                                    {{ $category->name }}
-                                </flux:select.option>
-                            @endforeach
-
-                            <flux:select.option.create wire:click="createCategory" min-length="1">
-                                Create "
-                                <span wire:text="category_search"></span>
-                                "
-                            </flux:select.option.create>
-                        </flux:select>
-
-                        <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
-
-                        <flux:date-picker wire:model="date" label="Date" required />
-
-                        <div
-                            class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto"
-                        >
-                            <flux:modal.close>
-                                <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
-                            </flux:modal.close>
-                            <flux:button variant="primary" type="submit">Add transaction</flux:button>
-                        </div>
-                    </form>
-                </flux:modal>
-            @endcan
+            <div class="mt-3 text-sm/6 sm:text-xs/6">
+                @if (! is_null($this->balanceChangePercentage))
+                    <flux:badge color="{{ $this->balanceChangeColor }}" size="sm">
+                        {{ number_format($this->balanceChangePercentage, 1) }}%
+                    </flux:badge>
+                    <flux:text size="sm" inline>from last month</flux:text>
+                @endif
+            </div>
+        </div>
+        <div>
+            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+            <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Expenses</div>
+            <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                ${{ number_format(abs($this->monthlyExpenses), 2) }}
+            </div>
+            <div class="mt-3 text-sm/6 sm:text-xs/6">
+                @if (! is_null($this->expensesChangePercentage))
+                    <flux:badge color="{{ $this->expensesChangeColor }}" size="sm">
+                        {{ number_format($this->expensesChangePercentage, 1) }}%
+                    </flux:badge>
+                    <flux:text size="sm" inline>from last month</flux:text>
+                @endif
+            </div>
+        </div>
+        <div>
+            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+            <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
+            <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                ${{ number_format($this->monthlyIncome, 2) }}
+            </div>
+            <div class="mt-3 text-sm/6 sm:text-xs/6">
+                @if (! is_null($this->incomeChangePercentage))
+                    <flux:badge color="{{ $this->incomeChangeColor }}" size="sm">
+                        {{ number_format($this->incomeChangePercentage, 1) }}%
+                    </flux:badge>
+                    <flux:text size="sm" inline>from last month</flux:text>
+                @endif
+            </div>
         </div>
     </div>
+
+    <div class="mt-14 flex items-end justify-between gap-4">
+        <flux:heading>Transactions</flux:heading>
+        @can('create', Transaction::class)
+            <flux:modal.trigger name="add-transaction">
+                <flux:button variant="primary">Add transaction</flux:button>
+            </flux:modal.trigger>
+        @endcan
+    </div>
+
+    <div class="mt-4">
+        <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+        @if ($this->transactions->isNotEmpty())
+            <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
+                @island(name: 'transactions', lazy: true)
+                    @placeholder
+                        @foreach (range(1, rand(3, 8)) as $i)
+                            <flux:skeleton.group animate="shimmer" class="py-4">
+                                <flux:skeleton class="h-15" />
+                            </flux:skeleton.group>
+                            @unless ($loop->last)
+                                <flux:separator variant="subtle" />
+                            @endunless
+                        @endforeach
+                    @endplaceholder
+
+                    @foreach ($this->transactions as $transaction)
+                        <livewire:transactions.item :$transaction wire:key="transaction-{{ $transaction->id }}" />
+                    @endforeach
+                @endisland
+            </div>
+            <div class="p-[.3125rem]">
+                <flux:button wire:click="loadMore" wire:island.append="transactions" variant="subtle" class="w-full">
+                    Load more
+                </flux:button>
+            </div>
+        @else
+            <div class="flex flex-col items-center justify-center py-12">
+                <flux:icon icon="credit-card" size="lg" class="text-zinc-400 dark:text-zinc-600" />
+                <flux:text class="mt-4 text-zinc-500 dark:text-zinc-400">No transactions yet</flux:text>
+            </div>
+        @endif
+    </div>
+
+    @can('create', Transaction::class)
+        <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
+            <form wire:submit="addTransaction" class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Add transaction</flux:heading>
+                    <flux:text class="mt-2">Add a new transaction to this account.</flux:text>
+                </div>
+                <flux:radio.group wire:model="type" label="Transaction type" variant="segmented" label:sr-only>
+                    <flux:radio value="expense" icon="minus">Expense</flux:radio>
+                    <flux:radio value="income" icon="plus">Income</flux:radio>
+                </flux:radio.group>
+                <flux:field>
+                    <flux:input.group>
+                        <flux:label sr-only>Amount</flux:label>
+                        <flux:input.group.prefix>{{ $account->currencySymbol }}</flux:input.group.prefix>
+                        <flux:input
+                            wire:model="amount"
+                            type="text"
+                            mask:dynamic="$money($input)"
+                            inputmode="decimal"
+                            placeholder="0.00"
+                            required
+                            autofocus
+                        />
+                    </flux:input.group>
+                    <flux:error name="amount" />
+                </flux:field>
+                <flux:input wire:model="payee" label="Payee" type="text" placeholder="Payee" label:sr-only required />
+                <flux:select
+                    wire:model="category"
+                    variant="combobox"
+                    label="Category"
+                    placeholder="Category"
+                    label:sr-only
+                >
+                    <x-slot name="input">
+                        <flux:select.input wire:model="category_search" />
+                    </x-slot>
+                    @foreach ($this->categories as $category)
+                        <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
+                            {{ $category->name }}
+                        </flux:select.option>
+                    @endforeach
+
+                    <flux:select.option.create wire:click="createCategory" min-length="1">
+                        Create "
+                        <span wire:text="category_search"></span>
+                        "
+                    </flux:select.option.create>
+                </flux:select>
+                <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
+                <flux:date-picker wire:model="date" label="Date" required />
+                <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
+                    <flux:modal.close>
+                        <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="primary" type="submit">Add transaction</flux:button>
+                </div>
+            </form>
+        </flux:modal>
+    @endcan
 
     @can('delete', $account)
         <flux:modal name="delete" class="w-full max-w-xs sm:max-w-md">
