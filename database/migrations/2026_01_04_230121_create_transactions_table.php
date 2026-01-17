@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('account_id')->index();
+            $table->foreignId('account_id')->nullable()->index();
             $table->foreignId('team_id')->index();
             $table->foreignId('created_by');
             $table->foreignId('category_id')->nullable()->index();
