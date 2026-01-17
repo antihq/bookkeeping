@@ -17,10 +17,8 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::redirect('dashboard', 'accounts')->name('dashboard');
-});
+    Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
 
-Route::middleware(['auth'])->group(function () {
     Route::livewire('accounts', 'pages::accounts.index')->name('accounts.index');
     Route::livewire('accounts/create', 'pages::accounts.create')->name('accounts.create');
     Route::livewire('accounts/{account}', 'pages::accounts.show')->name('accounts.show');
@@ -28,7 +26,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::livewire('transactions', 'pages::transactions.index')->name('transactions.index');
     Route::livewire('breakdown', 'pages::breakdown')->name('breakdown.index');
+});
 
+Route::middleware(['auth'])->group(function () {
     Route::livewire('teams/create', 'pages::teams.create')->name('teams.create');
     Route::livewire('teams/{team}', 'pages::teams.show')->name('teams.edit');
     Route::livewire('teams/{team}/members', 'pages::teams.members.index')->name('teams.members.index');

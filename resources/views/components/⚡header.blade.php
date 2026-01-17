@@ -31,7 +31,7 @@ new class extends Component {
     <flux:navbar>
         <flux:navbar.item
             :href="route('dashboard')"
-            :current="request()->routeIs('accounts.index')"
+            :current="request()->routeIs('dashboard')"
             wire:navigate
         >
             Home
