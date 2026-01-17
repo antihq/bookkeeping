@@ -258,15 +258,15 @@ new #[Title('Transactions')] class extends Component {
                         class="flex items-center justify-between gap-4 py-4"
                     >
                         <div>
-                            <div class="text-sm/6 font-semibold">
+                            <flux:heading class="leading-6!">
                                 <a href="{{ route('transactions.show', $transaction) }}" wire:navigate>
                                     {{ $transaction->payee }}
                                 </a>
-                            </div>
+                            </flux:heading>
                             @if ($transaction->category)
-                                <div class="text-xs/6 text-zinc-500">
+                                <flux:text size="sm" class="leading-6!">
                                     {{ $transaction->category->name }}
-                                </div>
+                                </flux:text>
                             @endif
                         </div>
                         <div class="text-right">
