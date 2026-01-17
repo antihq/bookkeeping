@@ -6,7 +6,8 @@ use Flux\Flux;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-new class extends Component {
+new class extends Component
+{
     public Transaction $transaction;
 
     public string $date = '';
@@ -39,7 +40,7 @@ new class extends Component {
     public function createCategory()
     {
         $this->validate([
-            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->transaction->team_id],
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,'.$this->transaction->team_id],
         ]);
 
         $category = $this->team->categories()->create([
@@ -68,8 +69,7 @@ new class extends Component {
             'date' => $this->date,
             'payee' => $this->payee,
             'note' => $this->note,
-            'amount' =>
-                $this->type === 'expense'
+            'amount' => $this->type === 'expense'
                     ? (int) -round((float) $this->amount * 100)
                     : (int) round((float) $this->amount * 100),
             'category_id' => $category?->id,
@@ -93,7 +93,7 @@ new class extends Component {
             ->categories()
             ->when(
                 $this->category_search,
-                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
             )
             ->limit(20)
             ->get();
@@ -117,7 +117,7 @@ new class extends Component {
     <div {{ $attributes }} class="flex items-center justify-between gap-4 py-4">
         <div>
             <flux:heading class="leading-6!">
-                <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}">
+                <flux:modal.trigger name="view-transaction-{{ $transaction->id }}">
                     <button type="button">{{ $transaction->payee }}</button>
                 </flux:modal.trigger>
             </flux:heading>
@@ -151,6 +151,9 @@ new class extends Component {
             <flux:dropdown align="end">
                 <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-mr-2" />
                 <flux:menu>
+                    <flux:modal.trigger name="view-transaction-{{ $transaction->id }}">
+                        <flux:menu.item icon="eye" icon:variant="micro">View</flux:menu.item>
+                    </flux:modal.trigger>
                     <flux:modal.trigger name="edit-transaction-{{ $transaction->id }}">
                         <flux:menu.item icon="pencil-square" icon:variant="micro">Edit</flux:menu.item>
                     </flux:modal.trigger>
@@ -273,6 +276,91 @@ new class extends Component {
                     <flux:button variant="primary" type="submit">Save changes</flux:button>
                 </div>
             </form>
+        @endisland
+    </flux:modal>
+
+    <flux:modal name="view-transaction-{{ $transaction->id }}" class="w-full sm:max-w-lg">
+        @island(lazy: true)
+            @placeholder
+                <div class="space-y-6">
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer" class="flex gap-4">
+                        <flux:skeleton.line class="flex-1" />
+                        <flux:skeleton.line class="flex-1" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+                </div>
+            @endplaceholder
+
+            <div class="space-y-8">
+                <div>
+                    <div class="flex items-center gap-4">
+                        <flux:heading size="lg">{{ $transaction->payee }}</flux:heading>
+                        @if ($transaction->amount >= 0)
+                            <flux:badge color="lime" size="sm">Income</flux:badge>
+                        @else
+                            <flux:badge color="pink" size="sm">Expense</flux:badge>
+                        @endif
+                    </div>
+                    <div class="mt-2.5 flex flex-wrap gap-x-10 gap-y-4 py-1.5">
+                        <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
+                            <flux:icon name="banknotes" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+                            <span>{{ $transaction->display_amount }}</span>
+                        </span>
+                        <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
+                            <flux:icon name="credit-card" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+                            <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
+                                {{ $transaction->account->name }}
+                            </a>
+                        </span>
+                        <span class="flex items-center gap-3 text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white">
+                            <flux:icon name="calendar" variant="micro" class="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
+                            <span>{{ $transaction->display_date }}</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div>
+                    <flux:heading level="2">Summary</flux:heading>
+                    <flux:separator variant="subtle" class="mt-4" />
+                    <x-description.list>
+                        <x-description.term>Account</x-description.term>
+                        <x-description.details>
+                            <a href="{{ route('accounts.show', $transaction->account) }}" wire:navigate>
+                                {{ $transaction->account->name }}
+                            </a>
+                        </x-description.details>
+
+                        <x-description.term>Date</x-description.term>
+                        <x-description.details>{{ $transaction->display_date }}</x-description.details>
+
+                        <x-description.term>Category</x-description.term>
+                        <x-description.details>{{ $transaction->category?->name ?? 'Uncategorized' }}</x-description.details>
+
+                        @if ($transaction->note)
+                            <x-description.term>Note</x-description.term>
+                            <x-description.details>{{ $transaction->note }}</x-description.details>
+                        @endif
+
+                        <x-description.term>Amount</x-description.term>
+                        <x-description.details>{{ $transaction->display_amount }}</x-description.details>
+                    </x-description.list>
+                </div>
+            </div>
         @endisland
     </flux:modal>
 
