@@ -37,49 +37,20 @@ new class extends Component {
             Home
         </flux:navbar.item>
 
-        <flux:dropdown position="bottom">
-            <flux:navbar.item icon:trailing="chevron-down" icon:variant="micro">
-                Accounts
-            </flux:navbar.item>
-
-            <flux:menu>
-                <flux:menu.item :href="route('transactions.index')" icon="rectangle-stack" wire:navigate>
-                    All accounts
-                </flux:menu.item>
-
-                @if (auth()->user()->currentTeam->accounts->isNotEmpty())
-                    <flux:menu.separator />
-
-                    @foreach (auth()->user()->currentTeam->accounts as $account)
-                        <flux:menu.item
-                            :href="route('accounts.show', $account)"
-                            :icon="request()->account?->is($account) ? 'check' : null"
-                            wire:navigate
-                        >
-                            <span class="inline-flex w-full items-center justify-between gap-4">
-                                {{ $account->name }}
-                                <flux:text class="text-[13px] font-normal tabular-nums" inline>
-                                    {{ $account->formatted_balance }}
-                                </flux:text>
-                            </span>
-                        </flux:menu.item>
-                    @endforeach
-                @endif
-
-                <flux:menu.separator />
-
-                <flux:menu.item :href="route('accounts.create')" icon="plus" wire:navigate>
-                    Add new account
-                </flux:menu.item>
-            </flux:menu>
-        </flux:dropdown>
-
         <flux:navbar.item
-            :href="route('breakdown.index')"
-            :current="request()->routeIs('breakdown.index')"
+            :href="route('accounts.index')"
+            :current="request()->routeIs('accounts.index')"
             wire:navigate
         >
-            Breakdown
+            Accounts
+        </flux:navbar.item>
+
+        <flux:navbar.item
+            :href="route('transactions.index')"
+            :current="request()->routeIs('transactions.index')"
+            wire:navigate
+        >
+            Transactions
         </flux:navbar.item>
     </flux:navbar>
 
