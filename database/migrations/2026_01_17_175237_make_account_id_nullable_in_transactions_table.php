@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->dropIndex('transactions_account_id_amount_index');
-            $table->dropIndex('transactions_team_id_account_id_index');
-            $table->dropIndex('transactions_account_id_index');
+            $table->dropIndex(['account_id', 'amount']);
+            $table->dropIndex(['team_id', 'account_id']);
+            $table->dropIndex(['account_id']);
             $table->dropColumn('account_id');
         });
 
@@ -25,9 +25,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('transactions', function (Blueprint $table) {
-            $table->dropIndex('transactions_account_id_index');
-            $table->dropIndex('transactions_team_id_account_id_index');
-            $table->dropIndex('transactions_account_id_amount_index');
+            $table->dropIndex(['account_id']);
+            $table->dropIndex(['team_id', 'account_id']);
+            $table->dropIndex(['account_id', 'amount']);
             $table->dropColumn('account_id');
         });
 
