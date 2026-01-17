@@ -75,7 +75,7 @@ new #[Title('Transactions')] class extends Component {
 
         Flux::modals()->close();
 
-        $this->reset(['payee', 'note', 'amount', 'category', 'account', 'page', 'type']);
+        $this->reset(['payee', 'note', 'amount', 'category', 'account', 'type']);
 
         $this->renderIsland('transactions');
     }
