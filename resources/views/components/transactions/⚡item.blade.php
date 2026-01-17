@@ -162,7 +162,7 @@ new class extends Component {
         </div>
     </div>
     <flux:modal name="edit-transaction-{{ $transaction->id }}" class="w-full sm:max-w-lg" @close="$refresh">
-        @island
+        @island(lazy: true)
             <form wire:submit="edit" class="space-y-6">
                 <div>
                     <flux:heading size="lg">Edit transaction</flux:heading>
