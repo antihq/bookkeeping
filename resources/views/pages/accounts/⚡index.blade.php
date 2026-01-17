@@ -71,14 +71,14 @@ new #[Title('Accounts')] class extends Component {
                         class="relative flex items-center justify-between gap-4 py-4"
                     >
                         <div>
-                            <div class="text-sm/6 font-semibold">
+                            <flux:heading class="leading-6!">
                                 <a href="{{ route('accounts.show', $account) }}" wire:navigate>
                                     {{ $account->name }}
                                 </a>
-                            </div>
-                            <div class="text-xs/6 text-zinc-500">
+                            </flux:heading>
+                            <flux:text size="sm" class="leading-6!">
                                 {{ $account->display_type }}
-                            </div>
+                            </flux:text>
                         </div>
                         <div class="flex shrink-0 items-center gap-x-4">
                             <div class="text-right tabular-nums">
