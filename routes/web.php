@@ -25,6 +25,7 @@ Route::middleware([
     Route::livewire('accounts/{account}/edit', 'pages::accounts.edit')->name('accounts.edit');
 
     Route::livewire('transactions', 'pages::transactions.index')->name('transactions.index');
+    Route::livewire('transactions/create', 'pages::transactions.create')->name('transactions.create');
     Route::livewire('transactions/{transaction}', 'pages::transactions.show')->name('transactions.show');
     Route::livewire('breakdown', 'pages::breakdown')->name('breakdown.index');
 });

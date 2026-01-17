@@ -48,7 +48,10 @@ new #[Title('All transactions')] class extends Component {
 
 <section class="mx-auto max-w-lg">
     <div>
-        <flux:heading size="xl">All transactions</flux:heading>
+        <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-4">
+            <flux:heading size="xl">All transactions</flux:heading>
+            <flux:button href="{{ route('transactions.create') }}" icon="plus" variant="primary" wire:navigate>Add transaction</flux:button>
+        </div>
 
         @if ($this->transactions->isNotEmpty())
             <div
