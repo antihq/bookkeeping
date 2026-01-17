@@ -175,6 +175,17 @@ new #[Title('Transactions')] class extends Component {
     {
         return $this->balanceChange >= 0 ? 'lime' : 'pink';
     }
+
+    public function deleteTransaction(int $id)
+    {
+        $transaction = $this->team->transactions()->findOrFail($id);
+
+        $this->authorize('delete', $transaction);
+
+        $transaction->delete();
+
+        Flux::toast('Transaction deleted successfully.', variant: 'success');
+    }
 };
 ?>
 
@@ -251,47 +262,22 @@ new #[Title('Transactions')] class extends Component {
 
         <div class="mt-4">
             <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-            <div class="divide-y divide-zinc-100 overflow-hidden dark:divide-white/5 dark:text-white">
+            @island(name: 'transactions', lazy: true)
+                @placeholder
+                    @foreach (range(1, rand(3, 8)) as $i)
+                        <flux:skeleton.group animate="shimmer" class="py-4">
+                            <flux:skeleton class="h-15" />
+                        </flux:skeleton.group>
+                        @unless ($loop->last)
+                            <flux:separator variant="subtle" />
+                        @endunless
+                    @endforeach
+                @endplaceholder
+
                 @foreach ($this->transactions as $transaction)
-                    <div
-                        wire:key="transaction-{{ $transaction->id }}"
-                        class="flex items-center justify-between gap-4 py-4"
-                    >
-                        <div>
-                            <flux:heading class="leading-6!">
-                                <a href="{{ route('transactions.show', $transaction) }}" wire:navigate>
-                                    {{ $transaction->payee }}
-                                </a>
-                            </flux:heading>
-                            @if ($transaction->category)
-                                <flux:text size="sm" class="leading-6!">
-                                    {{ $transaction->category->name }}
-                                </flux:text>
-                            @endif
-                        </div>
-                        <div class="text-right">
-                            <div class="tabular-nums">
-                                @if ($transaction->amount === 0)
-                                    <flux:text variant="strong">
-                                        {{ $transaction->formatted_amount }}
-                                    </flux:text>
-                                @elseif ($transaction->amount > 0)
-                                    <flux:badge color="lime" size="sm">
-                                        {{ $transaction->display_amount }}
-                                    </flux:badge>
-                                @else
-                                    <flux:badge color="pink" size="sm">
-                                        {{ $transaction->display_amount }}
-                                    </flux:badge>
-                                @endif
-                            </div>
-                            <flux:text class="mt-1 leading-6!" size="sm">
-                                {{ $transaction->display_date }}
-                            </flux:text>
-                        </div>
-                    </div>
+                    <livewire:transactions.item :$transaction wire:key="transaction-{{ $transaction->id }}" />
                 @endforeach
-            </div>
+            @endisland
         </div>
     @endif
 </section>
