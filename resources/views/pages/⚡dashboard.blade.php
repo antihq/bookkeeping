@@ -259,7 +259,9 @@ new #[Title('Transactions')] class extends Component {
                     >
                         <div>
                             <div class="text-sm/6 font-semibold">
-                                {{ $transaction->payee }}
+                                <a href="{{ route('transactions.show', $transaction) }}" wire:navigate>
+                                    {{ $transaction->payee }}
+                                </a>
                             </div>
                             @if ($transaction->category)
                                 <div class="text-xs/6 text-zinc-500">
