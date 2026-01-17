@@ -52,8 +52,9 @@ new #[Title('Accounts')] class extends Component {
         </div>
     @else
         <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
+            <flux:heading size="xl">Accounts</flux:heading>
             @can('create', App\Models\Account::class)
-                <flux:button href="{{ route('accounts.create') }}" variant="primary" wire:navigate>
+                <flux:button href="{{ route('accounts.create') }}" variant="primary" class="-my-0.5" wire:navigate>
                     Add account
                 </flux:button>
             @endcan
@@ -64,7 +65,7 @@ new #[Title('Accounts')] class extends Component {
         >
             <ul role="list" class="overflow-hidden p-[.3125rem]">
                 <li>
-                    <div class="relative flex justify-between gap-x-6 rounded-lg px-3.5 py-2.5 hover:bg-zinc-950/2.5 sm:px-3 sm:py-1.5 dark:hover:bg-white/2.5">
+                    <div class="relative flex items-center justify-between gap-x-6 rounded-lg px-3.5 py-2.5 hover:bg-zinc-950/2.5 sm:px-3 sm:py-1.5 dark:hover:bg-white/2.5">
                         <flux:heading>
                             <a href="{{ route('transactions.index') }}" wire:navigate>
                                 <span class="absolute inset-x-0 -top-px bottom-0"></span>
