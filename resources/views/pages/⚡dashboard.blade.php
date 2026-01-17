@@ -400,10 +400,7 @@ new #[Title('Transactions')] class extends Component {
     @can('create', Transaction::class)
         <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
             <form wire:submit="addTransaction" class="space-y-6">
-                <div>
-                    <flux:heading size="lg">Add transaction</flux:heading>
-                    <flux:text class="mt-2">Add a new transaction to your team.</flux:text>
-                </div>
+                <flux:heading size="lg">Add transaction</flux:heading>
                 <flux:radio.group wire:model="type" label="Transaction type" variant="segmented" label:sr-only>
                     <flux:radio value="expense" icon="minus">Expense</flux:radio>
                     <flux:radio value="income" icon="plus">Income</flux:radio>
