@@ -39,7 +39,7 @@ new #[Title('Accounts')] class extends Component {
 };
 ?>
 
-<section class="mx-auto max-w-lg space-y-8">
+<section class="mx-auto max-w-lg">
     @if ($this->accounts->count() === 0)
         <div class="flex flex-col items-center justify-center py-12">
             <flux:icon icon="credit-card" size="lg" class="text-gray-400 dark:text-gray-600" />
@@ -53,6 +53,27 @@ new #[Title('Accounts')] class extends Component {
     @else
         <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
             <flux:heading size="xl">Accounts</flux:heading>
+        </div>
+
+        <div class="mt-8 flex items-end justify-between">
+            <flux:heading level="2">Overview</flux:heading>
+        </div>
+        <div class="mt-4 grid gap-8 sm:grid-cols-1">
+            <div>
+                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Overal balance</div>
+                <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                    @if ($this->totalBalance >= 0)
+                        {{ $this->team->formatted_total_balance }}
+                    @else
+                        -{{ $this->team->formatted_total_balance }}
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-14 flex items-end justify-between">
+            <flux:heading level="2">All accounts</flux:heading>
             @can('create', App\Models\Account::class)
                 <flux:button href="{{ route('accounts.create') }}" variant="primary" class="-my-0.5" wire:navigate>
                     Add account
@@ -60,153 +81,74 @@ new #[Title('Accounts')] class extends Component {
             @endcan
         </div>
 
-        <div
-            class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
-        >
-            <ul role="list" class="overflow-hidden p-[.3125rem]">
-                <li>
-                    <div class="relative flex items-center justify-between gap-x-6 rounded-lg px-3.5 py-2.5 hover:bg-zinc-950/2.5 sm:px-3 sm:py-1.5 dark:hover:bg-white/2.5">
-                        <flux:heading>
-                            <a href="{{ route('transactions.index') }}" wire:navigate>
-                                <span class="absolute inset-x-0 -top-px bottom-0"></span>
-                                All accounts
-                            </a>
-                        </flux:heading>
-
-                            <div class="flex shrink-0 items-center gap-x-4">
-                                <div class="text-right tabular-nums">
-                                    @if ($this->totalBalance === 0)
-                                        <flux:text variant="strong" class="font-medium whitespace-nowrap">
-                                            {{ $this->team->formatted_total_balance }}
-                                        </flux:text>
-                                    @elseif ($this->totalBalance > 0)
-                                        <flux:text variant="strong" color="green" class="font-medium whitespace-nowrap">
-                                            {{ $this->team->formatted_total_balance }}
-                                        </flux:text>
-                                    @else
-                                        <flux:text variant="strong" color="red" class="font-medium whitespace-nowrap">
-                                            {{ $this->team->formatted_total_balance }}
-                                        </flux:text>
-                                    @endif
-                                </div>
-
+        <div class=" mt-4">
+            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+            <div
+                class="divide-y divide-zinc-100 overflow-hidden dark:divide-white/5 dark:text-white"
+            >
+                @foreach ($this->accounts as $account)
+                    <div
+                        wire:key="account-{{ $account->id }}"
+                        class="relative flex items-center justify-between gap-4 py-4"
+                    >
+                        <div>
+                            <div class="text-sm/6 font-semibold">
+                                <a href="{{ route('accounts.show', $account) }}" wire:navigate>
+                                    {{ $account->name }}
+                                </a>
+                            </div>
+                            <div class="text-xs/6 text-zinc-500">
+                                {{ $account->display_type }}
+                            </div>
+                        </div>
+                        <div class="flex shrink-0 items-center gap-x-4">
+                            <div class="text-right tabular-nums">
+                                @if ($account->balance_in_dollars === 0)
+                                    <flux:text variant="strong" class="font-medium whitespace-nowrap">
+                                        {{ $account->formatted_balance }}
+                                    </flux:text>
+                                @elseif ($account->balance_in_dollars > 0)
+                                    <flux:badge color="lime" size="sm" class="whitespace-nowrap">
+                                        {{ $account->formatted_balance }}
+                                    </flux:badge>
+                                @else
+                                    <flux:badge color="pink" size="sm" class="whitespace-nowrap">
+                                        {{ $account->formatted_balance }}
+                                    </flux:badge>
+                                @endif
+                            </div>
                             <flux:dropdown align="end">
-                                <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-mr-2" />
+                                <flux:button variant="subtle" square icon="ellipsis-horizontal" />
                                 <flux:menu>
                                     <flux:menu.item
-                                        href="{{ route('transactions.index') }}"
-                                        icon="eye"
-                                        icon:variant="micro"
+                                        href="{{ route('accounts.show', $account) }}"
                                         wire:navigate
                                     >
                                         View
                                     </flux:menu.item>
+
+                                    @can('update', $account)
+                                        <flux:menu.item
+                                            href="{{ route('accounts.edit', $account) }}"
+                                            wire:navigate
+                                        >
+                                            Edit
+                                        </flux:menu.item>
+                                    @endcan
+
+                                    @can('delete', $account)
+                                        <flux:modal.trigger name="delete-{{ $account->id }}">
+                                            <flux:menu.item variant="danger">
+                                                Delete
+                                            </flux:menu.item>
+                                        </flux:modal.trigger>
+                                    @endcan
                                 </flux:menu>
                             </flux:dropdown>
                         </div>
                     </div>
-                </li>
-            </ul>
-        </div>
-
-        <div
-            class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
-        >
-            <ul role="list" class="overflow-hidden p-[.3125rem]">
-                @foreach ($this->accounts as $account)
-                    <li wire:key="account-{{ $account->id }}">
-                        <div class="relative flex justify-between gap-x-6 rounded-lg px-3.5 py-2.5 hover:bg-zinc-950/2.5 sm:px-3 sm:py-1.5 dark:hover:bg-white/2.5">
-                            <div>
-                                <flux:heading class="truncate">
-                                    <a
-                                        href="{{ route('accounts.show', $account) }}"
-                                        wire:navigate
-                                    >
-                                        <span class="absolute inset-x-0 -top-px bottom-0"></span>
-                                        {{ $account->name }}
-                                    </a>
-                                </flux:heading>
-                                <flux:text class="text-sm/5 sm:text-[13px]/5">
-                                    {{ $account->display_type }}
-                                </flux:text>
-                            </div>
-
-                            <div class="flex shrink-0 items-center gap-x-4">
-                                <div class="text-right tabular-nums">
-                                    @if ($account->balance_in_dollars === 0)
-                                        <flux:text variant="strong" class="font-medium whitespace-nowrap">
-                                            {{ $account->formatted_balance }}
-                                        </flux:text>
-                                    @elseif ($account->balance_in_dollars > 0)
-                                        <flux:text variant="strong" color="green" class="font-medium whitespace-nowrap">
-                                            {{ $account->formatted_balance }}
-                                        </flux:text>
-                                    @else
-                                        <flux:text variant="strong" color="red" class="font-medium whitespace-nowrap">
-                                            {{ $account->formatted_balance }}
-                                        </flux:text>
-                                    @endif
-                                </div>
-
-                                <flux:dropdown align="end">
-                                    <flux:button variant="subtle" square icon="ellipsis-horizontal" class="-mr-2" />
-                                    <flux:menu>
-                                        @can('update', $account)
-                                            <flux:menu.item
-                                                href="{{ route('accounts.edit', $account) }}"
-                                                icon="pencil-square"
-                                                icon:variant="micro"
-                                                wire:navigate
-                                            >
-                                                Edit
-                                            </flux:menu.item>
-                                        @endcan
-
-                                        @can('delete', $account)
-                                            <flux:modal.trigger name="delete-{{ $account->id }}">
-                                                <flux:menu.item variant="danger" icon="trash" icon:variant="micro">
-                                                    Delete
-                                                </flux:menu.item>
-                                            </flux:modal.trigger>
-                                        @endcan
-                                    </flux:menu>
-                                </flux:dropdown>
-                            </div>
-                        </div>
-
-                        @unless ($loop->last)
-                            <li class="mx-3.5 my-1 h-px sm:mx-3">
-                                <flux:separator variant="subtle" wire:key="separator-{{ $account->id }}" />
-                            </li>
-                        @endunless
-
-                        @can('delete', $account)
-                            <flux:modal name="delete-{{ $account->id }}" class="w-full max-w-xs sm:max-w-md">
-                                <div class="space-y-6 sm:space-y-4">
-                                    <div>
-                                        <flux:heading>Delete account?</flux:heading>
-                                        <flux:text class="mt-2">
-                                            You're about to delete "{{ $account->name }}". All associated
-                                            transactions will also be deleted. This action cannot be reversed.
-                                        </flux:text>
-                                    </div>
-                                    <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
-                                        <flux:modal.close>
-                                            <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
-                                        </flux:modal.close>
-                                        <flux:button
-                                            wire:click="delete({{ $account->id }})"
-                                            variant="primary"
-                                        >
-                                            Delete
-                                        </flux:button>
-                                    </div>
-                                </div>
-                            </flux:modal>
-                        @endcan
-                    </li>
                 @endforeach
-            </ul>
+            </div>
         </div>
     @endif
 </section>
