@@ -73,6 +73,14 @@ new class extends Component {
                 </flux:menu.item>
             </flux:menu>
         </flux:dropdown>
+
+        <flux:navbar.item
+            :href="route('breakdown.index')"
+            :current="request()->routeIs('breakdown.index')"
+            wire:navigate
+        >
+            Breakdown
+        </flux:navbar.item>
     </flux:navbar>
 
     <flux:spacer />

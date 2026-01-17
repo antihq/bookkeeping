@@ -27,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     Route::livewire('accounts/{account}/edit', 'pages::accounts.edit')->name('accounts.edit');
 
     Route::livewire('transactions', 'pages::transactions.index')->name('transactions.index');
+    Route::livewire('breakdown', 'pages::breakdown')->name('breakdown.index');
 
     Route::livewire('teams/create', 'pages::teams.create')->name('teams.create');
     Route::livewire('teams/{team}', 'pages::teams.show')->name('teams.edit');
