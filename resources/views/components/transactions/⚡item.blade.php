@@ -163,6 +163,43 @@ new class extends Component {
     </div>
     <flux:modal name="edit-transaction-{{ $transaction->id }}" class="w-full sm:max-w-lg" @close="$refresh">
         @island(lazy: true)
+            @placeholder
+                <div class="space-y-6">
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer" class="flex gap-4">
+                        <flux:skeleton.line class="flex-1" />
+                        <flux:skeleton.line class="flex-1" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+
+                    <flux:skeleton.group animate="shimmer">
+                        <flux:skeleton.line size="lg" />
+                    </flux:skeleton.group>
+                </div>
+            @endplaceholder
+
             <form wire:submit="edit" class="space-y-6">
                 <div>
                     <flux:heading size="lg">Edit transaction</flux:heading>
