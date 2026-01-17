@@ -26,7 +26,7 @@ new class extends Component {
 ?>
 
 <flux:header {{ $attributes }}>
-    <flux:spacer />
+    <flux:spacer class="max-sm:hidden" />
 
     <flux:navbar>
         <flux:navbar.item
