@@ -150,6 +150,137 @@ new #[Title('Account')] class extends Component {
     {
         return Auth::user();
     }
+
+    #[Computed]
+    public function accountBalance(): float
+    {
+        return $this->account->balance_in_dollars;
+    }
+
+    #[Computed]
+    public function monthlyExpenses(): float
+    {
+        return $this->account->current_month_expenses;
+    }
+
+    #[Computed]
+    public function monthlyIncome(): float
+    {
+        return $this->account->current_month_income;
+    }
+
+    #[Computed]
+    public function lastMonthExpenses(): float
+    {
+        return $this->account->last_month_expenses;
+    }
+
+    #[Computed]
+    public function lastMonthIncome(): float
+    {
+        return $this->account->last_month_income;
+    }
+
+    #[Computed]
+    public function lastMonthBalance(): float
+    {
+        $lastMonthEnd = now()->subMonth()->endOfMonth();
+
+        return ($this->account->start_balance +
+                $this->account->transactions()
+                    ->where('date', '<=', $lastMonthEnd)
+                    ->sum('amount')) / 100;
+    }
+
+    #[Computed]
+    public function expensesChange(): float
+    {
+        return $this->monthlyExpenses - $this->lastMonthExpenses;
+    }
+
+    #[Computed]
+    public function incomeChange(): float
+    {
+        return $this->monthlyIncome - $this->lastMonthIncome;
+    }
+
+    #[Computed]
+    public function balanceChange(): float
+    {
+        return $this->accountBalance - $this->lastMonthBalance;
+    }
+
+    #[Computed]
+    public function expensesChangePercentage(): ?float
+    {
+        if ($this->lastMonthExpenses === 0.0) {
+            return null;
+        }
+
+        return (($this->monthlyExpenses - $this->lastMonthExpenses) / abs($this->lastMonthExpenses)) * 100;
+    }
+
+    #[Computed]
+    public function incomeChangePercentage(): ?float
+    {
+        if ($this->lastMonthIncome === 0.0) {
+            return null;
+        }
+
+        return (($this->monthlyIncome - $this->lastMonthIncome) / abs($this->lastMonthIncome)) * 100;
+    }
+
+    #[Computed]
+    public function balanceChangePercentage(): ?float
+    {
+        if ($this->lastMonthBalance === 0.0) {
+            return null;
+        }
+
+        return (($this->accountBalance - $this->lastMonthBalance) / abs($this->lastMonthBalance)) * 100;
+    }
+
+    #[Computed]
+    public function expensesChangeFormatted(): string
+    {
+        $change = $this->expensesChange;
+
+        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+    }
+
+    #[Computed]
+    public function incomeChangeFormatted(): string
+    {
+        $change = $this->incomeChange;
+
+        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+    }
+
+    #[Computed]
+    public function balanceChangeFormatted(): string
+    {
+        $change = $this->balanceChange;
+
+        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+    }
+
+    #[Computed]
+    public function expensesChangeColor(): string
+    {
+        return $this->expensesChange <= 0 ? 'lime' : 'pink';
+    }
+
+    #[Computed]
+    public function incomeChangeColor(): string
+    {
+        return $this->incomeChange >= 0 ? 'lime' : 'pink';
+    }
+
+    #[Computed]
+    public function balanceChangeColor(): string
+    {
+        return $this->balanceChange >= 0 ? 'lime' : 'pink';
+    }
 };
 ?>
 
@@ -180,72 +311,67 @@ new #[Title('Account')] class extends Component {
                 </flux:menu>
             </flux:dropdown>
         </div>
-
-        <div
-            class="relative h-full w-full rounded-xl bg-white shadow-[0px_0px_0px_1px_rgba(9,9,11,0.07),0px_2px_2px_0px_rgba(9,9,11,0.05)] dark:bg-zinc-900 dark:shadow-[0px_0px_0px_1px_rgba(255,255,255,0.1)] dark:before:pointer-events-none dark:before:absolute dark:before:-inset-px dark:before:rounded-xl dark:before:shadow-[0px_2px_8px_0px_rgba(0,0,0,0.20),0px_1px_0px_0px_rgba(255,255,255,0.06)_inset] forced-colors:outline"
-        >
-            <div class="overflow-hidden p-[.3125rem]">
-                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                    <flux:text>Overall balance</flux:text>
-                    <flux:text variant="strong" class="whitespace-nowrap">
-                        {{ $account->formatted_balance }}
-                    </flux:text>
-                </div>
-                <div class="mx-3.5 my-1 h-px sm:mx-3">
-                    <flux:separator variant="subtle" />
-                </div>
-                <div
-                    @class([
-                        'w-full px-3.5 pt-2 pb-1 sm:px-3',
-                        'flex items-center',
-                        'text-start text-sm/5 font-medium sm:text-xs/5',
-                        'font-medium text-zinc-500 dark:text-zinc-400',
-                    ])
-                >
-                    This month
-                </div>
-                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                    <flux:text>Income</flux:text>
-                    <flux:text variant="strong" class="whitespace-nowrap">
-                        {{ $account->current_month_income_formatted }}
-                    </flux:text>
-                </div>
-                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                    <flux:text>Expenses</flux:text>
-                    <flux:text variant="strong" class="whitespace-nowrap">
-                        -{{ $account->current_month_expenses_formatted }}
-                    </flux:text>
-                </div>
-                <div class="mx-3.5 my-1 h-px sm:mx-3">
-                    <flux:separator variant="subtle" />
-                </div>
-                <div
-                    @class([
-                        'w-full px-3.5 pt-2 pb-1 sm:px-3',
-                        'flex items-center',
-                        'text-start text-sm/5 font-medium sm:text-xs/5',
-                        'font-medium text-zinc-500 dark:text-zinc-400',
-                    ])
-                >
-                    Last month
-                </div>
-                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                    <flux:text>Income</flux:text>
-                    <flux:text variant="strong" class="whitespace-nowrap">
-                        {{ $account->last_month_income_formatted }}
-                    </flux:text>
-                </div>
-                <div class="flex flex-wrap items-start justify-between gap-3 px-3.5 py-2.5 sm:px-3 sm:py-1.5">
-                    <flux:text>Expenses</flux:text>
-                    <flux:text variant="strong" class="whitespace-nowrap">
-                        -{{ $account->last_month_expenses_formatted }}
-                    </flux:text>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="space-y-14">
+        <div class="space-y-6 sm:space-y-4">
+            <div class="mt-8 flex items-end justify-between">
+                <flux:heading level="2">Overview</flux:heading>
+                <flux:text>This month</flux:text>
+            </div>
+            <div class="mt-4 grid gap-8 sm:grid-cols-3">
+                <div>
+                    <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                    <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Balance</div>
+                    <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                        @if ($this->accountBalance >= 0)
+                            {{ $account->formattedBalance }}
+                        @else
+                            -{{ $account->formattedBalance }}
+                        @endif
+                    </div>
+                    <div class="mt-3 text-sm/6 sm:text-xs/6">
+                        @if (!is_null($this->balanceChangePercentage))
+                            <flux:badge color="{{ $this->balanceChangeColor }}" size="sm">
+                                {{ number_format($this->balanceChangePercentage, 1) }}%
+                            </flux:badge>
+                            <flux:text size="sm" inline>from last month</flux:text>
+                        @endif
+                    </div>
+                </div>
+                <div>
+                    <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                    <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Expenses</div>
+                    <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                        ${{ number_format(abs($this->monthlyExpenses), 2) }}
+                    </div>
+                    <div class="mt-3 text-sm/6 sm:text-xs/6">
+                        @if (!is_null($this->expensesChangePercentage))
+                            <flux:badge color="{{ $this->expensesChangeColor }}" size="sm">
+                                {{ number_format($this->expensesChangePercentage, 1) }}%
+                            </flux:badge>
+                            <flux:text size="sm" inline>from last month</flux:text>
+                        @endif
+                    </div>
+                </div>
+                <div>
+                    <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                    <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
+                    <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                        ${{ number_format($this->monthlyIncome, 2) }}
+                    </div>
+                    <div class="mt-3 text-sm/6 sm:text-xs/6">
+                        @if (!is_null($this->incomeChangePercentage))
+                            <flux:badge color="{{ $this->incomeChangeColor }}" size="sm">
+                                {{ number_format($this->incomeChangePercentage, 1) }}%
+                            </flux:badge>
+                            <flux:text size="sm" inline>from last month</flux:text>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="space-y-6 sm:space-y-4">
             <div class="flex items-end justify-between gap-4">
                 <flux:heading size="lg">Transactions</flux:heading>
@@ -302,8 +428,8 @@ new #[Title('Account')] class extends Component {
                 </div>
             @else
                 <div class="flex flex-col items-center justify-center py-12">
-                    <flux:icon icon="credit-card" size="lg" class="text-gray-400 dark:text-gray-600" />
-                    <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No transactions yet</flux:text>
+                    <flux:icon icon="credit-card" size="lg" class="text-zinc-400 dark:text-zinc-600" />
+                    <flux:text class="mt-4 text-zinc-500 dark:text-zinc-400">No transactions yet</flux:text>
                 </div>
             @endif
 
