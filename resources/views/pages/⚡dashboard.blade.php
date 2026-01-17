@@ -29,6 +29,26 @@ new #[Title('Transactions')] class extends Component {
     {
         return $this->team->total_balance_in_dollars;
     }
+
+    #[Computed]
+    public function monthlyExpenses(): float
+    {
+        return $this->team->transactions()
+            ->where('amount', '<', 0)
+            ->whereYear('date', now()->year)
+            ->whereMonth('date', now()->month)
+            ->sum('amount') / 100;
+    }
+
+    #[Computed]
+    public function monthlyIncome(): float
+    {
+        return $this->team->transactions()
+            ->where('amount', '>', 0)
+            ->whereYear('date', now()->year)
+            ->whereMonth('date', now()->month)
+            ->sum('amount') / 100;
+    }
 };
 ?>
 
@@ -45,17 +65,32 @@ new #[Title('Transactions')] class extends Component {
 
         <div class="mt-8 flex items-end justify-between">
             <flux:heading level="2">Overview</flux:heading>
+            <flux:text>This month</flux:text>
         </div>
-        <div class="mt-4 grid gap-8 sm:grid-cols-1">
+        <div class="mt-4 grid gap-8 sm:grid-cols-3">
             <div>
                 <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-                <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Overal balance</div>
+                <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Overall balance</div>
                 <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
                     @if ($this->totalBalance >= 0)
                         {{ $this->team->formatted_total_balance }}
                     @else
                         -{{ $this->team->formatted_total_balance }}
                     @endif
+                </div>
+            </div>
+            <div>
+                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Expenses</div>
+                <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                    ${{ number_format(abs($this->monthlyExpenses), 2) }}
+                </div>
+            </div>
+            <div>
+                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
+                <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                    ${{ number_format($this->monthlyIncome, 2) }}
                 </div>
             </div>
         </div>
