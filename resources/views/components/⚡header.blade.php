@@ -34,7 +34,7 @@ new class extends Component {
             :current="request()->routeIs('accounts.index')"
             wire:navigate
         >
-            Overview
+            Home
         </flux:navbar.item>
 
         <flux:dropdown position="bottom">
