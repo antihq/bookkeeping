@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\Account;
 use App\Models\Team;
+use App\Models\Transaction;
+use App\Models\User;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -8,6 +11,22 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 new #[Title('Transactions')] class extends Component {
+    public string $date = '';
+
+    public string $payee = '';
+
+    public ?string $note = null;
+
+    public string $amount = '';
+
+    public string $type = 'expense';
+
+    public ?int $category = null;
+
+    public string $category_search = '';
+
+    public ?int $account = null;
+
     #[Computed]
     public function transactions()
     {
@@ -17,6 +36,66 @@ new #[Title('Transactions')] class extends Component {
             ->orderBy('date', 'desc')
             ->limit(10)
             ->get();
+    }
+
+    public function mount()
+    {
+        $this->date = now()->format('Y-m-d');
+    }
+
+    public function addTransaction()
+    {
+        $this->authorize('create', Transaction::class);
+
+        $this->validate([
+            'date' => ['required', 'date'],
+            'payee' => ['required', 'string', 'max:255'],
+            'amount' => ['required'],
+            'category' => ['nullable', 'exists:categories,id'],
+            'account' => ['nullable', 'exists:accounts,id'],
+        ]);
+
+        $category = $this->category ? $this->team->categories()->findOrFail($this->category) : null;
+        $account = $this->account ? $this->team->accounts()->findOrFail($this->account) : null;
+
+        $this->team->transactions()->create([
+            'date' => $this->date,
+            'payee' => $this->payee,
+            'amount' =>
+                $this->type === 'expense'
+                    ? (int) -round((float) $this->amount * 100)
+                    : (int) round((float) $this->amount * 100),
+            'note' => $this->note,
+            'created_by' => $this->user->id,
+            'category_id' => $category?->id,
+            'account_id' => $account?->id,
+        ]);
+
+        Flux::toast('Transaction added successfully.', variant: 'success');
+
+        Flux::modals()->close();
+
+        $this->reset(['payee', 'note', 'amount', 'category', 'account', 'page', 'type']);
+
+        $this->renderIsland('transactions');
+    }
+
+    public function createCategory()
+    {
+        $this->validate([
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->team->id],
+        ]);
+
+        $category = $this->team->categories()->create([
+            'name' => $this->pull('category_search'),
+        ]);
+
+        $this->category = $category->id;
+    }
+
+    public function updatedAmount($value)
+    {
+        $this->amount = str_replace(['$', ','], '', $value);
     }
 
     #[Computed]
@@ -186,6 +265,31 @@ new #[Title('Transactions')] class extends Component {
 
         Flux::toast('Transaction deleted successfully.', variant: 'success');
     }
+
+    #[Computed]
+    public function categories()
+    {
+        return $this->team
+            ->categories()
+            ->when(
+                $this->category_search,
+                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+            )
+            ->limit(20)
+            ->get();
+    }
+
+    #[Computed]
+    public function accounts()
+    {
+        return $this->team->accounts()->get();
+    }
+
+    #[Computed]
+    public function user(): User
+    {
+        return Auth::user();
+    }
 };
 ?>
 
@@ -194,6 +298,13 @@ new #[Title('Transactions')] class extends Component {
         <div class="flex flex-col items-center justify-center py-12">
             <flux:icon icon="banknotes" size="lg" class="text-gray-400 dark:text-gray-600" />
             <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No transactions yet</flux:text>
+            @can('create', Transaction::class)
+                <div class="mt-6">
+                    <flux:modal.trigger name="add-transaction">
+                        <flux:button variant="primary">Add transaction</flux:button>
+                    </flux:modal.trigger>
+                </div>
+            @endcan
         </div>
     @else
         <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
@@ -243,7 +354,7 @@ new #[Title('Transactions')] class extends Component {
                 <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
                 <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
                 <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                    ${{ number_format($this->monthlyIncome, 2) }}
+                    ${{ number_format(abs($this->monthlyIncome), 2) }}
                 </div>
                 <div class="mt-3 text-sm/6 sm:text-xs/6">
                     @if (!is_null($this->incomeChangePercentage))
@@ -256,8 +367,13 @@ new #[Title('Transactions')] class extends Component {
             </div>
         </div>
 
-        <div class="mt-14 flex items-end justify-between">
+        <div class="mt-14 flex items-end justify-between gap-4">
             <flux:heading level="2">Recent transactions</flux:heading>
+            @can('create', Transaction::class)
+                <flux:modal.trigger name="add-transaction">
+                    <flux:button variant="primary">Add transaction</flux:button>
+                </flux:modal.trigger>
+            @endcan
         </div>
 
         <div class="mt-4">
@@ -280,4 +396,73 @@ new #[Title('Transactions')] class extends Component {
             @endisland
         </div>
     @endif
+
+    @can('create', Transaction::class)
+        <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
+            <form wire:submit="addTransaction" class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Add transaction</flux:heading>
+                    <flux:text class="mt-2">Add a new transaction to your team.</flux:text>
+                </div>
+                <flux:radio.group wire:model="type" label="Transaction type" variant="segmented" label:sr-only>
+                    <flux:radio value="expense" icon="minus">Expense</flux:radio>
+                    <flux:radio value="income" icon="plus">Income</flux:radio>
+                </flux:radio.group>
+                <flux:field>
+                    <flux:input.group>
+                        <flux:label sr-only>Amount</flux:label>
+                        <flux:input.group.prefix>$</flux:input.group.prefix>
+                        <flux:input
+                            wire:model="amount"
+                            type="text"
+                            mask:dynamic="$money($input)"
+                            inputmode="decimal"
+                            placeholder="0.00"
+                            required
+                            autofocus
+                        />
+                    </flux:input.group>
+                    <flux:error name="amount" />
+                </flux:field>
+                <flux:input wire:model="payee" label="Payee" type="text" placeholder="Payee" label:sr-only required />
+                <flux:select
+                    wire:model="category"
+                    variant="combobox"
+                    label="Category"
+                    placeholder="Category"
+                    label:sr-only
+                >
+                    <x-slot name="input">
+                        <flux:select.input wire:model="category_search" />
+                    </x-slot>
+                    @foreach ($this->categories as $category)
+                        <flux:select.option :value="$category->id" :wire:key="'cat-'.$category->id">
+                            {{ $category->name }}
+                        </flux:select.option>
+                    @endforeach
+
+                    <flux:select.option.create wire:click="createCategory" min-length="1">
+                        Create "
+                        <span wire:text="category_search"></span>
+                        "
+                    </flux:select.option.create>
+                </flux:select>
+                <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
+                <flux:date-picker wire:model="date" label="Date" required />
+                <flux:select wire:model="account" label="Account" placeholder="Optional: Select an account">
+                    @foreach ($this->accounts as $acc)
+                        <flux:select.option :value="$acc->id" :wire:key="'acc-'.$acc->id">
+                            {{ $acc->name }}
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
+                <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
+                    <flux:modal.close>
+                        <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="primary" type="submit">Add transaction</flux:button>
+                </div>
+            </form>
+        </flux:modal>
+    @endcan
 </section>
