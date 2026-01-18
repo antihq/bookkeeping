@@ -1,17 +1,16 @@
 <?php
 
-use App\Models\Account;
 use App\Models\Team;
 use App\Models\Transaction;
 use App\Models\User;
-use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Transactions')] class extends Component {
+new #[Title('Transactions')] class extends Component
+{
     public string $date = '';
 
     public string $payee = '';
@@ -64,8 +63,7 @@ new #[Title('Transactions')] class extends Component {
         $this->team->transactions()->create([
             'date' => $this->date,
             'payee' => $this->payee,
-            'amount' =>
-                $this->type === 'expense'
+            'amount' => $this->type === 'expense'
                     ? (int) -round((float) $this->amount * 100)
                     : (int) round((float) $this->amount * 100),
             'note' => $this->note,
@@ -86,7 +84,7 @@ new #[Title('Transactions')] class extends Component {
     public function createCategory()
     {
         $this->validate([
-            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->team->id],
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,'.$this->team->id],
         ]);
 
         $category = $this->team->categories()->create([
@@ -360,7 +358,7 @@ new #[Title('Transactions')] class extends Component {
             ->categories()
             ->when(
                 $this->category_search,
-                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
             )
             ->limit(20)
             ->get();
