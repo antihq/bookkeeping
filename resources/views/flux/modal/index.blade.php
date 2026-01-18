@@ -41,11 +41,11 @@ if ($flyout) {
 } else {
     $classes = Flux::classes()
         ->add(match ($variant) {
-            default => 'p-8 [:where(&)]:max-w-xl [:where(&)]:min-w-xs max-sm:fixed max-sm:m-0 max-sm:mt-auto max-sm:min-w-[100vw]',
-            'bare' => 'max-sm:fixed max-sm:m-0 max-sm:mt-auto max-sm:min-w-[100vw]',
+            default => 'fixed inset-0 min-w-[100vw] max-h-dvh min-h-dvh overflow-y-auto pt-6 sm:pt-0',
+            'bare' => '',
         })
         ->add(match ($variant) {
-            default => 'bg-white dark:bg-zinc-900 ring-1 ring-zinc-950/10 dark:ring-white/10 shadow-lg rounded-t-3xl sm:rounded-2xl',
+            default => 'bg-transparent',
             'bare' => 'bg-transparent',
         });
 }
@@ -87,7 +87,7 @@ if ($dismissible === false) {
 
     <dialog
         wire:ignore.self {{-- This needs to be here because the dialog element adds a "close" attribute that isn't durable... --}}
-        {{ $styleAttributes->class($classes) }}
+        {{ ($flyout || $variant === 'bare') ? $styleAttributes->class($classes) : $styleAttributes->except(['class'])->class($classes) }}
         @if ($name) data-modal="{{ $name }}" @endif
         @if ($flyout) data-flux-flyout @endif
         x-data
@@ -105,13 +105,33 @@ if ($dismissible === false) {
             x-on:modal-close.document="if (! $event.detail.name || ($event.detail.name === @js($name) && (! $event.detail.scope))) $el.close()"
         @endif
     >
-        {{ $slot }}
+        <?php if ($flyout || $variant === 'bare'): ?>
+            {{ $slot }}
 
-        <?php if ($closable): ?>
-            <div class="absolute top-0 end-0 mt-4 me-4">
+            <?php if ($closable): ?>
+                <div class="absolute top-0 end-0 mt-4 me-4">
+                    <flux:modal.close>
+                        <flux:button variant="ghost" icon="x-mark" size="sm" aria-label="Close modal" class="text-zinc-400! hover:text-zinc-800! dark:text-zinc-500! dark:hover:text-white!"></flux:button>
+                    </flux:modal.close>
+                </div>
+            <?php endif; ?>
+        <?php else : ?>
+            <div class="grid min-h-full grid-rows-[1fr_auto] justify-items-center sm:grid-rows-[1fr_auto_3fr] sm:p-4">
                 <flux:modal.close>
-                    <flux:button variant="ghost" icon="x-mark" size="sm" aria-label="Close modal" class="text-zinc-400! hover:text-zinc-800! dark:text-zinc-500! dark:hover:text-white!"></flux:button>
+                    <button class="absolute inset-0"></button>
                 </flux:modal.close>
+
+                <div {{ $styleAttributes->only(['class'])->class('relative row-start-2 w-full min-w-0 rounded-t-3xl bg-white p-(--gutter) shadow-lg ring-1 ring-zinc-950/10 [--gutter:--spacing(8)] sm:mb-auto sm:rounded-2xl dark:bg-zinc-900 dark:ring-white/10') }}>
+                    {{ $slot }}
+
+                    <?php if ($closable): ?>
+                        <div class="absolute top-0 end-0 mt-4 me-4">
+                            <flux:modal.close>
+                                <flux:button variant="ghost" icon="x-mark" size="sm" aria-label="Close modal" class="text-zinc-400! hover:text-zinc-800! dark:text-zinc-500! dark:hover:text-white!"></flux:button>
+                            </flux:modal.close>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         <?php endif; ?>
     </dialog>
