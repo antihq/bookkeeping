@@ -334,12 +334,6 @@ new #[Title('Transactions')] class extends Component
         return $this->balanceChange >= 0 ? 'lime' : 'pink';
     }
 
-    #[Computed]
-    public function periodLabel(): string
-    {
-        return $this->selectedPeriod === 'this_month' ? 'This month' : 'Last month';
-    }
-
     public function deleteTransaction(int $id)
     {
         $transaction = $this->team->transactions()->findOrFail($id);
@@ -398,10 +392,12 @@ new #[Title('Transactions')] class extends Component
 
         <div class="mt-8 flex items-end justify-between gap-4">
             <flux:heading level="2">Overview</flux:heading>
-            <flux:select wire:model.live="selectedPeriod">
-                <flux:select.option value="this_month">This month</flux:select.option>
-                <flux:select.option value="last_month">Last month</flux:select.option>
-            </flux:select>
+            <div>
+                <flux:select wire:model.live="selectedPeriod">
+                    <flux:select.option value="this_month">This month</flux:select.option>
+                    <flux:select.option value="last_month">Last month</flux:select.option>
+                </flux:select>
+            </div>
         </div>
         <div class="mt-4 grid gap-8 sm:grid-cols-3">
             <div>
