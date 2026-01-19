@@ -28,7 +28,7 @@ new class extends Component {
 <flux:header {{ $attributes }}>
     <flux:spacer class="max-sm:hidden" />
 
-    <flux:navbar>
+    <flux:navbar class="overflow-x-auto whitespace-nowrap scrollbar-hide me-4">
         <flux:navbar.item
             :href="route('dashboard')"
             :current="request()->routeIs('dashboard')"

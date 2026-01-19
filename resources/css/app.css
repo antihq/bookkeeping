@@ -39,3 +39,14 @@
         --color-accent-foreground: var(--color-zinc-800);
     }
 }
+
+@layer utilities {
+    .scrollbar-hide {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
