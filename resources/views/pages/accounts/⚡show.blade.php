@@ -421,7 +421,7 @@ new #[Title('Account')] class extends Component {
                     <flux:badge color="{{ $this->balanceChangeColor }}" size="sm">
                         {{ number_format($this->balanceChangePercentage, 1) }}%
                     </flux:badge>
-                    <flux:text size="sm" inline>from previous month</flux:text>
+                    <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
                 @endif
             </div>
         </div>
@@ -436,7 +436,7 @@ new #[Title('Account')] class extends Component {
                     <flux:badge color="{{ $this->expensesChangeColor }}" size="sm">
                         {{ number_format($this->expensesChangePercentage, 1) }}%
                     </flux:badge>
-                    <flux:text size="sm" inline>from previous month</flux:text>
+                    <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
                 @endif
             </div>
         </div>
@@ -451,7 +451,7 @@ new #[Title('Account')] class extends Component {
                     <flux:badge color="{{ $this->incomeChangeColor }}" size="sm">
                         {{ number_format($this->incomeChangePercentage, 1) }}%
                     </flux:badge>
-                    <flux:text size="sm" inline>from previous month</flux:text>
+                    <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
                 @endif
             </div>
         </div>
