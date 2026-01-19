@@ -1,16 +1,54 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Team;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 new #[Title('Categories')] class extends Component {
+    public string $selectedPeriod = 'this_month';
+
     #[Computed]
     public function categories()
     {
-        return $this->team->categories()->get();
+        $date = $this->selectedMonthDate;
+
+        return $this->team->categories()
+            ->whereHas('transactions', function ($query) use ($date) {
+                $query->whereYear('date', $date->year)
+                    ->whereMonth('date', $date->month);
+            })
+            ->with(['transactions' => function ($query) use ($date) {
+                $query->whereYear('date', $date->year)
+                    ->whereMonth('date', $date->month);
+            }])
+            ->get();
+    }
+
+    #[Computed]
+    public function selectedMonthDate(): Carbon
+    {
+        return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
+    }
+
+    private function getCategoryBalance(Category $category): float
+    {
+        return $category->transactions->sum('amount') / 100;
+    }
+
+    public function categoryBalanceFormatted(Category $category): string
+    {
+        $balance = $this->getCategoryBalance($category);
+
+        return '$'.number_format($balance, 2);
+    }
+
+    public function categoryBalanceColor(Category $category): string
+    {
+        return $this->getCategoryBalance($category) >= 0 ? 'lime' : 'pink';
     }
 
     #[Computed]
@@ -28,8 +66,12 @@ new #[Title('Categories')] class extends Component {
             <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No categories yet</flux:text>
         </div>
     @else
-        <div class="flex flex-wrap justify-between gap-x-6 gap-y-4">
+        <div class="flex flex-wrap justify-between items-center gap-x-6 gap-y-4">
             <flux:heading size="xl">All categories</flux:heading>
+            <flux:select wire:model.live="selectedPeriod">
+                <flux:select.option value="this_month">This month</flux:select.option>
+                <flux:select.option value="last_month">Last month</flux:select.option>
+            </flux:select>
         </div>
 
         <div class="mt-8">
@@ -50,8 +92,14 @@ new #[Title('Categories')] class extends Component {
                             </flux:heading>
                         </div>
 
-                        <flux:dropdown align="end">
-                            <flux:button variant="subtle" square icon="ellipsis-horizontal" />
+                        <div class="flex shrink-0 items-center gap-x-4">
+                            <div class="text-right tabular-nums">
+                                <flux:badge color="{{ $this->categoryBalanceColor($category) }}" size="sm" class="whitespace-nowrap">
+                                    {{ $this->categoryBalanceFormatted($category) }}
+                                </flux:badge>
+                            </div>
+                            <flux:dropdown align="end">
+                                <flux:button variant="subtle" square icon="ellipsis-horizontal" />
                                 <flux:menu>
                                     <flux:menu.item
                                         href="{{ route('categories.show', $category) }}"
@@ -59,8 +107,9 @@ new #[Title('Categories')] class extends Component {
                                     >
                                         View
                                     </flux:menu.item>
-                            </flux:menu>
-                        </flux:dropdown>
+                                </flux:menu>
+                            </flux:dropdown>
+                        </div>
                     </div>
                 @endforeach
             </div>
