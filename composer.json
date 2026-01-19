@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "antihq/antihq-bookkeeping",
     "type": "project",
-    "description": "Modern Laravel-based personal finance and bookkeeping application with team collaboration features, built with Livewire 4 and Flux UI Pro.",
+    "description": "Personal finance and bookkeeping application built with Laravel, Livewire 4, and Flux UI Pro.",
     "keywords": [
         "laravel",
         "framework",
