@@ -3,6 +3,7 @@
 use App\Models\Category;
 use App\Models\Team;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -13,6 +14,8 @@ new #[Title('Category')] class extends Component
     public Category $category;
 
     public $page = 1;
+
+    public string $selectedPeriod = 'this_month';
 
     public function mount()
     {
@@ -45,11 +48,161 @@ new #[Title('Category')] class extends Component
     {
         return Auth::user();
     }
+
+    #[Computed]
+    public function selectedMonthDate(): Carbon
+    {
+        return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
+    }
+
+    #[Computed]
+    public function previousMonthDate(): Carbon
+    {
+        return $this->selectedMonthDate->copy()->subMonth();
+    }
+
+    private function getMonthTotal(Carbon $date, string $comparison): float
+    {
+        return $this->category
+            ->transactions()
+            ->where('amount', $comparison, 0)
+            ->whereYear('date', $date->year)
+            ->whereMonth('date', $date->month)
+            ->sum('amount') / 100;
+    }
+
+    #[Computed]
+    public function selectedMonthExpenses(): float
+    {
+        return $this->getMonthTotal($this->selectedMonthDate, '<');
+    }
+
+    #[Computed]
+    public function selectedMonthIncome(): float
+    {
+        return $this->getMonthTotal($this->selectedMonthDate, '>');
+    }
+
+    #[Computed]
+    public function previousMonthExpenses(): float
+    {
+        return $this->getMonthTotal($this->previousMonthDate, '<');
+    }
+
+    #[Computed]
+    public function previousMonthIncome(): float
+    {
+        return $this->getMonthTotal($this->previousMonthDate, '>');
+    }
+
+    #[Computed]
+    public function expensesChange(): float
+    {
+        return $this->selectedMonthExpenses - $this->previousMonthExpenses;
+    }
+
+    #[Computed]
+    public function incomeChange(): float
+    {
+        return $this->selectedMonthIncome - $this->previousMonthIncome;
+    }
+
+    private function calculateChangePercentage(float $current, float $previous): ?float
+    {
+        if ($previous === 0.0) {
+            return null;
+        }
+
+        return (($current - $previous) / abs($previous)) * 100;
+    }
+
+    #[Computed]
+    public function expensesChangePercentage(): ?float
+    {
+        return $this->calculateChangePercentage($this->selectedMonthExpenses, $this->previousMonthExpenses);
+    }
+
+    #[Computed]
+    public function incomeChangePercentage(): ?float
+    {
+        return $this->calculateChangePercentage($this->selectedMonthIncome, $this->previousMonthIncome);
+    }
+
+    private function formatChange(float $change, string $currencySymbol): string
+    {
+        return ($change >= 0 ? '+' : '-') . $currencySymbol . number_format(abs($change), 2);
+    }
+
+    #[Computed]
+    public function expensesChangeFormatted(): string
+    {
+        return $this->formatChange($this->expensesChange, '$');
+    }
+
+    #[Computed]
+    public function incomeChangeFormatted(): string
+    {
+        return $this->formatChange($this->incomeChange, '$');
+    }
+
+    #[Computed]
+    public function expensesChangeColor(): string
+    {
+        return $this->expensesChange <= 0 ? 'lime' : 'pink';
+    }
+
+    #[Computed]
+    public function incomeChangeColor(): string
+    {
+        return $this->incomeChange >= 0 ? 'lime' : 'pink';
+    }
 };
 ?>
 
 <section class="mx-auto max-w-lg">
     <flux:heading size="xl">{{ $category->name }}</flux:heading>
+
+    <div class="mt-8 flex items-end justify-between gap-4">
+        <flux:heading level="2">Overview</flux:heading>
+        <div>
+            <flux:select wire:model.live="selectedPeriod">
+                <flux:select.option value="this_month">This month</flux:select.option>
+                <flux:select.option value="last_month">Last month</flux:select.option>
+            </flux:select>
+        </div>
+    </div>
+    <div class="mt-4 grid gap-8 sm:grid-cols-2">
+        <div>
+            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+            <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Expenses</div>
+            <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                ${{ number_format(abs($this->selectedMonthExpenses), 2) }}
+            </div>
+            <div class="mt-3 text-sm/6 sm:text-xs/6">
+                @if (! is_null($this->expensesChangePercentage))
+                    <flux:badge color="{{ $this->expensesChangeColor }}" size="sm">
+                        {{ number_format($this->expensesChangePercentage, 1) }}%
+                    </flux:badge>
+                    <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
+                @endif
+            </div>
+        </div>
+        <div>
+            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+            <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
+            <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
+                ${{ number_format(abs($this->selectedMonthIncome), 2) }}
+            </div>
+            <div class="mt-3 text-sm/6 sm:text-xs/6">
+                @if (! is_null($this->incomeChangePercentage))
+                    <flux:badge color="{{ $this->incomeChangeColor }}" size="sm">
+                        {{ number_format($this->incomeChangePercentage, 1) }}%
+                    </flux:badge>
+                    <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
+                @endif
+            </div>
+        </div>
+    </div>
 
     <div class="mt-14">
         <flux:heading>Transactions</flux:heading>
