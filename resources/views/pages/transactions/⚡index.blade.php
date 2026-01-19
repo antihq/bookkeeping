@@ -152,7 +152,7 @@ new #[Title('All transactions')] class extends Component {
         <flux:heading size="xl">All transactions</flux:heading>
         @can('create', Transaction::class)
             <flux:modal.trigger name="add-transaction">
-                <flux:button icon="plus" variant="primary">Add transaction</flux:button>
+                <flux:button variant="primary">Add transaction</flux:button>
             </flux:modal.trigger>
         @endcan
     </div>
