@@ -115,10 +115,10 @@ new class extends Component
 
 <div>
     <div {{ $attributes }} class="flex items-center justify-between gap-4 py-4">
-        <div>
+        <div class="overflow-hidden">
             <flux:heading class="leading-6!">
                 <flux:modal.trigger name="view-transaction-{{ $transaction->id }}">
-                    <button type="button">{{ $transaction->payee }}</button>
+                    <button type="button" class="max-w-full truncate text-left">{{ $transaction->payee }}</button>
                 </flux:modal.trigger>
             </flux:heading>
             <flux:text class="leading-6!" size="sm">
