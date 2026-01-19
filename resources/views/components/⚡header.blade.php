@@ -46,6 +46,14 @@ new class extends Component {
         </flux:navbar.item>
 
         <flux:navbar.item
+            :href="route('categories.index')"
+            :current="request()->routeIs('categories.index')"
+            wire:navigate
+        >
+            Categories
+        </flux:navbar.item>
+
+        <flux:navbar.item
             :href="route('transactions.index')"
             :current="request()->routeIs('transactions.index')"
             wire:navigate
