@@ -49,6 +49,18 @@ new #[Title('Categories')] class extends Component {
                                 </a>
                             </flux:heading>
                         </div>
+
+                        <flux:dropdown align="end">
+                            <flux:button variant="subtle" square icon="ellipsis-horizontal" />
+                                <flux:menu>
+                                    <flux:menu.item
+                                        href="{{ route('categories.show', $category) }}"
+                                        wire:navigate
+                                    >
+                                        View
+                                    </flux:menu.item>
+                            </flux:menu>
+                        </flux:dropdown>
                     </div>
                 @endforeach
             </div>
