@@ -4,6 +4,7 @@ use App\Models\Account;
 use App\Models\Team;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -160,122 +161,72 @@ new #[Title('Account')] class extends Component {
     }
 
     #[Computed]
-    public function monthlyExpenses(): float
-    {
-        return $this->account->current_month_expenses;
-    }
-
-    #[Computed]
-    public function monthlyIncome(): float
-    {
-        return $this->account->current_month_income;
-    }
-
-    #[Computed]
-    public function lastMonthExpenses(): float
-    {
-        return $this->account->last_month_expenses;
-    }
-
-    #[Computed]
-    public function lastMonthIncome(): float
-    {
-        return $this->account->last_month_income;
-    }
-
-    #[Computed]
-    public function lastMonthBalance(): float
-    {
-        $lastMonthEnd = now()
-            ->subMonth()
-            ->endOfMonth();
-
-        return ($this->account->start_balance +
-            $this->account
-                ->transactions()
-                ->where('date', '<=', $lastMonthEnd)
-                ->sum('amount')) /
-            100;
-    }
-
-    #[Computed]
-    public function selectedMonthDate()
+    public function selectedMonthDate(): Carbon
     {
         return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
     }
 
     #[Computed]
-    public function previousMonthDate()
+    public function previousMonthDate(): Carbon
     {
         return $this->selectedMonthDate->copy()->subMonth();
+    }
+
+    private function getMonthTotal(Carbon $date, string $comparison): float
+    {
+        return $this->account
+            ->transactions()
+            ->where('amount', $comparison, 0)
+            ->whereYear('date', $date->year)
+            ->whereMonth('date', $date->month)
+            ->sum('amount') / 100;
+    }
+
+    private function getMonthEndBalance(Carbon $date): float
+    {
+        $monthEnd = $date->copy()->endOfMonth();
+
+        return ($this->account->start_balance +
+            $this->account
+                ->transactions()
+                ->where('date', '<=', $monthEnd)
+                ->sum('amount')) / 100;
     }
 
     #[Computed]
     public function selectedMonthExpenses(): float
     {
-        return $this->account
-            ->transactions()
-            ->where('amount', '<', 0)
-            ->whereYear('date', $this->selectedMonthDate->year)
-            ->whereMonth('date', $this->selectedMonthDate->month)
-            ->sum('amount') / 100;
+        return $this->getMonthTotal($this->selectedMonthDate, '<');
     }
 
     #[Computed]
     public function selectedMonthIncome(): float
     {
-        return $this->account
-            ->transactions()
-            ->where('amount', '>', 0)
-            ->whereYear('date', $this->selectedMonthDate->year)
-            ->whereMonth('date', $this->selectedMonthDate->month)
-            ->sum('amount') / 100;
+        return $this->getMonthTotal($this->selectedMonthDate, '>');
     }
 
     #[Computed]
     public function selectedMonthEndBalance(): float
     {
-        $monthEnd = $this->selectedMonthDate->copy()->endOfMonth();
-
-        return ($this->account->start_balance +
-            $this->account
-                ->transactions()
-                ->where('date', '<=', $monthEnd)
-                ->sum('amount')) / 100;
+        return $this->getMonthEndBalance($this->selectedMonthDate);
     }
 
     #[Computed]
     public function previousMonthExpenses(): float
     {
-        return $this->account
-            ->transactions()
-            ->where('amount', '<', 0)
-            ->whereYear('date', $this->previousMonthDate->year)
-            ->whereMonth('date', $this->previousMonthDate->month)
-            ->sum('amount') / 100;
+        return $this->getMonthTotal($this->previousMonthDate, '<');
     }
 
     #[Computed]
     public function previousMonthIncome(): float
     {
-        return $this->account
-            ->transactions()
-            ->where('amount', '>', 0)
-            ->whereYear('date', $this->previousMonthDate->year)
-            ->whereMonth('date', $this->previousMonthDate->month)
-            ->sum('amount') / 100;
+        return $this->getMonthTotal($this->previousMonthDate, '>');
     }
 
     #[Computed]
     public function previousMonthEndBalance(): float
     {
-        $monthEnd = $this->previousMonthDate->copy()->endOfMonth();
-
-        return ($this->account->start_balance +
-            $this->account
-                ->transactions()
-                ->where('date', '<=', $monthEnd)
-                ->sum('amount')) / 100;
+        return $this->getMonthEndBalance($this->previousMonthDate);
     }
 
     #[Computed]
@@ -296,58 +247,54 @@ new #[Title('Account')] class extends Component {
         return $this->selectedMonthEndBalance - $this->previousMonthEndBalance;
     }
 
-    #[Computed]
-    public function expensesChangePercentage(): ?float
+    private function calculateChangePercentage(float $current, float $previous): ?float
     {
-        if ($this->previousMonthExpenses === 0.0) {
+        if ($previous === 0.0) {
             return null;
         }
 
-        return (($this->selectedMonthExpenses - $this->previousMonthExpenses) / abs($this->previousMonthExpenses)) * 100;
+        return (($current - $previous) / abs($previous)) * 100;
+    }
+
+    #[Computed]
+    public function expensesChangePercentage(): ?float
+    {
+        return $this->calculateChangePercentage($this->selectedMonthExpenses, $this->previousMonthExpenses);
     }
 
     #[Computed]
     public function incomeChangePercentage(): ?float
     {
-        if ($this->previousMonthIncome === 0.0) {
-            return null;
-        }
-
-        return (($this->selectedMonthIncome - $this->previousMonthIncome) / abs($this->previousMonthIncome)) * 100;
+        return $this->calculateChangePercentage($this->selectedMonthIncome, $this->previousMonthIncome);
     }
 
     #[Computed]
     public function balanceChangePercentage(): ?float
     {
-        if ($this->previousMonthEndBalance === 0.0) {
-            return null;
-        }
+        return $this->calculateChangePercentage($this->selectedMonthEndBalance, $this->previousMonthEndBalance);
+    }
 
-        return (($this->selectedMonthEndBalance - $this->previousMonthEndBalance) / abs($this->previousMonthEndBalance)) * 100;
+    private function formatChange(float $change, string $currencySymbol): string
+    {
+        return ($change >= 0 ? '+' : '-') . $currencySymbol . number_format(abs($change), 2);
     }
 
     #[Computed]
     public function expensesChangeFormatted(): string
     {
-        $change = $this->expensesChange;
-
-        return ($change >= 0 ? '+' : '-') . '$' . number_format(abs($change), 2);
+        return $this->formatChange($this->expensesChange, $this->account->currencySymbol);
     }
 
     #[Computed]
     public function incomeChangeFormatted(): string
     {
-        $change = $this->incomeChange;
-
-        return ($change >= 0 ? '+' : '-') . '$' . number_format(abs($change), 2);
+        return $this->formatChange($this->incomeChange, $this->account->currencySymbol);
     }
 
     #[Computed]
     public function balanceChangeFormatted(): string
     {
-        $change = $this->balanceChange;
-
-        return ($change >= 0 ? '+' : '-') . '$' . number_format(abs($change), 2);
+        return $this->formatChange($this->balanceChange, $this->account->currencySymbol);
     }
 
     #[Computed]
