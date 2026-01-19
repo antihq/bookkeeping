@@ -66,12 +66,14 @@ new #[Title('Categories')] class extends Component {
             <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No categories yet</flux:text>
         </div>
     @else
-        <div class="flex flex-wrap justify-between items-center gap-x-6 gap-y-4">
+        <div class="flex items-end justify-between gap-4">
             <flux:heading size="xl">All categories</flux:heading>
-            <flux:select wire:model.live="selectedPeriod">
-                <flux:select.option value="this_month">This month</flux:select.option>
-                <flux:select.option value="last_month">Last month</flux:select.option>
-            </flux:select>
+            <div>
+                <flux:select wire:model.live="selectedPeriod">
+                    <flux:select.option value="this_month">This month</flux:select.option>
+                    <flux:select.option value="last_month">Last month</flux:select.option>
+                </flux:select>
+            </div>
         </div>
 
         <div class="mt-8">
