@@ -15,16 +15,15 @@
     --font-sans--font-feature-settings: 'cv11';
 
     --color-zinc-50: oklch(98.8% 0.003 106.5);
-    --color-zinc-100: oklch(96.6% 0.005 106.5);
-    --color-zinc-200: oklch(93% 0.007 106.5);
-    --color-zinc-300: oklch(88% 0.011 106.6);
-    --color-zinc-400: oklch(73.7% 0.021 106.9);
-    --color-zinc-500: oklch(58% 0.031 107.3);
-    --color-zinc-600: oklch(46.6% 0.025 107.3);
-    --color-zinc-700: oklch(39.4% 0.023 107.4);
-    --color-zinc-800: oklch(28.6% 0.016 107.4);
-    --color-zinc-900: oklch(22.8% 0.013 107.4);
-    --color-zinc-950: oklch(15.3% 0.006 107.1);
+    --color-zinc-100: oklch(96% .003 325.6);
+    --color-zinc-200: oklch(92.2% .005 325.62);
+    --color-zinc-300: oklch(86.5% .012 325.68);
+    --color-zinc-400: oklch(71.1% .019 323.02);
+    --color-zinc-500: oklch(54.2% .034 322.5);
+    --color-zinc-600: oklch(43.5% .029 321.78);
+    --color-zinc-700: oklch(36.4% .029 323.89);
+    --color-zinc-800: oklch(26.3% .024 320.12);
+    --color-zinc-950: oklch(14.5% .008 326);
 }
 
 @theme {
