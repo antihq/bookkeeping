@@ -18,6 +18,8 @@ new #[Title('Account')] class extends Component {
 
     public string $payee = '';
 
+    public string $payee_search = '';
+
     public ?string $note = null;
 
     public string $amount = '';
@@ -70,7 +72,7 @@ new #[Title('Account')] class extends Component {
 
         Flux::modals()->close();
 
-        $this->reset(['payee', 'note', 'amount', 'category', 'page', 'type']);
+        $this->reset(['payee', 'payee_search', 'note', 'amount', 'category', 'page', 'type']);
 
         $this->renderIsland('transactions');
     }
@@ -130,6 +132,20 @@ new #[Title('Account')] class extends Component {
                 fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
             )
             ->limit(20)
+            ->get();
+    }
+
+    #[Computed]
+    public function payees()
+    {
+        return $this->account
+            ->transactions()
+            ->select('payee')
+            ->when(
+                $this->payee_search,
+                fn ($query) => $query->where('payee', 'like', '%' . $this->payee_search . '%'),
+            )
+            ->distinct()
             ->get();
     }
 
@@ -474,7 +490,13 @@ new #[Title('Account')] class extends Component {
                     </flux:input.group>
                     <flux:error name="amount" />
                 </flux:field>
-                <flux:input wire:model="payee" label="Payee" type="text" placeholder="Payee" label:sr-only required />
+                <flux:autocomplete wire:model="payee" label="Payee" placeholder="Payee" label:sr-only >
+                    @foreach ($this->payees as $payee)
+                        <flux:autocomplete.item wire:key="payee-{{ $loop->index }}">
+                            {{ $payee->payee }}
+                        </flux:autocomplete.item>
+                    @endforeach
+                </flux:autocomplete>
                 <flux:select
                     wire:model="category"
                     variant="combobox"
