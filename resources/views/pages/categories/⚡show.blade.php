@@ -156,6 +156,18 @@ new #[Title('Category')] class extends Component
     {
         return $this->incomeChange >= 0 ? 'lime' : 'pink';
     }
+
+    #[Computed]
+    public function hasExpenses(): bool
+    {
+        return $this->selectedMonthExpenses !== 0.0;
+    }
+
+    #[Computed]
+    public function hasIncome(): bool
+    {
+        return $this->selectedMonthIncome !== 0.0;
+    }
 };
 ?>
 
@@ -171,7 +183,8 @@ new #[Title('Category')] class extends Component
             </flux:select>
         </div>
     </div>
-    <div class="mt-4 grid gap-8 sm:grid-cols-2">
+    <div class="mt-4 grid gap-8 @if ($this->hasExpenses && $this->hasIncome) sm:grid-cols-2 @endif">
+        @if ($this->hasExpenses)
         <div>
             <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
             <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Expenses</div>
@@ -187,6 +200,8 @@ new #[Title('Category')] class extends Component
                 @endif
             </div>
         </div>
+        @endif
+        @if ($this->hasIncome)
         <div>
             <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
             <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
@@ -202,6 +217,7 @@ new #[Title('Category')] class extends Component
                 @endif
             </div>
         </div>
+        @endif
     </div>
 
     <div class="mt-14">
