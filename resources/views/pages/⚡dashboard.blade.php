@@ -391,8 +391,8 @@ new #[Title('Transactions')] class extends Component
 <section class="mx-auto max-w-lg">
     @if ($this->transactions->count() === 0)
         <div class="flex flex-col items-center justify-center py-12">
-            <flux:icon icon="banknotes" size="lg" class="text-gray-400 dark:text-gray-600" />
-            <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No transactions yet</flux:text>
+            <flux:heading>No transactions yet.</flux:heading>
+            <flux:text>Log your transactions with a single tap.</flux:text>
             @can('create', Transaction::class)
                 <div class="mt-6">
                     <flux:modal.trigger name="add-transaction">
