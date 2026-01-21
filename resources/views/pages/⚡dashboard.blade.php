@@ -554,13 +554,15 @@ new #[Title('Transactions')] class extends Component
                 </flux:select>
                 <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
                 <flux:date-picker wire:model="date" label="Date" required />
-                <flux:select wire:model="account" label="Account" placeholder="Optional: Select an account">
-                    @foreach ($this->accounts as $acc)
-                        <flux:select.option :value="$acc->id" :wire:key="'acc-'.$acc->id">
-                            {{ $acc->name }}
-                        </flux:select.option>
-                    @endforeach
-                </flux:select>
+                @if ($this->accounts->isNotEmpty())
+                    <flux:select wire:model="account" label="Account" placeholder="Optional: Select an account">
+                        @foreach ($this->accounts as $acc)
+                            <flux:select.option :value="$acc->id" :wire:key="'acc-'.$acc->id">
+                                {{ $acc->name }}
+                            </flux:select.option>
+                        @endforeach
+                    </flux:select>
+                @endif
                 <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
                     <flux:modal.close>
                         <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>

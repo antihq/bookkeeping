@@ -62,8 +62,8 @@ new #[Title('Categories')] class extends Component {
 <section class="mx-auto max-w-lg">
     @if ($this->categories->count() === 0)
         <div class="flex flex-col items-center justify-center py-12">
-            <flux:icon icon="tag" size="lg" class="text-gray-400 dark:text-gray-600" />
-            <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No categories yet</flux:text>
+            <flux:heading>No categories yet.</flux:heading>
+            <flux:text>Categories will appear here once you add transactions.</flux:text>
         </div>
     @else
         <div class="flex items-end justify-between gap-4">

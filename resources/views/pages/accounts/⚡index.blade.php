@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Account;
 use App\Models\Team;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
@@ -42,12 +43,14 @@ new #[Title('Accounts')] class extends Component {
 <section class="mx-auto max-w-lg">
     @if ($this->accounts->count() === 0)
         <div class="flex flex-col items-center justify-center py-12">
-            <flux:icon icon="credit-card" size="lg" class="text-gray-400 dark:text-gray-600" />
-            <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No accounts yet</flux:text>
+            <flux:heading>No accounts yet.</flux:heading>
+            <flux:text>Create your first account to start tracking your finances.</flux:text>
             @can('create', Account::class)
-                <flux:button href="{{ route('accounts.create') }}" variant="primary" class="mt-4" size="sm">
-                    Add your first account
-                </flux:button>
+                <div class="mt-6">
+                    <flux:button href="{{ route('accounts.create') }}" variant="primary" wire:navigate>
+                        Add account
+                    </flux:button>
+                </div>
             @endcan
         </div>
     @else

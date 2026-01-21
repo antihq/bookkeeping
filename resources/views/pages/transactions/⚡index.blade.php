@@ -164,17 +164,17 @@ new #[Title('All transactions')] class extends Component {
 ?>
 
 <section class="mx-auto max-w-lg">
-    <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-4">
-        <flux:heading size="xl">All transactions</flux:heading>
-        @can('create', Transaction::class)
-            <flux:modal.trigger name="add-transaction">
-                <flux:button variant="primary">Add transaction</flux:button>
-            </flux:modal.trigger>
-        @endcan
-    </div>
+    @if ($this->transactions->isNotEmpty())
+        <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-4">
+            <flux:heading size="xl">All transactions</flux:heading>
+            @can('create', Transaction::class)
+                <flux:modal.trigger name="add-transaction">
+                    <flux:button variant="primary">Add transaction</flux:button>
+                </flux:modal.trigger>
+            @endcan
+        </div>
 
-    <div class="mt-8">
-        @if ($this->transactions->isNotEmpty())
+        <div class="mt-8">
             <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
             <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
                 @island(name: 'transactions', lazy: true)
@@ -204,20 +204,20 @@ new #[Title('All transactions')] class extends Component {
                     Load more
                 </flux:button>
             </div>
-        @else
-            <div class="flex flex-col items-center justify-center py-12">
-                <flux:icon icon="document-text" size="lg" class="text-gray-400 dark:text-gray-600" />
-                <flux:text class="mt-4 text-gray-500 dark:text-gray-400">No transactions yet</flux:text>
-                @can('create', Transaction::class)
-                    <div class="mt-6">
-                        <flux:modal.trigger name="add-transaction">
-                            <flux:button variant="primary">Add transaction</flux:button>
-                        </flux:modal.trigger>
-                    </div>
-                @endcan
-            </div>
-        @endif
-    </div>
+        </div>
+    @else
+        <div class="flex flex-col items-center justify-center py-12">
+            <flux:heading>No transactions yet.</flux:heading>
+            <flux:text>Log your transactions with a single tap.</flux:text>
+            @can('create', Transaction::class)
+                <div class="mt-6">
+                    <flux:modal.trigger name="add-transaction">
+                        <flux:button variant="primary">Add transaction</flux:button>
+                    </flux:modal.trigger>
+                </div>
+            @endcan
+        </div>
+    @endif
 
     @can('create', Transaction::class)
         <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
@@ -274,13 +274,15 @@ new #[Title('All transactions')] class extends Component {
                 </flux:select>
                 <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
                 <flux:date-picker wire:model="date" label="Date" required />
-                <flux:select wire:model="account" label="Account" placeholder="Optional: Select an account">
-                    @foreach ($this->accounts as $acc)
-                        <flux:select.option :value="$acc->id" :wire:key="'acc-'.$acc->id">
-                            {{ $acc->name }}
-                        </flux:select.option>
-                    @endforeach
-                </flux:select>
+                @if ($this->accounts->isNotEmpty())
+                    <flux:select wire:model="account" label="Account" placeholder="Optional: Select an account">
+                        @foreach ($this->accounts as $acc)
+                            <flux:select.option :value="$acc->id" :wire:key="'acc-'.$acc->id">
+                                {{ $acc->name }}
+                            </flux:select.option>
+                        @endforeach
+                    </flux:select>
+                @endif
                 <div class="flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto">
                     <flux:modal.close>
                         <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>

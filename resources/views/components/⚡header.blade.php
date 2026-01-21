@@ -2,6 +2,7 @@
 
 use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 new class extends Component {
@@ -21,6 +22,12 @@ new class extends Component {
         }
 
         return $this->redirectRoute('dashboard', navigate: true);
+    }
+
+    #[Computed]
+    public function hasCategories(): bool
+    {
+        return Auth::user()?->currentTeam?->categories()->exists() ?? false;
     }
 };
 ?>
@@ -45,13 +52,15 @@ new class extends Component {
             Accounts
         </flux:navbar.item>
 
-        <flux:navbar.item
-            :href="route('categories.index')"
-            :current="request()->routeIs('categories.index')"
-            wire:navigate
-        >
-            Categories
-        </flux:navbar.item>
+        @if ($this->hasCategories)
+            <flux:navbar.item
+                :href="route('categories.index')"
+                :current="request()->routeIs('categories.index')"
+                wire:navigate
+            >
+                Categories
+            </flux:navbar.item>
+        @endif
 
         <flux:navbar.item
             :href="route('transactions.index')"
