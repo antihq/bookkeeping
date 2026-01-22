@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "96df9b5c13357c2aa9c9c30ec2a67c21",
+    "content-hash": "cbfac8625306e0f335e18bac8d6790c0",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2578,16 +2578,16 @@
         },
         {
             "name": "livewire/flux",
-            "version": "v2.11.0",
+            "version": "v2.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/flux.git",
-                "reference": "163fd7333468d527153da6100f3c8e8e402a8f90"
+                "reference": "3ada3b2644215fd1ccb7003ce8e6bc185c22e70a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/flux/zipball/163fd7333468d527153da6100f3c8e8e402a8f90",
-                "reference": "163fd7333468d527153da6100f3c8e8e402a8f90",
+                "url": "https://api.github.com/repos/livewire/flux/zipball/3ada3b2644215fd1ccb7003ce8e6bc185c22e70a",
+                "reference": "3ada3b2644215fd1ccb7003ce8e6bc185c22e70a",
                 "shasum": ""
             },
             "require": {
@@ -2638,25 +2638,25 @@
             ],
             "support": {
                 "issues": "https://github.com/livewire/flux/issues",
-                "source": "https://github.com/livewire/flux/tree/v2.11.0"
+                "source": "https://github.com/livewire/flux/tree/v2.11.1"
             },
-            "time": "2026-01-21T09:22:09+00:00"
+            "time": "2026-01-21T17:09:56+00:00"
         },
         {
             "name": "livewire/flux-pro",
-            "version": "2.11.0",
+            "version": "2.11.1",
             "dist": {
                 "type": "zip",
-                "url": "https://composer.fluxui.dev/download/a0e37654-7fbb-47b1-8442-b90d38f74747/flux-pro-2.11.0.zip",
-                "reference": "0236929d760243d024286ed717e29763ec3230bb",
-                "shasum": "c042495ad8903fb130847ecc6cfbb8810e5e8dd8"
+                "url": "https://composer.fluxui.dev/download/a0e59879-7eab-483a-94eb-2e558792f25e/flux-pro-2.11.1.zip",
+                "reference": "6c7259941b0914b768f0cd024b126d102a375858",
+                "shasum": "d2cc2eabe94e94242a3e3f07a75bda2370c4fba0"
             },
             "require": {
                 "illuminate/console": "^10.0|^11.0|^12.0",
                 "illuminate/support": "^10.0|^11.0|^12.0",
                 "illuminate/view": "^10.0|^11.0|^12.0",
                 "laravel/prompts": "^0.1.24|^0.2|^0.3",
-                "livewire/flux": "2.11.0|dev-main",
+                "livewire/flux": "2.11.1|dev-main",
                 "livewire/livewire": "^3.7.4|^4.0",
                 "php": "^8.1",
                 "symfony/console": "^6.0|^7.0"
@@ -2713,20 +2713,20 @@
                 "livewire",
                 "ui"
             ],
-            "time": "2026-01-21T09:33:53+00:00"
+            "time": "2026-01-22T11:01:01+00:00"
         },
         {
             "name": "livewire/livewire",
-            "version": "v4.0.0",
+            "version": "v4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "7c66e50218be801d6d257714c6642e9024f8a183"
+                "reference": "57fd2f193072560f8615e513972db5fb9dc93501"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/7c66e50218be801d6d257714c6642e9024f8a183",
-                "reference": "7c66e50218be801d6d257714c6642e9024f8a183",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/57fd2f193072560f8615e513972db5fb9dc93501",
+                "reference": "57fd2f193072560f8615e513972db5fb9dc93501",
                 "shasum": ""
             },
             "require": {
@@ -2781,7 +2781,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v4.0.0"
+                "source": "https://github.com/livewire/livewire/tree/v4.0.2"
             },
             "funding": [
                 {
@@ -2789,7 +2789,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-01-14T10:40:38+00:00"
+            "time": "2026-01-21T09:09:58+00:00"
         },
         {
             "name": "mobiledetect/mobiledetectlib",

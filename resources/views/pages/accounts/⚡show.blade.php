@@ -8,10 +8,12 @@ use Carbon\Carbon;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Renderless;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Account')] class extends Component {
+new #[Title('Account')] class extends Component
+{
     public Account $account;
 
     public string $date = '';
@@ -32,6 +34,8 @@ new #[Title('Account')] class extends Component {
 
     public $page = 1;
 
+    public bool $hasTransactions = false;
+
     public string $selectedPeriod = 'this_month';
 
     public function mount()
@@ -39,6 +43,7 @@ new #[Title('Account')] class extends Component {
         $this->authorize('view', $this->account);
 
         $this->date = now()->format('Y-m-d');
+        $this->hasTransactions = $this->account->transactions()->exists();
     }
 
     public function addTransaction()
@@ -58,8 +63,7 @@ new #[Title('Account')] class extends Component {
             input: [
                 'date' => $this->date,
                 'payee' => $this->payee,
-                'amount' =>
-                    $this->type === 'expense'
+                'amount' => $this->type === 'expense'
                         ? (int) -round((float) $this->amount * 100)
                         : (int) round((float) $this->amount * 100),
                 'note' => $this->note,
@@ -67,6 +71,8 @@ new #[Title('Account')] class extends Component {
             createdBy: $this->user,
             category: $category,
         );
+
+        $this->hasTransactions = true;
 
         Flux::toast('Transaction added successfully.', variant: 'success');
 
@@ -80,7 +86,7 @@ new #[Title('Account')] class extends Component {
     public function createCategory()
     {
         $this->validate([
-            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,' . $this->team->id],
+            'category_search' => ['required', 'unique:categories,name,NULL,id,team_id,'.$this->team->id],
         ]);
 
         $category = $this->team->categories()->create([
@@ -101,6 +107,7 @@ new #[Title('Account')] class extends Component {
         return $this->redirectRoute('accounts.index');
     }
 
+    #[Renderless]
     public function deleteTransaction(int $id)
     {
         $transaction = $this->account->transactions()->findOrFail($id);
@@ -115,6 +122,8 @@ new #[Title('Account')] class extends Component {
     public function loadMore()
     {
         $this->page++;
+
+        $this->renderIsland('pagination');
     }
 
     public function updatedAmount($value)
@@ -129,7 +138,7 @@ new #[Title('Account')] class extends Component {
             ->categories()
             ->when(
                 $this->category_search,
-                fn ($query) => $query->where('name', 'like', '%' . $this->category_search . '%'),
+                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
             )
             ->limit(20)
             ->get();
@@ -138,12 +147,12 @@ new #[Title('Account')] class extends Component {
     #[Computed]
     public function payees()
     {
-        return $this->account
+        return $this->team
             ->transactions()
             ->select('payee')
             ->when(
                 $this->payee_search,
-                fn ($query) => $query->where('payee', 'like', '%' . $this->payee_search . '%'),
+                fn ($query) => $query->where('payee', 'like', '%'.$this->payee_search.'%'),
             )
             ->distinct()
             ->get();
@@ -160,7 +169,7 @@ new #[Title('Account')] class extends Component {
     {
         return $this->account
             ->transactions()
-            ->forPage($this->page, 25)
+            ->forPage($this->page, 5)
             ->get();
     }
 
@@ -168,6 +177,12 @@ new #[Title('Account')] class extends Component {
     public function user(): User
     {
         return Auth::user();
+    }
+
+    #[Computed]
+    public function hasMorePages(): bool
+    {
+        return $this->account->transactions()->count() > ($this->page * 5);
     }
 
     #[Computed]
@@ -292,7 +307,7 @@ new #[Title('Account')] class extends Component {
 
     private function formatChange(float $change, string $currencySymbol): string
     {
-        return ($change >= 0 ? '+' : '-') . $currencySymbol . number_format(abs($change), 2);
+        return ($change >= 0 ? '+' : '-').$currencySymbol.number_format(abs($change), 2);
     }
 
     #[Computed]
@@ -429,31 +444,38 @@ new #[Title('Account')] class extends Component {
         @endcan
     </div>
 
-    @island(name: 'transactions', lazy: true)
-        @placeholder
-            <div class="mt-4">
-                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-                <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
+    <div id="transactions" class="mt-8" wire:show="hasTransactions" wire:cloak>
+        <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+        <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
+            @island(name: 'transactions', lazy: true)
+                @placeholder
                     @foreach (range(1, rand(3, 8)) as $i)
                         <flux:skeleton.group animate="shimmer" class="py-4">
                             <flux:skeleton class="h-15" />
                         </flux:skeleton.group>
                     @endforeach
-                </div>
-            </div>
-        @endplaceholder
-        @if ($this->transactions->isNotEmpty())
-            <div class="mt-4">
-                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-                <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
+                @endplaceholder
+                @foreach ($this->transactions as $transaction)
+                    <livewire:transactions.item :$transaction wire:key="transaction-{{ $transaction->id }}" />
+                @endforeach
+            @endisland
+        </div>
 
-                    @foreach ($this->transactions as $transaction)
-                        <livewire:transactions.item :$transaction wire:key="transaction-{{ $transaction->id }}" />
-                    @endforeach
+        @island(name: 'pagination')
+            @if ($this->hasMorePages)
+                <div id="pagination" class="p-[.3125rem]">
+                    <flux:button
+                        wire:click="loadMore"
+                        wire:island.append="transactions"
+                        variant="subtle"
+                        class="w-full"
+                    >
+                        Load more
+                    </flux:button>
                 </div>
-            </div>
-        @endif
-    @endisland
+            @endif
+        @endisland
+    </div>
 
     @can('create', Transaction::class)
         <flux:modal name="add-transaction" class="w-full sm:max-w-lg">

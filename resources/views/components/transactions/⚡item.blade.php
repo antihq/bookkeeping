@@ -26,6 +26,8 @@ new class extends Component
 
     public string $category_search = '';
 
+    public bool $visible = true;
+
     public function mount()
     {
         $this->date = $this->transaction->date;
@@ -113,7 +115,7 @@ new class extends Component
 };
 ?>
 
-<div>
+<div wire:show="visible">
     <div {{ $attributes }} class="flex items-center justify-between gap-4 py-4">
         <div class="overflow-hidden">
             <flux:heading class="leading-6!">
@@ -380,10 +382,19 @@ new class extends Component
                 <flux:modal.close>
                     <flux:button variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
                 </flux:modal.close>
-                <flux:button wire:click="$parent.deleteTransaction({{ $transaction->id }})" variant="primary">
-                    Delete
-                </flux:button>
+                <flux:modal.close>
+                    <flux:button wire:click="$js.deleteTransaction({{ $transaction->id }})" variant="primary" class="w-full sm:w-auto">
+                        Delete
+                    </flux:button>
+                </flux:modal.close>
             </div>
         </div>
     </flux:modal>
 </div>
+
+<script>
+    this.$js.deleteTransaction = (id) => {
+        this.visible = false;
+        $wire.$parent.deleteTransaction(id);
+    }
+</script>

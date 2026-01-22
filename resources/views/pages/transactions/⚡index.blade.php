@@ -6,10 +6,12 @@ use App\Models\User;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Renderless;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('All transactions')] class extends Component {
+new #[Title('All transactions')] class extends Component
+{
     public $page = 1;
 
     public string $date = '';
@@ -30,14 +32,19 @@ new #[Title('All transactions')] class extends Component {
 
     public ?int $account = null;
 
+    public bool $hasTransactions = false;
+
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
+        $this->hasTransactions = $this->team->transactions()->exists();
     }
 
     public function loadMore()
     {
         $this->page++;
+
+        $this->renderIsland('pagination');
     }
 
     public function addTransaction()
@@ -67,6 +74,8 @@ new #[Title('All transactions')] class extends Component {
             'account_id' => $account?->id,
         ]);
 
+        $this->hasTransactions = true;
+
         Flux::toast('Transaction added successfully.', variant: 'success');
 
         Flux::modals()->close();
@@ -89,6 +98,7 @@ new #[Title('All transactions')] class extends Component {
         $this->category = $category->id;
     }
 
+    #[Renderless]
     public function deleteTransaction(int $id)
     {
         $transaction = $this->team->transactions()->findOrFail($id);
@@ -112,7 +122,7 @@ new #[Title('All transactions')] class extends Component {
             ->transactions()
             ->with(['account', 'category', 'creator'])
             ->orderBy('date', 'desc')
-            ->forPage($this->page, 25)
+            ->forPage($this->page, 5)
             ->get();
     }
 
@@ -160,11 +170,17 @@ new #[Title('All transactions')] class extends Component {
     {
         return Auth::user();
     }
+
+    #[Computed]
+    public function hasMorePages(): bool
+    {
+        return $this->team->transactions()->count() > ($this->page * 5);
+    }
 };
 ?>
 
 <section class="mx-auto max-w-lg">
-    @if ($this->transactions->isNotEmpty())
+    @if ($hasTransactions)
         <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-4">
             <flux:heading size="xl">All transactions</flux:heading>
             @can('create', Transaction::class)
@@ -172,38 +188,6 @@ new #[Title('All transactions')] class extends Component {
                     <flux:button variant="primary">Add transaction</flux:button>
                 </flux:modal.trigger>
             @endcan
-        </div>
-
-        <div class="mt-8">
-            <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
-            <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
-                @island(name: 'transactions', lazy: true)
-                    @placeholder
-                        @foreach (range(1, rand(3, 8)) as $i)
-                            <flux:skeleton.group animate="shimmer" class="py-4">
-                                <flux:skeleton class="h-15" />
-                            </flux:skeleton.group>
-                        @endforeach
-                    @endplaceholder
-                    @foreach ($this->transactions as $transaction)
-                        <livewire:transactions.item
-                            :$transaction
-                            wire:key="transaction-{{ $transaction->id }}"
-                        />
-                    @endforeach
-                @endisland
-            </div>
-
-            <div class="p-[.3125rem]">
-                <flux:button
-                    wire:click="loadMore"
-                    wire:island.append="transactions"
-                    variant="subtle"
-                    class="w-full"
-                >
-                    Load more
-                </flux:button>
-            </div>
         </div>
     @else
         <div class="flex flex-col items-center justify-center py-12">
@@ -218,6 +202,42 @@ new #[Title('All transactions')] class extends Component {
             @endcan
         </div>
     @endif
+
+    <div id="transactions" class="mt-8" wire:show="hasTransactions" wire:cloak>
+        <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+        <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
+            @island(name: 'transactions', lazy: true)
+                @placeholder
+                    @foreach (range(1, rand(3, 8)) as $i)
+                        <flux:skeleton.group animate="shimmer" class="py-4">
+                            <flux:skeleton class="h-15" />
+                        </flux:skeleton.group>
+                    @endforeach
+                @endplaceholder
+                @foreach ($this->transactions as $transaction)
+                    <livewire:transactions.item
+                        :$transaction
+                        wire:key="transaction-{{ $transaction->id }}"
+                    />
+                @endforeach
+            @endisland
+        </div>
+
+        @island(name: 'pagination')
+            @if ($this->hasMorePages)
+                <div id="pagination" class="p-[.3125rem]">
+                    <flux:button
+                        wire:click="loadMore"
+                        wire:island.append="transactions"
+                        variant="subtle"
+                        class="w-full"
+                    >
+                        Load more
+                    </flux:button>
+                </div>
+            @endif
+        @endisland
+    </div>
 
     @can('create', Transaction::class)
         <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
