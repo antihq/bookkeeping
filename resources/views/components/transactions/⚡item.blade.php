@@ -368,7 +368,7 @@ new class extends Component
         @endisland
     </flux:modal>
 
-    <flux:modal name="delete-transaction-{{ $transaction->id }}" class="w-full max-w-xs sm:max-w-md">
+    <flux:modal name="delete-transaction-{{ $transaction->id }}" class="w-full sm:max-w-md">
         <div class="space-y-6 sm:space-y-4">
             <div>
                 <flux:heading>Delete transaction?</flux:heading>

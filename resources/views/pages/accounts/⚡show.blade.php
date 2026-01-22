@@ -429,39 +429,31 @@ new #[Title('Account')] class extends Component {
         @endcan
     </div>
 
-    <div class="mt-4">
-        <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+    @island(name: 'transactions', lazy: true)
+        @placeholder
+            <div class="mt-4">
+                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
+                    @foreach (range(1, rand(3, 8)) as $i)
+                        <flux:skeleton.group animate="shimmer" class="py-4">
+                            <flux:skeleton class="h-15" />
+                        </flux:skeleton.group>
+                    @endforeach
+                </div>
+            </div>
+        @endplaceholder
         @if ($this->transactions->isNotEmpty())
-            <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
-                @island(name: 'transactions', lazy: true)
-                    @placeholder
-                        @foreach (range(1, rand(3, 8)) as $i)
-                            <flux:skeleton.group animate="shimmer" class="py-4">
-                                <flux:skeleton class="h-15" />
-                            </flux:skeleton.group>
-                            @unless ($loop->last)
-                                <flux:separator variant="subtle" />
-                            @endunless
-                        @endforeach
-                    @endplaceholder
+            <div class="mt-4">
+                <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
+                <div class="divide-y divide-zinc-100 dark:divide-white/5 dark:text-white">
 
                     @foreach ($this->transactions as $transaction)
                         <livewire:transactions.item :$transaction wire:key="transaction-{{ $transaction->id }}" />
                     @endforeach
-                @endisland
-            </div>
-            <div class="p-[.3125rem]">
-                <flux:button wire:click="loadMore" wire:island.append="transactions" variant="subtle" class="w-full">
-                    Load more
-                </flux:button>
-            </div>
-        @else
-            <div class="flex flex-col items-center justify-center py-12">
-                <flux:icon icon="credit-card" size="lg" class="text-zinc-400 dark:text-zinc-600" />
-                <flux:text class="mt-4 text-zinc-500 dark:text-zinc-400">No transactions yet</flux:text>
+                </div>
             </div>
         @endif
-    </div>
+    @endisland
 
     @can('create', Transaction::class)
         <flux:modal name="add-transaction" class="w-full sm:max-w-lg">
