@@ -114,129 +114,9 @@ new #[Title('Transactions')] class extends Component
     }
 
     #[Computed]
-    public function totalBalance(): float
-    {
-        return $this->team->total_balance_in_dollars;
-    }
-
-    #[Computed]
-    public function selectedMonthDate()
+    public function selectedPeriodDate()
     {
         return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
-    }
-
-    #[Computed]
-    public function previousMonthDate()
-    {
-        return $this->selectedMonthDate->copy()->subMonth();
-    }
-
-    #[Computed]
-    public function selectedMonthExpenses(): float
-    {
-        return $this->team->monthExpenses($this->selectedMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function selectedMonthIncome(): float
-    {
-        return $this->team->monthIncome($this->selectedMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function selectedMonthEndBalance(): float
-    {
-        return $this->team->monthEndBalance($this->selectedMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function previousMonthExpenses(): float
-    {
-        return $this->team->monthExpenses($this->previousMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function previousMonthIncome(): float
-    {
-        return $this->team->monthIncome($this->previousMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function previousMonthEndBalance(): float
-    {
-        return $this->team->monthEndBalance($this->previousMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function expensesChange(): float
-    {
-        return $this->team->expensesChange($this->selectedMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function incomeChange(): float
-    {
-        return $this->team->incomeChange($this->selectedMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function balanceChange(): float
-    {
-        return $this->team->balanceChange($this->selectedMonthDate) / 100;
-    }
-
-    #[Computed]
-    public function expensesChangePercentage(): ?float
-    {
-        return $this->team->expensesChangePercentage($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function incomeChangePercentage(): ?float
-    {
-        return $this->team->incomeChangePercentage($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function balanceChangePercentage(): ?float
-    {
-        return $this->team->balanceChangePercentage($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function expensesChangeFormatted(): string
-    {
-        return $this->team->expensesChangeFormatted($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function incomeChangeFormatted(): string
-    {
-        return $this->team->incomeChangeFormatted($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function balanceChangeFormatted(): string
-    {
-        return $this->team->balanceChangeFormatted($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function expensesChangeColor(): string
-    {
-        return $this->team->expensesChangeColor($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function incomeChangeColor(): string
-    {
-        return $this->team->incomeChangeColor($this->selectedMonthDate);
-    }
-
-    #[Computed]
-    public function balanceChangeColor(): string
-    {
-        return $this->team->balanceChangeColor($this->selectedMonthDate);
     }
 
     public function deleteTransaction(int $id)
@@ -323,16 +203,16 @@ new #[Title('Transactions')] class extends Component
                 <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
                 <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Overall balance</div>
                 <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                    @if ($this->selectedMonthEndBalance >= 0)
-                        ${{ number_format(abs($this->selectedMonthEndBalance), 2) }}
+                    @if (($this->team->monthEndBalance($this->selectedPeriodDate) / 100) >= 0)
+                        ${{ number_format(abs($this->team->monthEndBalance($this->selectedPeriodDate) / 100), 2) }}
                     @else
-                        -${{ number_format(abs($this->selectedMonthEndBalance), 2) }}
+                        -${{ number_format(abs($this->team->monthEndBalance($this->selectedPeriodDate) / 100), 2) }}
                     @endif
                 </div>
                 <div class="mt-3 text-sm/6 sm:text-xs/6">
-                    @if (!is_null($this->balanceChangePercentage))
-                        <flux:badge color="{{ $this->balanceChangeColor }}" size="sm">
-                            {{ number_format($this->balanceChangePercentage, 1) }}%
+                    @if (!is_null($this->team->balanceChangePercentage($this->selectedPeriodDate)))
+                        <flux:badge color="{{ $this->team->balanceChangeColor($this->selectedPeriodDate) }}" size="sm">
+                            {{ number_format($this->team->balanceChangePercentage($this->selectedPeriodDate), 1) }}%
                         </flux:badge>
                         <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
                     @endif
@@ -342,12 +222,12 @@ new #[Title('Transactions')] class extends Component
                 <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
                 <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Expenses</div>
                 <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                    ${{ number_format(abs($this->selectedMonthExpenses), 2) }}
+                    ${{ number_format(abs($this->team->monthExpenses($this->selectedPeriodDate) / 100), 2) }}
                 </div>
                 <div class="mt-3 text-sm/6 sm:text-xs/6">
-                    @if (!is_null($this->expensesChangePercentage))
-                        <flux:badge color="{{ $this->expensesChangeColor }}" size="sm">
-                            {{ number_format($this->expensesChangePercentage, 1) }}%
+                    @if (!is_null($this->team->expensesChangePercentage($this->selectedPeriodDate)))
+                        <flux:badge color="{{ $this->team->expensesChangeColor($this->selectedPeriodDate) }}" size="sm">
+                            {{ number_format($this->team->expensesChangePercentage($this->selectedPeriodDate), 1) }}%
                         </flux:badge>
                         <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
                     @endif
@@ -357,12 +237,12 @@ new #[Title('Transactions')] class extends Component
                 <hr role="presentation" class="w-full border-t border-zinc-950/10 dark:border-white/10" />
                 <div class="mt-6 text-lg/6 font-medium sm:text-sm/6">Income</div>
                 <div class="mt-3 text-3xl/8 font-semibold sm:text-2xl/8">
-                    ${{ number_format(abs($this->selectedMonthIncome), 2) }}
+                    ${{ number_format(abs($this->team->monthIncome($this->selectedPeriodDate) / 100), 2) }}
                 </div>
                 <div class="mt-3 text-sm/6 sm:text-xs/6">
-                    @if (!is_null($this->incomeChangePercentage))
-                        <flux:badge color="{{ $this->incomeChangeColor }}" size="sm">
-                            {{ number_format($this->incomeChangePercentage, 1) }}%
+                    @if (!is_null($this->team->incomeChangePercentage($this->selectedPeriodDate)))
+                        <flux:badge color="{{ $this->team->incomeChangeColor($this->selectedPeriodDate) }}" size="sm">
+                            {{ number_format($this->team->incomeChangePercentage($this->selectedPeriodDate), 1) }}%
                         </flux:badge>
                         <flux:text size="sm" inline class="whitespace-nowrap">from previous month</flux:text>
                     @endif
