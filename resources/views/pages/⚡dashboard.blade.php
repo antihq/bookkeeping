@@ -15,21 +15,33 @@ new #[Title('Transactions')] class extends Component
 
     public string $payee = '';
 
-    public string $payee_search = '';
-
-    public ?string $note = null;
+    public string $note = '';
 
     public string $amount = '';
 
     public string $type = 'expense';
 
-    public ?int $category = null;
-
-    public string $category_search = '';
+    public string $category = '';
 
     public string $account = '';
 
+    public string $payee_search = '';
+
+    public string $category_search = '';
+
     public string $selectedPeriod = 'this_month';
+
+    #[Computed]
+    public function user(): User
+    {
+        return Auth::user();
+    }
+
+    #[Computed]
+    public function team(): Team
+    {
+        return $this->user()->currentTeam;
+    }
 
     #[Computed]
     public function transactions()
@@ -42,6 +54,45 @@ new #[Title('Transactions')] class extends Component
             ->get();
     }
 
+    #[Computed]
+    public function accounts()
+    {
+        return $this->team->accounts()->get();
+    }
+
+    #[Computed]
+    public function categories()
+    {
+        return $this->team
+            ->categories()
+            ->when(
+                $this->category_search,
+                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
+            )
+            ->limit(20)
+            ->get();
+    }
+
+    #[Computed]
+    public function payees()
+    {
+        return $this->team
+            ->transactions()
+            ->select('payee')
+            ->when(
+                $this->payee_search,
+                fn ($query) => $query->where('payee', 'like', '%'.$this->payee_search.'%'),
+            )
+            ->distinct()
+            ->get();
+    }
+
+    #[Computed]
+    public function selectedPeriodDate()
+    {
+        return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
+    }
+
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
@@ -51,6 +102,11 @@ new #[Title('Transactions')] class extends Component
         if ($latestTransaction?->account_id) {
             $this->account = $latestTransaction->account_id;
         }
+    }
+
+    public function updatedAmount($value)
+    {
+        $this->amount = str_replace(['$', ','], '', $value);
     }
 
     public function addTransaction()
@@ -84,7 +140,7 @@ new #[Title('Transactions')] class extends Component
 
         Flux::modals()->close();
 
-        $this->reset(['payee', 'payee_search', 'note', 'amount', 'category', 'account', 'type']);
+        $this->reset(['payee', 'payee_search', 'note', 'amount', 'category_search', 'category', 'type']);
 
         $this->renderIsland('transactions');
     }
@@ -102,23 +158,6 @@ new #[Title('Transactions')] class extends Component
         $this->category = $category->id;
     }
 
-    public function updatedAmount($value)
-    {
-        $this->amount = str_replace(['$', ','], '', $value);
-    }
-
-    #[Computed]
-    public function team(): Team
-    {
-        return Auth::user()->currentTeam;
-    }
-
-    #[Computed]
-    public function selectedPeriodDate()
-    {
-        return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
-    }
-
     public function deleteTransaction(int $id)
     {
         $transaction = $this->team->transactions()->findOrFail($id);
@@ -128,45 +167,6 @@ new #[Title('Transactions')] class extends Component
         $transaction->delete();
 
         Flux::toast('Transaction deleted successfully.', variant: 'success');
-    }
-
-    #[Computed]
-    public function categories()
-    {
-        return $this->team
-            ->categories()
-            ->when(
-                $this->category_search,
-                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
-            )
-            ->limit(20)
-            ->get();
-    }
-
-    #[Computed]
-    public function accounts()
-    {
-        return $this->team->accounts()->get();
-    }
-
-    #[Computed]
-    public function payees()
-    {
-        return $this->team
-            ->transactions()
-            ->select('payee')
-            ->when(
-                $this->payee_search,
-                fn ($query) => $query->where('payee', 'like', '%'.$this->payee_search.'%'),
-            )
-            ->distinct()
-            ->get();
-    }
-
-    #[Computed]
-    public function user(): User
-    {
-        return Auth::user();
     }
 };
 ?>
