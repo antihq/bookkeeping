@@ -30,7 +30,7 @@ new #[Title('All transactions')] class extends Component
 
     public string $category_search = '';
 
-    public ?int $account = null;
+    public string $account = '';
 
     public bool $hasTransactions = false;
 
@@ -301,7 +301,7 @@ new #[Title('All transactions')] class extends Component
                 <flux:input wire:model="note" label="Note" type="text" placeholder="Note" label:sr-only />
                 <flux:date-picker wire:model="date" label="Date" required />
                 @if ($this->accounts->isNotEmpty())
-                    <flux:select wire:model="account" label="Account" placeholder="Optional: Select an account">
+                    <flux:select wire:model="account" label="Account" placeholder="Choose account...">
                         @foreach ($this->accounts as $acc)
                             <flux:select.option :value="$acc->id" :wire:key="'acc-'.$acc->id">
                                 {{ $acc->name }}
