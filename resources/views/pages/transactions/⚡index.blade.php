@@ -38,6 +38,12 @@ new #[Title('All transactions')] class extends Component
     {
         $this->date = now()->format('Y-m-d');
         $this->hasTransactions = $this->team->transactions()->exists();
+
+        $latestTransaction = $this->team->latestTransactionForUser($this->user);
+
+        if ($latestTransaction?->account_id) {
+            $this->account = $latestTransaction->account_id;
+        }
     }
 
     public function loadMore()
