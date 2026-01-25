@@ -206,43 +206,37 @@ new #[Title('Transactions')] class extends Component
     #[Computed]
     public function expensesChangeFormatted(): string
     {
-        $change = $this->expensesChange;
-
-        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+        return $this->team->expensesChangeFormatted($this->selectedMonthDate);
     }
 
     #[Computed]
     public function incomeChangeFormatted(): string
     {
-        $change = $this->incomeChange;
-
-        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+        return $this->team->incomeChangeFormatted($this->selectedMonthDate);
     }
 
     #[Computed]
     public function balanceChangeFormatted(): string
     {
-        $change = $this->balanceChange;
-
-        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+        return $this->team->balanceChangeFormatted($this->selectedMonthDate);
     }
 
     #[Computed]
     public function expensesChangeColor(): string
     {
-        return $this->expensesChange <= 0 ? 'lime' : 'pink';
+        return $this->team->expensesChangeColor($this->selectedMonthDate);
     }
 
     #[Computed]
     public function incomeChangeColor(): string
     {
-        return $this->incomeChange >= 0 ? 'lime' : 'pink';
+        return $this->team->incomeChangeColor($this->selectedMonthDate);
     }
 
     #[Computed]
     public function balanceChangeColor(): string
     {
-        return $this->balanceChange >= 0 ? 'lime' : 'pink';
+        return $this->team->balanceChangeColor($this->selectedMonthDate);
     }
 
     public function deleteTransaction(int $id)

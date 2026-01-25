@@ -4,8 +4,6 @@ use App\Models\Account;
 use App\Models\Category;
 use App\Models\User;
 
-use function Pest\Laravel\actingAs;
-
 beforeEach(function () {
     $this->user = User::factory()->withPersonalTeam()->create();
     $this->team = $this->user->currentTeam;
@@ -271,3 +269,206 @@ it('returns null for balance change percentage when previous month is zero', fun
     expect($this->team->balanceChangePercentage($thisMonth))->toBeNull();
 });
 
+it('formats expenses change correctly', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => -10000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Store Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => -15000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Store This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->expensesChangeFormatted($thisMonth))->toBe('-$50.00');
+});
+
+it('formats income change correctly', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => 10000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Employer Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => 12000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Employer This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->incomeChangeFormatted($thisMonth))->toBe('+$20.00');
+});
+
+it('formats balance change correctly', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => 5000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Employer Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => 3000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Employer This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    $expectedBalance = 100000 + 5000 + 3000;
+    $previousBalance = 100000 + 5000;
+    $change = ($expectedBalance - $previousBalance) / 100;
+
+    $expectedString = ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+
+    expect($this->team->balanceChangeFormatted($thisMonth))->toBe($expectedString);
+});
+
+it('returns correct color for expenses change', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => -10000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Store Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => -15000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Store This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->expensesChangeColor($thisMonth))->toBe('lime');
+});
+
+it('returns correct color for income change', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => 10000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Employer Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => 12000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Employer This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->incomeChangeColor($thisMonth))->toBe('lime');
+});
+
+it('returns correct color for balance change', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => 5000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Employer Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => 3000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Employer This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->balanceChangeColor($thisMonth))->toBe('lime');
+});
+
+it('returns pink color when expenses decrease', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => -15000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Store Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => -10000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Store This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->expensesChangeColor($thisMonth))->toBe('pink');
+});
+
+it('returns pink color when income decreases', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => 12000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Employer Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => 10000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Employer This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->incomeChangeColor($thisMonth))->toBe('pink');
+});
+
+it('returns pink color when balance decreases', function () {
+    $lastMonth = now()->subMonth();
+    $thisMonth = now();
+
+    $this->team->transactions()->createMany([
+        [
+            'amount' => 5000,
+            'date' => $lastMonth->format('Y-m-d'),
+            'payee' => 'Employer Last Month',
+            'created_by' => $this->user->id,
+        ],
+        [
+            'amount' => -3000,
+            'date' => $thisMonth->format('Y-m-d'),
+            'payee' => 'Store This Month',
+            'created_by' => $this->user->id,
+        ],
+    ]);
+
+    expect($this->team->balanceChangeColor($thisMonth))->toBe('pink');
+});

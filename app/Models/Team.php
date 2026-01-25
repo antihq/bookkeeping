@@ -158,6 +158,42 @@ class Team extends JetstreamTeam
         return (($this->monthEndBalance($currentDate) - $previousBalance) / abs($previousBalance)) * 100;
     }
 
+    public function expensesChangeFormatted(Carbon $currentDate): string
+    {
+        $change = $this->expensesChange($currentDate) / 100;
+
+        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+    }
+
+    public function incomeChangeFormatted(Carbon $currentDate): string
+    {
+        $change = $this->incomeChange($currentDate) / 100;
+
+        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+    }
+
+    public function balanceChangeFormatted(Carbon $currentDate): string
+    {
+        $change = $this->balanceChange($currentDate) / 100;
+
+        return ($change >= 0 ? '+' : '-').'$'.number_format(abs($change), 2);
+    }
+
+    public function expensesChangeColor(Carbon $currentDate): string
+    {
+        return $this->expensesChange($currentDate) <= 0 ? 'lime' : 'pink';
+    }
+
+    public function incomeChangeColor(Carbon $currentDate): string
+    {
+        return $this->incomeChange($currentDate) >= 0 ? 'lime' : 'pink';
+    }
+
+    public function balanceChangeColor(Carbon $currentDate): string
+    {
+        return $this->balanceChange($currentDate) >= 0 ? 'lime' : 'pink';
+    }
+
     /**
      * Get the attributes that should be cast.
      *
