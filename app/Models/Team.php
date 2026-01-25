@@ -50,6 +50,14 @@ class Team extends JetstreamTeam
         return $this->hasMany(Transaction::class);
     }
 
+    public function latestTransactionForUser(User $user): ?Transaction
+    {
+        return $this->transactions()
+            ->where('created_by', $user->id)
+            ->latest('created_at')
+            ->first();
+    }
+
     protected function totalBalanceInDollars(): Attribute
     {
         return Attribute::make(

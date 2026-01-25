@@ -45,6 +45,12 @@ new #[Title('Transactions')] class extends Component
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
+
+        $latestTransaction = $this->team->latestTransactionForUser($this->user);
+
+        if ($latestTransaction?->account_id) {
+            $this->account = $latestTransaction->account_id;
+        }
     }
 
     public function addTransaction()
