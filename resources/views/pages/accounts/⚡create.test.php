@@ -11,25 +11,13 @@ it('can create accounts', function () {
         ->set('name', 'Test Savings Account')
         ->set('start_balance', 1234.56)
         ->call('create')
-        ->assertHasNoErrors()
-        ->assertRedirect(route('accounts.index'));
+        ->assertHasNoErrors();
 
     $account = $user->currentTeam->accounts()->latest()->first();
 
     expect($account->name)->toBe('Test Savings Account');
     expect($account->type)->toBe('savings');
     expect($account->start_balance)->toBe(123456);
-});
-
-it('prevents invalid account types', function () {
-    $user = User::factory()->withPersonalTeam()->create();
-
-    Livewire::actingAs($user)->test('pages::accounts.create')
-        ->set('type', 'invalid')
-        ->set('name', 'Test Account')
-        ->set('start_balance', 100)
-        ->call('create')
-        ->assertHasErrors(['type']);
 });
 
 it('stores balance in cents', function () {

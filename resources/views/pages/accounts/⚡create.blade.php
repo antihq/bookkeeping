@@ -9,11 +9,23 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 new #[Title('Add account')] class extends Component {
-    public string $type = 'checking';
-
     public string $name = '';
 
+    public string $type = 'checking';
+
     public string $start_balance = '';
+
+    #[Computed]
+    public function user(): User
+    {
+        return Auth::user();
+    }
+
+    #[Computed]
+    public function team()
+    {
+        return $this->user->currentTeam;
+    }
 
     public function mount()
     {
@@ -35,8 +47,7 @@ new #[Title('Add account')] class extends Component {
             'start_balance' => ['required', 'numeric'],
         ]);
 
-        Account::create([
-            'team_id' => $this->team->id,
+        $account = $this->team->accounts()->create([
             'created_by' => $this->user->id,
             'type' => $this->type,
             'name' => $this->name,
@@ -45,19 +56,7 @@ new #[Title('Add account')] class extends Component {
 
         Flux::toast('Account created successfully.', variant: 'success');
 
-        return $this->redirectRoute('accounts.index', navigate: true);
-    }
-
-    #[Computed]
-    public function team()
-    {
-        return $this->user->currentTeam;
-    }
-
-    #[Computed]
-    public function user(): User
-    {
-        return Auth::user();
+        return $this->redirectRoute('accounts.show', $account, navigate: true);
     }
 };
 ?>

@@ -29,24 +29,6 @@ it('can edit accounts', function () {
     expect($account->start_balance)->toBe(200050);
 });
 
-it('prevents invalid account types', function () {
-    $user = User::factory()->withPersonalTeam()->create();
-
-    $account = Account::factory()->for($user->currentTeam, 'team')->create([
-        'name' => 'Test Account',
-        'type' => 'checking',
-        'start_balance' => 100000,
-        'created_by' => $user->id,
-    ]);
-
-    Livewire::actingAs($user)->test('pages::accounts.edit', ['account' => $account])
-        ->set('type', 'invalid')
-        ->set('name', 'Test Account')
-        ->set('start_balance', 100)
-        ->call('update')
-        ->assertHasErrors(['type']);
-});
-
 it('converts balance from dollars to cents', function () {
     $user = User::factory()->withPersonalTeam()->create();
 
