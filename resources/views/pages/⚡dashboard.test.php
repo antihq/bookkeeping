@@ -159,3 +159,18 @@ it('non-owner non-admin users cannot add transactions', function () {
 it('redirects guests to the login page', function () {
     get('/dashboard')->assertRedirect('/login');
 });
+
+it('can create category', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+
+    Livewire::actingAs($user)
+        ->test('pages::dashboard')
+        ->set('category_search', 'Groceries')
+        ->call('createCategory')
+        ->assertHasNoErrors();
+
+    $category = $user->currentTeam->categories()->where('name', 'Groceries')->first();
+
+    expect($category->name)->toBe('Groceries');
+    expect($category->team_id)->toBe($user->currentTeam->id);
+});
