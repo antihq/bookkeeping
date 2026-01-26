@@ -16,27 +16,93 @@ new #[Title('Account')] class extends Component
 {
     public Account $account;
 
-    public string $date = '';
-
-    public string $payee = '';
-
-    public string $payee_search = '';
-
-    public ?string $note = null;
-
-    public string $amount = '';
-
-    public string $type = 'expense';
-
-    public ?int $category = null;
-
-    public string $category_search = '';
-
     public $page = 1;
 
     public bool $hasTransactions = false;
 
     public string $selectedPeriod = 'this_month';
+
+    public string $amount = '';
+
+    public string $category = '';
+
+    public string $category_search = '';
+
+    public string $date = '';
+
+    public string $note = '';
+
+    public string $payee = '';
+
+    public string $payee_search = '';
+
+    public string $type = 'expense';
+
+    #[Computed]
+    public function user(): User
+    {
+        return Auth::user();
+    }
+
+    #[Computed]
+    public function team(): Team
+    {
+        return $this->account->team;
+    }
+
+    #[Computed]
+    public function transactions()
+    {
+        return $this->account
+            ->transactions()
+            ->forPage($this->page, 5)
+            ->get();
+    }
+
+    #[Computed]
+    public function categories()
+    {
+        return $this->team
+            ->categories()
+            ->when(
+                $this->category_search,
+                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
+            )
+            ->limit(20)
+            ->get();
+    }
+
+    #[Computed]
+    public function payees()
+    {
+        return $this->team
+            ->transactions()
+            ->select('payee')
+            ->when(
+                $this->payee_search,
+                fn ($query) => $query->where('payee', 'like', '%'.$this->payee_search.'%'),
+            )
+            ->distinct()
+            ->get();
+    }
+
+    #[Computed]
+    public function hasMorePages(): bool
+    {
+        return $this->account->transactions()->count() > ($this->page * 5);
+    }
+
+    #[Computed]
+    public function accountBalance(): float
+    {
+        return $this->account->balance_in_dollars;
+    }
+
+    #[Computed]
+    public function selectedMonthDate(): Carbon
+    {
+        return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
+    }
 
     public function mount()
     {
@@ -129,72 +195,6 @@ new #[Title('Account')] class extends Component
     public function updatedAmount($value)
     {
         $this->amount = str_replace(['$', ','], '', $value);
-    }
-
-    #[Computed]
-    public function categories()
-    {
-        return $this->team
-            ->categories()
-            ->when(
-                $this->category_search,
-                fn ($query) => $query->where('name', 'like', '%'.$this->category_search.'%'),
-            )
-            ->limit(20)
-            ->get();
-    }
-
-    #[Computed]
-    public function payees()
-    {
-        return $this->team
-            ->transactions()
-            ->select('payee')
-            ->when(
-                $this->payee_search,
-                fn ($query) => $query->where('payee', 'like', '%'.$this->payee_search.'%'),
-            )
-            ->distinct()
-            ->get();
-    }
-
-    #[Computed]
-    public function team(): Team
-    {
-        return $this->account->team;
-    }
-
-    #[Computed]
-    public function transactions()
-    {
-        return $this->account
-            ->transactions()
-            ->forPage($this->page, 5)
-            ->get();
-    }
-
-    #[Computed]
-    public function user(): User
-    {
-        return Auth::user();
-    }
-
-    #[Computed]
-    public function hasMorePages(): bool
-    {
-        return $this->account->transactions()->count() > ($this->page * 5);
-    }
-
-    #[Computed]
-    public function accountBalance(): float
-    {
-        return $this->account->balance_in_dollars;
-    }
-
-    #[Computed]
-    public function selectedMonthDate(): Carbon
-    {
-        return $this->selectedPeriod === 'this_month' ? now() : now()->subMonth();
     }
 };
 ?>
