@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -166,5 +167,126 @@ class Account extends Model
         return Attribute::make(
             set: fn (string $value) => strtolower($value),
         );
+    }
+
+    public function monthExpenses(Carbon $date): int
+    {
+        return $this->transactions()
+            ->where('amount', '<', 0)
+            ->whereYear('date', $date->year)
+            ->whereMonth('date', $date->month)
+            ->sum('amount');
+    }
+
+    public function monthIncome(Carbon $date): int
+    {
+        return $this->transactions()
+            ->where('amount', '>', 0)
+            ->whereYear('date', $date->year)
+            ->whereMonth('date', $date->month)
+            ->sum('amount');
+    }
+
+    public function monthEndBalance(Carbon $date): int
+    {
+        $monthEnd = $date->copy()->endOfMonth();
+
+        return $this->start_balance +
+            $this->transactions()
+                ->where('date', '<=', $monthEnd)
+                ->sum('amount');
+    }
+
+    public function expensesChange(Carbon $currentDate): int
+    {
+        $previousDate = $currentDate->copy()->subMonth();
+
+        return $this->monthExpenses($currentDate) - $this->monthExpenses($previousDate);
+    }
+
+    public function incomeChange(Carbon $currentDate): int
+    {
+        $previousDate = $currentDate->copy()->subMonth();
+
+        return $this->monthIncome($currentDate) - $this->monthIncome($previousDate);
+    }
+
+    public function balanceChange(Carbon $currentDate): int
+    {
+        $previousDate = $currentDate->copy()->subMonth();
+
+        return $this->monthEndBalance($currentDate) - $this->monthEndBalance($previousDate);
+    }
+
+    public function expensesChangePercentage(Carbon $currentDate): ?float
+    {
+        $previousDate = $currentDate->copy()->subMonth();
+        $previousExpenses = $this->monthExpenses($previousDate);
+
+        if ($previousExpenses === 0) {
+            return null;
+        }
+
+        return (($this->monthExpenses($currentDate) - $previousExpenses) / abs($previousExpenses)) * 100;
+    }
+
+    public function incomeChangePercentage(Carbon $currentDate): ?float
+    {
+        $previousDate = $currentDate->copy()->subMonth();
+        $previousIncome = $this->monthIncome($previousDate);
+
+        if ($previousIncome === 0) {
+            return null;
+        }
+
+        return (($this->monthIncome($currentDate) - $previousIncome) / abs($previousIncome)) * 100;
+    }
+
+    public function balanceChangePercentage(Carbon $currentDate): ?float
+    {
+        $previousDate = $currentDate->copy()->subMonth();
+        $previousBalance = $this->monthEndBalance($previousDate);
+
+        if ($previousBalance === 0) {
+            return null;
+        }
+
+        return (($this->monthEndBalance($currentDate) - $previousBalance) / abs($previousBalance)) * 100;
+    }
+
+    public function expensesChangeFormatted(Carbon $currentDate): string
+    {
+        $change = $this->expensesChange($currentDate) / 100;
+
+        return ($change >= 0 ? '+' : '-').$this->currencySymbol.number_format(abs($change), 2);
+    }
+
+    public function incomeChangeFormatted(Carbon $currentDate): string
+    {
+        $change = $this->incomeChange($currentDate) / 100;
+
+        return ($change >= 0 ? '+' : '-').$this->currencySymbol.number_format(abs($change), 2);
+    }
+
+    public function balanceChangeFormatted(Carbon $currentDate): string
+    {
+        $change = $this->balanceChange($currentDate) / 100;
+
+        return ($change >= 0 ? '+' : '-').$this->currencySymbol.number_format(abs($change), 2);
+    }
+
+    public function expensesChangeColor(Carbon $currentDate): string
+    {
+        return $this->expensesChange($currentDate) <= 0 ? 'lime' : 'pink';
+    }
+
+    public function incomeChangeColor(Carbon $currentDate): string
+    {
+        return $this->incomeChange($currentDate) >= 0 ? 'lime' : 'pink';
+    }
+
+    public function balanceChangeColor(Carbon $currentDate): string
+    {
+        return $this->balanceChange($currentDate) >= 0 ? 'lime' : 'pink';
     }
 }
