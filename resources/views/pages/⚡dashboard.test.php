@@ -174,3 +174,74 @@ it('can create category', function () {
     expect($category->name)->toBe('Groceries');
     expect($category->team_id)->toBe($user->currentTeam->id);
 });
+
+it('can delete transaction', function () {
+    $user = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($user->currentTeam, 'team')->create();
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Coffee Shop',
+            'amount' => -550,
+            'note' => null,
+        ],
+        createdBy: $user,
+    );
+
+    Livewire::actingAs($user)
+        ->test('pages::dashboard')
+        ->call('deleteTransaction', $transaction->id)
+        ->assertHasNoErrors();
+
+    expect($transaction->fresh())->toBeNull();
+});
+
+it('non-owner non-admin users cannot delete transactions', function () {
+    $owner = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($owner->currentTeam, 'team')->create();
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Coffee Shop',
+            'amount' => -550,
+            'note' => null,
+        ],
+        createdBy: $owner,
+    );
+
+    $member = User::factory()->withPersonalTeam()->create();
+    $owner->currentTeam->users()->attach($member, ['role' => 'editor']);
+    $member->currentTeam = $owner->currentTeam;
+
+    Livewire::actingAs($member)
+        ->test('pages::dashboard')
+        ->call('deleteTransaction', $transaction->id)
+        ->assertForbidden();
+
+    expect($transaction->fresh())->not->toBeNull();
+});
+
+it('admin users can delete transactions', function () {
+    $owner = User::factory()->withPersonalTeam()->create();
+    $account = Account::factory()->for($owner->currentTeam, 'team')->create();
+    $transaction = $account->addTransaction(
+        input: [
+            'date' => now()->toDateString(),
+            'payee' => 'Coffee Shop',
+            'amount' => -550,
+            'note' => null,
+        ],
+        createdBy: $owner,
+    );
+
+    $admin = User::factory()->withPersonalTeam()->create();
+    $owner->currentTeam->users()->attach($admin, ['role' => 'admin']);
+    $admin->currentTeam = $owner->currentTeam;
+
+    Livewire::actingAs($admin)
+        ->test('pages::dashboard')
+        ->call('deleteTransaction', $transaction->id)
+        ->assertHasNoErrors();
+
+    expect($transaction->fresh())->toBeNull();
+});
