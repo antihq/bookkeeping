@@ -55,7 +55,7 @@ new #[Title('Account')] class extends Component
     {
         return $this->account
             ->transactions()
-            ->forPage($this->page, 5)
+            ->forPage($this->page, 25)
             ->get();
     }
 
@@ -89,7 +89,7 @@ new #[Title('Account')] class extends Component
     #[Computed]
     public function hasMorePages(): bool
     {
-        return $this->account->transactions()->count() > ($this->page * 5);
+        return $this->account->transactions()->count() > ($this->page * 25);
     }
 
     #[Computed]

@@ -128,7 +128,7 @@ new #[Title('All transactions')] class extends Component
             ->transactions()
             ->with(['account', 'category', 'creator'])
             ->orderBy('date', 'desc')
-            ->forPage($this->page, 5)
+            ->forPage($this->page, 25)
             ->get();
     }
 
@@ -180,7 +180,7 @@ new #[Title('All transactions')] class extends Component
     #[Computed]
     public function hasMorePages(): bool
     {
-        return $this->team->transactions()->count() > ($this->page * 5);
+        return $this->team->transactions()->count() > ($this->page * 25);
     }
 };
 ?>
